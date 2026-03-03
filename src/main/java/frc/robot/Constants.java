@@ -4,10 +4,19 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RPM;
+
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.units.measure.AngularVelocity;
 
 /** Add your docs here. */
 public class Constants {
+    // General constants
+    public static class KrakenX60 {
+        public static final AngularVelocity kFreeSpeed = RPM.of(6000);
+     }
+
     // Constants for Hopper subsystem
     public static final int RIGHT_PPT_ID = 25;
     public static final int LEFT_PPT_ID = 15;
