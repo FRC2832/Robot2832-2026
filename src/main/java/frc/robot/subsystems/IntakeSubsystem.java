@@ -13,11 +13,10 @@ import frc.robot.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
     /** Creates a new IntakeSubsystem. */
-    private SparkFlex intakeMotor;
+
     private TalonFX intakeInternalRotatorMotor, intakeExtenderMotor;
 
     public IntakeSubsystem() {
-        intakeMotor = new SparkFlex(Constants.INTAKE_ID, Constants.INTAKE_MOTOR_TYPE);
         intakeInternalRotatorMotor = new TalonFX(Constants.INTAKE_INTERNAL_ROTATOR_ID);
         intakeExtenderMotor = new TalonFX(Constants.INTAKE_EXTENDER_ID);
     }

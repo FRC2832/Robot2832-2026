@@ -17,6 +17,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -25,12 +26,14 @@ import frc.robot.Constants.KrakenX60;
 public class HopperSubsystem extends SubsystemBase {
     /** Creates a new HopperSubsystem. */
     private TalonFX rightPPT, leftPPT, accelerator;
+    private SparkFlex indexer;
     private final MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0).withSlot(0);
 
     public HopperSubsystem() {
         rightPPT = new TalonFX(Constants.RIGHT_PPT_ID);
         leftPPT = new TalonFX(Constants.LEFT_PPT_ID);
         accelerator = new TalonFX(Constants.ACCELERATOR_ID);
+        indexer = new SparkFlex(Constants.INDEXER_ID, Constants.INDEXER_MOTOR_TYPE);
 
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants

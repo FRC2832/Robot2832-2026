@@ -21,12 +21,13 @@ public class Constants {
     public static final int RIGHT_PPT_ID = 25;
     public static final int LEFT_PPT_ID = 15;
     public static final int ACCELERATOR_ID = 27;
+    public static final int INDEXER_ID = 17;
+    public static final MotorType INDEXER_MOTOR_TYPE = MotorType.kBrushless;
 
     // Constants for Intake subsystem
-    public static final int INTAKE_ID = 17;
     public static final int INTAKE_INTERNAL_ROTATOR_ID = 19;
     public static final int INTAKE_EXTENDER_ID = 18;
-    public static final MotorType INTAKE_MOTOR_TYPE = MotorType.kBrushless;
+    
 
     // Constants for Shooter subsytem
     public static final int LEFT_SHOOTER_ID = 14;
