@@ -65,10 +65,13 @@ public class VisionSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     leftResults = estimatePose(leftCam, leftCamSim, leftPoseEstimator);
     rightResults = estimatePose(rightCam, rightCamSim, rightPoseEstimator);
+    /*
     RobotContainer.logger.updateCameraDetections();
     if(Robot.isSimulation()){
       visionSim.update(RobotContainer.drivetrain.getPose());
     }
+    */
+    
   }
 
   public List<PhotonPipelineResult> estimatePose(PhotonCamera cam, PhotonCameraSim camSim, PhotonPoseEstimator estimator){
@@ -82,7 +85,7 @@ public class VisionSubsystem extends SubsystemBase {
         continue;
       EstimatedRobotPose est = maybeEst.get();
       //TODO add camera std dev
-      RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
+      // RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
     }
     return results;
   }
