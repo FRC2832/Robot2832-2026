@@ -68,6 +68,8 @@ public class VisionSubsystem extends SubsystemBase {
     if(Robot.isSimulation()){
       visionSim.update(RobotContainer.drivetrain.getState().Pose);
     }
+    */
+    
   }
 
   public List<PhotonPipelineResult> estimatePose(PhotonCamera cam, PhotonCameraSim camSim, PhotonPoseEstimator estimator){
@@ -81,7 +83,7 @@ public class VisionSubsystem extends SubsystemBase {
         continue;
       EstimatedRobotPose est = maybeEst.get();
       //TODO add camera std dev
-      RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
+      // RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
     }
     return results;
   }
