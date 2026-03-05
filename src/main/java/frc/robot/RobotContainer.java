@@ -41,7 +41,7 @@ public class RobotContainer {
 
     // Variables added in non-swerve project creation
     private double speedMultiplier = 1.0;
-    public double leftTriggerVal = driverController.getLeftTriggerAxis();
+    // public double leftTriggerVal = driverController.getLeftTriggerAxis();
 
     public RobotContainer() {
         configureBindings();
@@ -84,7 +84,7 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // Speed control keys (Variable speed control)
-        driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis()));
+        driverController.leftTrigger(0.15).whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
         // driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 0.7)); // Turtle
         // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4)); // Snail
     }

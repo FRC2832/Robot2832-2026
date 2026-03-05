@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -12,11 +13,13 @@ public class DriveSpeedCMDs extends Command {
     /** Creates a new DriveSpeedCMDs. */
     private RobotContainer rc;
     private double multiplier;
+    private CommandXboxController driverController;
 
-    public DriveSpeedCMDs(RobotContainer rc, double multiplier) {
+    public DriveSpeedCMDs(RobotContainer rc, double multiplier, CommandXboxController driverController) {
         // Use addRequirements() here to declare subsystem dependencies.
         this.rc = rc;
         this.multiplier = multiplier;
+        this.driverController = driverController;
     }
 
     // Called when the command is initially scheduled.
@@ -28,11 +31,13 @@ public class DriveSpeedCMDs extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if ((1.0 - rc.leftTriggerVal) > 0.4) {
-            rc.setSpeedMultiplier(1.0 - rc.leftTriggerVal);
-            // TODO: Remove line when done testing
-            System.out.println("TriggerVal:" + (1.0 - rc.leftTriggerVal));
+        if ((1.0 - driverController.getLeftTriggerAxis()) > 0.15) {
+            rc.setSpeedMultiplier(1.0 - driverController.getLeftTriggerAxis() * 0.75);
+            System.out.println("Trigger Val" + driverController.getLeftTriggerAxis());
+        } else {
+            rc.setSpeedMultiplier(0.5);
         }
+
     }
 
     // Called once the command ends or is interrupted.
