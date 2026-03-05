@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.RPM;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.units.measure.AngularVelocity;
+import com.ctre.phoenix6.CANBus;
+
 
 /** Add your docs here. */
 public class Constants {
@@ -39,5 +41,7 @@ public class Constants {
     public static final int LEFT_ROTATOR_CANCODER_ID = 4;
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
 
+    // Other CAN ID Constants
+    public static final CANBus CANivoreCANBus = new CANBus("CANIvore");
 
 }
