@@ -68,7 +68,6 @@ public class VisionSubsystem extends SubsystemBase {
     if(Robot.isSimulation()){
       visionSim.update(RobotContainer.drivetrain.getState().Pose);
     }
-    */
     
   }
 

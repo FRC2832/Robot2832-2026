@@ -18,6 +18,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.HopperSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
@@ -41,7 +45,12 @@ public class RobotContainer {
 
     // Variables added in non-swerve project creation
     private double speedMultiplier = 1.0;
-    // public double leftTriggerVal = driverController.getLeftTriggerAxis();
+
+    // Subsytem declaration
+    private final HopperSubsystem hopperSubsystem = new HopperSubsystem();
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
     public RobotContainer() {
         configureBindings();
@@ -52,12 +61,20 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with
-                                                                                                   // negative Y
-                                                                                                   // (forward)
-                        .withVelocityY(-driverController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate * speedMultiplier) // Drive counterclockwise with
-                                                                                    // negative X (left)
+                drivetrain.applyRequest(
+                        () -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed * speedMultiplier) // Drive
+                                                                                                             // forward
+                                                                                                             // with
+                                // negative Y
+                                // (forward)
+                                .withVelocityY(-driverController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left
+                                                                                                          // with
+                                                                                                          // negative X
+                                                                                                          // (left)
+                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate * speedMultiplier) // Drive
+                                                                                                                      // counterclockwise
+                                                                                                                      // with
+                // negative X (left)
                 ));
 
         // Idle while the robot is disabled. This ensures the configured
@@ -68,7 +85,8 @@ public class RobotContainer {
 
         driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driverController.b().whileTrue(drivetrain.applyRequest(
-                () -> point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))));
+                () -> point.withModuleDirection(
+                        new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -84,9 +102,12 @@ public class RobotContainer {
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // Speed control keys (Variable speed control)
-        driverController.leftTrigger(0.15).whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
-        // driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 0.7)); // Turtle
-        // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4)); // Snail
+        driverController.leftTrigger(0.15)
+                .whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
+        // driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 0.7));
+        // // Turtle
+        // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4));
+        // // Snail
     }
 
     public Command getAutonomousCommand() {
