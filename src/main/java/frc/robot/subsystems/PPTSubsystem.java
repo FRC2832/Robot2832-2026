@@ -27,34 +27,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.KrakenX60;
 
-public class HopperSubsystem extends SubsystemBase {
+public class PPTSubsystem extends SubsystemBase {
     /** Creates a new HopperSubsystem. */
 
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
-    public enum IndexerSpeed {
+
+    public enum Speed {
         STOP(0),
         FORWARD(.8),
         REVERSE(-.8);
 
         private final double percentOutput;
 
-        private IndexerSpeed(double percentOutput) {
-            this.percentOutput = percentOutput;
-        }
-
-        public Voltage voltage() {
-            return Volts.of(percentOutput * 12.0);
-        }
-    }
-
-    public enum PPTSpeed {
-        STOP(0),
-        FORWARD(.8),
-        REVERSE(-.8);
-
-        private final double percentOutput;
-
-        private PPTSpeed(double percentOutput) {
+        private Speed(double percentOutput) {
             this.percentOutput = percentOutput;
         }
 
@@ -66,16 +51,13 @@ public class HopperSubsystem extends SubsystemBase {
     // -------------------------------------------------------
 
     private TalonFX rightPPT, leftPPT;
-    private SparkFlex indexer;
 
     private final VoltageOut rightPPTVoltageRequest = new VoltageOut(0);
     private final VoltageOut leftPPTVoltageRequest = new VoltageOut(0);
 
-    public HopperSubsystem() {
+    public PPTSubsystem() {
         rightPPT = new TalonFX(Constants.RIGHT_PPT_ID, Constants.CANivoreCANBus); 
         leftPPT = new TalonFX(Constants.LEFT_PPT_ID, Constants.CANivoreCANBus);
-
-        indexer = new SparkFlex(Constants.INDEXER_ID, Constants.INDEXER_MOTOR_TYPE); // I don't configure this motor.
 
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
@@ -113,34 +95,27 @@ public class HopperSubsystem extends SubsystemBase {
     }
 
     // Speed controls ----------------------------------
-    /** Sets the speed of BOTH PPT motors. */ 
-    public void setPPTSpeed(PPTSpeed speed) {
+    public void setPPTSpeed(Speed rightSpeed, Speed leftSpeed) {
         rightPPT.setControl(
             rightPPTVoltageRequest
-                .withOutput(speed.voltage())
+                .withOutput(rightSpeed.voltage())
         );
         leftPPT.setControl(
             leftPPTVoltageRequest
-                .withOutput(speed.voltage())
+                .withOutput(leftSpeed.voltage())
         );
     }
 
-    public void setIndexerSpeed(IndexerSpeed speed){
-        indexer.setVoltage(speed.voltage());
-    }
-
     // ---------------------------------------------------
-
     // COMMANDS ------------------------------------------
+
     public Command deliverCommand() {
         return startEnd(
             () -> {
-                setIndexerSpeed(IndexerSpeed.FORWARD);
-                setPPTSpeed(PPTSpeed.FORWARD);
+                setPPTSpeed(Speed.FORWARD, Speed.FORWARD);
             },
             () -> {
-                setIndexerSpeed(IndexerSpeed.STOP);
-                setPPTSpeed(PPTSpeed.STOP);
+                setPPTSpeed(Speed.STOP,Speed.STOP);
             }
         );
     }
@@ -148,15 +123,14 @@ public class HopperSubsystem extends SubsystemBase {
     public Command reverseDeliverCommand() {
         return startEnd(
             () -> {
-                setIndexerSpeed(IndexerSpeed.REVERSE);
-                setPPTSpeed(PPTSpeed.REVERSE);
+                setPPTSpeed(Speed.REVERSE, Speed.REVERSE);
             },
-            () ->  {
-                setIndexerSpeed(IndexerSpeed.STOP);
-                setPPTSpeed(PPTSpeed.STOP);
+            () -> {
+                setPPTSpeed(Speed.STOP,Speed.STOP);
             }
         );
     }
+
 
     //--------------------------------------------------------
 

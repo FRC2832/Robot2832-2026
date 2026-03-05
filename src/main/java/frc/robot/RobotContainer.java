@@ -19,8 +19,9 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.HopperSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PPTSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
@@ -44,7 +45,8 @@ public class RobotContainer {
 
     // Subsystem instantiation
     public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    public final HopperSubsystem hopperSubsystem = new HopperSubsystem();
+    public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+    public final PPTSubsystem pptSubsystem = new PPTSubsystem();
 
 
     public RobotContainer() {
@@ -88,12 +90,13 @@ public class RobotContainer {
 
 
         // Operator controls
-        operatorController.rightBumper().whileTrue(hopperSubsystem.deliverCommand());
-        operatorController.leftBumper().whileTrue(hopperSubsystem.reverseDeliverCommand());
+        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
+        operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
         
         operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
         operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
-        //operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
+        // TODO: Check the button binds on this because I can't seem to find the select button.
+        operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
 
     }
 
