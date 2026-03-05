@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
+import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -39,6 +39,10 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    // Variables added in non-swerve project creation
+    private double speedMultiplier = 1.0;
+    public double leftTriggerVal = driverController.getLeftTriggerAxis();
+
     public RobotContainer() {
         configureBindings();
     }
@@ -48,11 +52,11 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with
+                drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed * speedMultiplier) // Drive forward with
                                                                                                    // negative Y
                                                                                                    // (forward)
-                        .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with
+                        .withVelocityY(-driverController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left with negative X (left)
+                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate * speedMultiplier) // Drive counterclockwise with
                                                                                     // negative X (left)
                 ));
 
@@ -73,10 +77,16 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+        // TODO: Test if this works to actually reset field orientation
         // Reset the field-centric heading on start press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        // Speed control keys (Variable speed control)
+        driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis()));
+        // driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 0.7)); // Turtle
+        // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4)); // Snail
     }
 
     public Command getAutonomousCommand() {
@@ -93,5 +103,10 @@ public class RobotContainer {
                         .withTimeout(5.0),
                 // Finally idle for the rest of auton
                 drivetrain.applyRequest(() -> idle));
+    }
+
+    // Used in DriveSpeedCMDs to set speedMultiplier
+    public void setSpeedMultiplier(double multiplier) {
+        speedMultiplier = multiplier;
     }
 }
