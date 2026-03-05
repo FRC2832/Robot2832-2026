@@ -65,9 +65,8 @@ public class VisionSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     leftResults = estimatePose(leftCam, leftCamSim, leftPoseEstimator);
     rightResults = estimatePose(rightCam, rightCamSim, rightPoseEstimator);
-    RobotContainer.logger.updateCameraDetections();
     if(Robot.isSimulation()){
-      visionSim.update(RobotContainer.drivetrain.getPose());
+      visionSim.update(RobotContainer.drivetrain.getState().Pose);
     }
   }
 
