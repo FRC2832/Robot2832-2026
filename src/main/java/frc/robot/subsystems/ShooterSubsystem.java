@@ -23,47 +23,51 @@ import frc.robot.Constants.KrakenX60;
 
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
-    private TalonFX rightShooterMotor, leftShooterMotor;
+    private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
 
     public ShooterSubsystem() {
         rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID);
         leftShooterMotor = new TalonFX(Constants.LEFT_SHOOTER_ID);
+        accelerator = new TalonFX(Constants.ACCELERATOR_ID);
 
         // TODO: Figure out inversion state of motors
-        // Confirm appropriate inversion, voltage limits, current limits, and PID constants
+        // Confirm appropriate inversion, voltage limits, current limits, and PID
+        // constants
         configureMotor(rightShooterMotor, InvertedValue.CounterClockwise_Positive);
         configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
+        configureMotor(accelerator, InvertedValue.Clockwise_Positive);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
         final TalonFXConfiguration config = new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(invertDirection)
-                    .withNeutralMode(NeutralModeValue.Coast)
-            )
-            .withVoltage(
-                new VoltageConfigs()
-                    .withPeakReverseVoltage(Volts.of(0))
-            )
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(40))
-                    .withSupplyCurrentLimitEnable(true)
-            )
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(0.5)
-                    .withKI(2)
-                    .withKD(0)
-                    .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
-            );
-            motor.getConfigurator().apply(config);
+                .withMotorOutput(
+                        new MotorOutputConfigs()
+                                .withInverted(invertDirection)
+                                .withNeutralMode(NeutralModeValue.Coast))
+                .withVoltage(
+                        new VoltageConfigs()
+                                .withPeakReverseVoltage(Volts.of(0)))
+                .withCurrentLimits(
+                        new CurrentLimitsConfigs()
+                                .withStatorCurrentLimit(Amps.of(60))
+                                .withStatorCurrentLimitEnable(true)
+                                .withSupplyCurrentLimit(Amps.of(40))
+                                .withSupplyCurrentLimitEnable(true))
+                .withSlot0(
+                        new Slot0Configs()
+                                .withKP(0.5)
+                                .withKI(2)
+                                .withKD(0)
+                                .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting
+                                                                                            // max RPS
+                );
+        motor.getConfigurator().apply(config);
     }
 
-    public void setMotorSpeed(double speed) {
+    public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
+        rightShooterMotor.set(rightSpeed);
+        leftShooterMotor.set(leftSpeed);
+        accelerator.set(accelSpeed);
 
     }
 
