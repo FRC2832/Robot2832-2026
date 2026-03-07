@@ -13,6 +13,8 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.AngularVelocity;
+import com.ctre.phoenix6.CANBus;
+
 
 
 
@@ -45,6 +47,8 @@ public class Constants {
     public static final int LEFT_ROTATOR_CANCODER_ID = 4;
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
 
+    // Other CAN ID Constants
+    public static final CANBus CANivoreCANBus = new CANBus("CANIvore");
     public static final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     
     public static final Transform3d leftCamPose = new Transform3d(.01905, .31115, .5334, new Rotation3d(0, 25*Math.PI/180, 90*Math.PI/180));

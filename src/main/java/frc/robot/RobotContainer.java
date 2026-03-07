@@ -4,7 +4,9 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -15,18 +17,20 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.DriveSpeedCMDs;
+
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.HopperSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PPTSubsystem;
+import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
+    private double MaxSpeed = 0.5 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
                                                                                         // speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
+    private double MaxAngularRate = 0.8 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
                                                                                       // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -47,10 +51,12 @@ public class RobotContainer {
     private double speedMultiplier = 1.0;
 
     // Subsytem declaration
-    private final HopperSubsystem hopperSubsystem = new HopperSubsystem();
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final TurretSubsystem turretSubsystem = new TurretSubsystem();
+    public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
+    public final PPTSubsystem pptSubsystem = new PPTSubsystem();
+
 
     public RobotContainer() {
         configureBindings();
@@ -101,6 +107,19 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
+
+        // Operator controls
+        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
+        operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
+        
+        operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
+        operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
+        operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
+        operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
+
+        // Default Commands
+        indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
+
         // Speed control keys (Variable speed control)
         driverController.leftTrigger(0.15)
                 .whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
@@ -108,6 +127,8 @@ public class RobotContainer {
         // // Turtle
         // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4));
         // // Snail
+        driverController.y().toggleOnTrue(RobotContainer.drivetrain.applyRequest(() -> brake));
+        
     }
 
     public Command getAutonomousCommand() {

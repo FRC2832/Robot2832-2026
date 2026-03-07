@@ -13,11 +13,18 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.KrakenX60;
@@ -26,12 +33,16 @@ public class TurretSubsystem extends SubsystemBase {
     /** Creates a new TurretSubsystem. */
     private TalonFX leftRotationMotor, rightRotationMotor;
     private CANcoder leftCANcoder, rightCANcoder;
+    private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
     public TurretSubsystem() {
         leftRotationMotor = new TalonFX(Constants.LEFT_ROTATOR_ID);
         rightRotationMotor = new TalonFX(Constants.RIGHT_ROTATOR_ID);
         leftCANcoder = new CANcoder(Constants.LEFT_ROTATOR_CANCODER_ID);
         rightCANcoder = new CANcoder(Constants.RIGHT_ROTATOR_CANCODER_ID);
+
+        leftRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
+        rightRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
 
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
@@ -67,8 +78,9 @@ public class TurretSubsystem extends SubsystemBase {
             motor.getConfigurator().apply(config);
     }
 
-    public void setAngle(double angle) {
-        
+    public void setAngle(double leftAngle, double rightAngle) {
+        leftRotationMotor.setControl(motionMagicRequest.withPosition(Angle.ofRelativeUnits(leftAngle, Units.Degrees)));
+        rightRotationMotor.setControl(motionMagicRequest.withPosition(Angle.ofRelativeUnits(rightAngle, Units.Degrees)));
     }
 
     @Override
