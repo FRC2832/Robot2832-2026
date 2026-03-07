@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.wpilibj.Servo;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -35,11 +36,18 @@ public class TurretSubsystem extends SubsystemBase {
     private CANcoder leftCANcoder, rightCANcoder;
     private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
+    // Should the hood be a seperate subsystem is question of the century. Tyros have it as a seperate subsytem.
+    private final Servo leftHoodServo;
+    private final Servo rightHoodServo;
+
     public TurretSubsystem() {
         leftRotationMotor = new TalonFX(Constants.LEFT_ROTATOR_ID);
         rightRotationMotor = new TalonFX(Constants.RIGHT_ROTATOR_ID);
         leftCANcoder = new CANcoder(Constants.LEFT_ROTATOR_CANCODER_ID);
         rightCANcoder = new CANcoder(Constants.RIGHT_ROTATOR_CANCODER_ID);
+
+        leftHoodServo = new Servo(Constants.LEFT_SERVO_ID);
+        rightHoodServo = new Servo(Constants.RIGHT_SERVO_ID);
 
         leftRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
         rightRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
@@ -78,9 +86,14 @@ public class TurretSubsystem extends SubsystemBase {
             motor.getConfigurator().apply(config);
     }
 
-    public void setAngle(double leftAngle, double rightAngle) {
+    public void setTurretAngle(double leftAngle, double rightAngle) {
         leftRotationMotor.setControl(motionMagicRequest.withPosition(Angle.ofRelativeUnits(leftAngle, Units.Degrees)));
         rightRotationMotor.setControl(motionMagicRequest.withPosition(Angle.ofRelativeUnits(rightAngle, Units.Degrees)));
+    }
+
+    // TODO: make this work :)
+    public void setHoodAngle(double leftAngle, double rightAngle) {
+        return;
     }
 
     @Override
