@@ -52,7 +52,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public enum Position {
         // FIXME: This is wrong - See what the real life values should be. Genuinely do not run the code like this it will NOT be pretty. VS code only has todo but this is like a death siren.
-        HOMED(110),
+        // HOMED(110),
         STOWED(100),
         INTAKE(-4);
 
@@ -116,7 +116,7 @@ public class IntakeSubsystem extends SubsystemBase {
             motor.getConfigurator().apply(config);
     }
 
-    // --------------------------------------------------
+    // ------------------------------------------------------------------
     // ACTUAL FUNCTIONS -------------------------------------------------
 
     // QUESTION: Do we want a manual override for intake position ????????
@@ -142,16 +142,16 @@ public class IntakeSubsystem extends SubsystemBase {
             () -> {
                 setIntakePosition(Position.INTAKE);
             },
-            () -> setIntakePosition(Position.INTAKE) //what is the pass equivalent. return isn't working. can I just leave it empty.
+            () -> setIntakePosition(Position.INTAKE) // what is the pass equivalent. return isn't working. can I just leave it empty.
         );
     }
 
     public Command retractIntakeCommand() {
         return startEnd(
             () -> {
-                setIntakePosition(Position.INTAKE);
+                setIntakePosition(Position.STOWED);
             },
-            () -> setIntakePosition(Position.INTAKE)
+            () -> setIntakePosition(Position.STOWED)
         );
     }
 

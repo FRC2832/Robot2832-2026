@@ -95,8 +95,11 @@ public class RobotContainer {
         
         operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
         operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
-        // TODO: Check the button binds on this because I can't seem to find the select button.
         operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
+        operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
+
+        // Default Commands
+        indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
 
     }
 
