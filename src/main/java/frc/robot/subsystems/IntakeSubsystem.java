@@ -36,8 +36,8 @@ public class IntakeSubsystem extends SubsystemBase {
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
      public enum Speed {
         STOP(0),
-        INTAKE(0.8),
-        REVERSE(-0.8);
+        INTAKE(0.2),
+        REVERSE(-0.2);
 
         private final double percentOutput;
 
@@ -139,36 +139,28 @@ public class IntakeSubsystem extends SubsystemBase {
     
     public Command extendIntakeCommand() {
         return startEnd(
-            () -> {
-                setIntakePosition(Position.INTAKE);
-            },
-            () -> setIntakePosition(Position.INTAKE) // what is the pass equivalent. return isn't working. can I just leave it empty.
+            () -> setIntakePosition(Position.INTAKE),
+            () -> {}
         );
     }
 
     public Command retractIntakeCommand() {
         return startEnd(
-            () -> {
-                setIntakePosition(Position.STOWED);
-            },
-            () -> setIntakePosition(Position.STOWED)
+            () -> setIntakePosition(Position.STOWED),
+            () -> {}
         );
     }
 
     public Command runIntakeCommand() {
         return startEnd(
-            () -> {
-                setIntakeSpeed(Speed.INTAKE);
-            },
+            () -> setIntakeSpeed(Speed.INTAKE),
             () -> setIntakeSpeed(Speed.STOP)
         );
     }
 
     public Command reverseIntakeCommand() {
         return startEnd(
-            () -> {
-                setIntakeSpeed(Speed.REVERSE);
-            },
+            () -> setIntakeSpeed(Speed.REVERSE),
             () -> setIntakeSpeed(Speed.STOP)
         );
     }

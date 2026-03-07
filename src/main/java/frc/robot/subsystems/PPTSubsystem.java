@@ -31,8 +31,8 @@ public class PPTSubsystem extends SubsystemBase {
 
     public enum Speed {
         STOP(0),
-        FORWARD(.8),
-        REVERSE(-.8);
+        FORWARD(0.2),
+        REVERSE(-0.2);
 
         private final double percentOutput;
 
@@ -108,23 +108,15 @@ public class PPTSubsystem extends SubsystemBase {
 
     public Command deliverCommand() {
         return startEnd(
-            () -> {
-                setPPTSpeed(Speed.FORWARD, Speed.FORWARD);
-            },
-            () -> {
-                setPPTSpeed(Speed.STOP,Speed.STOP);
-            }
+            () -> setPPTSpeed(Speed.FORWARD, Speed.FORWARD),
+            () -> setPPTSpeed(Speed.STOP,Speed.STOP)
         );
     }
 
     public Command reverseDeliverCommand() {
         return startEnd(
-            () -> {
-                setPPTSpeed(Speed.REVERSE, Speed.REVERSE);
-            },
-            () -> {
-                setPPTSpeed(Speed.STOP,Speed.STOP);
-            }
+            () -> setPPTSpeed(Speed.REVERSE, Speed.REVERSE),
+            () -> setPPTSpeed(Speed.STOP,Speed.STOP)
         );
     }
 

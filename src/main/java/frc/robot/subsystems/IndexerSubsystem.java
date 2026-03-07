@@ -19,8 +19,8 @@ public class IndexerSubsystem extends SubsystemBase {
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
     public enum Speed {
         STOP(0),
-        FORWARD(.8),
-        REVERSE(-.8);
+        FORWARD(0.2),
+        REVERSE(-0.2);
 
         private final double percentOutput;
 
@@ -53,23 +53,15 @@ public class IndexerSubsystem extends SubsystemBase {
     // TODO: This should be made the default command but since we're only doing subsystem setup right now I didn't do that.
     public Command deliverCommand() {
         return startEnd(
-            () -> {
-                setIndexerSpeed(Speed.FORWARD);
-            },
-            () -> {
-                setIndexerSpeed(Speed.STOP);
-            }
+            () -> setIndexerSpeed(Speed.FORWARD),
+            () -> setIndexerSpeed(Speed.STOP)
         );
     }
 
     public Command reverseDeliverCommand() {
         return startEnd(
-            () -> {
-                setIndexerSpeed(Speed.REVERSE);
-            },
-            () ->  {
-                setIndexerSpeed(Speed.STOP);
-            }
+            () -> setIndexerSpeed(Speed.REVERSE),
+            () -> setIndexerSpeed(Speed.STOP)
         );
     }
 
