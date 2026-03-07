@@ -36,10 +36,10 @@ public class TurretSubsystem extends SubsystemBase {
     private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
     public TurretSubsystem() {
-        leftRotationMotor = new TalonFX(Constants.LEFT_ROTATOR_ID);
-        rightRotationMotor = new TalonFX(Constants.RIGHT_ROTATOR_ID);
-        leftCANcoder = new CANcoder(Constants.LEFT_ROTATOR_CANCODER_ID);
-        rightCANcoder = new CANcoder(Constants.RIGHT_ROTATOR_CANCODER_ID);
+        leftRotationMotor = new TalonFX(Constants.LEFT_ROTATOR_ID, Constants.CANivoreCANBus);
+        rightRotationMotor = new TalonFX(Constants.RIGHT_ROTATOR_ID, Constants.CANivoreCANBus);
+        leftCANcoder = new CANcoder(Constants.LEFT_ROTATOR_CANCODER_ID, Constants.CANivoreCANBus);
+        rightCANcoder = new CANcoder(Constants.RIGHT_ROTATOR_CANCODER_ID, Constants.CANivoreCANBus);
 
         leftRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
         rightRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));

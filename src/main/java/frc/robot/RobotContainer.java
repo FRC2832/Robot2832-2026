@@ -9,6 +9,9 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import com.revrobotics.util.StatusLogger;
+import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -59,6 +62,9 @@ public class RobotContainer {
 
 
     public RobotContainer() {
+        // PathPlannerLogging.clearLoggingCallbacks();
+        // SignalLogger.enableAutoLogging(false);
+        // StatusLogger.disableAutoLogging();
         configureBindings();
     }
 
@@ -112,10 +118,10 @@ public class RobotContainer {
         operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
         
-        operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
-        operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
-        operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
-        operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
+        operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
+        operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
+        //operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
+        //operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
 
         // Default Commands
         indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());

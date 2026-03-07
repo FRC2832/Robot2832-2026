@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -53,17 +54,17 @@ public class IntakeSubsystem extends SubsystemBase {
     public enum Position {
         // FIXME: This is wrong - See what the real life values should be. Genuinely do not run the code like this it will NOT be pretty. VS code only has todo but this is like a death siren.
         // HOMED(110),
-        STOWED(100),
-        INTAKE(-4);
+        STOWED(5),
+        INTAKE(1);
 
-        private final double degrees;
+        private final double rotations;
 
-        private Position(double degrees) {
-            this.degrees = degrees;
+        private Position(double rotations) {
+            this.rotations = rotations;
         }
 
         public Angle angle() {
-            return Degrees.of(degrees);
+            return Rotations.of(rotations);
         }
     }
 
@@ -81,7 +82,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
-        configureMotor(intakeInternalRotatorMotor, InvertedValue.CounterClockwise_Positive);
+        configureMotor(intakeInternalRotatorMotor, InvertedValue.Clockwise_Positive);
         configureMotor(intakeExtenderMotor, InvertedValue.CounterClockwise_Positive); // inverted
 
         SmartDashboard.putData(this); 
@@ -95,10 +96,10 @@ public class IntakeSubsystem extends SubsystemBase {
                     .withInverted(invertDirection)
                     .withNeutralMode(NeutralModeValue.Coast)
             )
-            .withVoltage(
-                new VoltageConfigs()
-                    .withPeakReverseVoltage(Volts.of(0))
-            )
+            // .withVoltage(
+            //     new VoltageConfigs()
+            //         .withPeakReverseVoltage(Volts.of(0))
+            // )
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))

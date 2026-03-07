@@ -6,7 +6,12 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkBaseConfigAccessor;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,8 +24,8 @@ public class IndexerSubsystem extends SubsystemBase {
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
     public enum Speed {
         STOP(0),
-        FORWARD(0.2),
-        REVERSE(-0.2);
+        FORWARD(0.1),
+        REVERSE(-0.1);
 
         private final double percentOutput;
 
@@ -39,6 +44,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public IndexerSubsystem() {
         indexer = new SparkFlex(Constants.INDEXER_ID, Constants.INDEXER_MOTOR_TYPE); // I don't configure this motor.
+        indexer.configure(new SparkFlexConfig().inverted(true), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
 

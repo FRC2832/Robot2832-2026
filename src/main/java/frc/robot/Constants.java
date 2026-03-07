@@ -48,7 +48,7 @@ public class Constants {
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
 
     // Other CAN ID Constants
-    public static final CANBus CANivoreCANBus = new CANBus("CANIvore");
+    public static final CANBus CANivoreCANBus = new CANBus("CANivore");
     public static final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     
     public static final Transform3d leftCamPose = new Transform3d(.01905, .31115, .5334, new Rotation3d(0, 25*Math.PI/180, 90*Math.PI/180));

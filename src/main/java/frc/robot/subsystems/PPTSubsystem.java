@@ -58,7 +58,7 @@ public class PPTSubsystem extends SubsystemBase {
 
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
-        configureMotor(rightPPT, InvertedValue.CounterClockwise_Positive);
+        configureMotor(rightPPT, InvertedValue.Clockwise_Positive);
         configureMotor(leftPPT, InvertedValue.CounterClockwise_Positive); // inverted
     }
 
@@ -70,10 +70,10 @@ public class PPTSubsystem extends SubsystemBase {
                     .withInverted(invertDirection)
                     .withNeutralMode(NeutralModeValue.Coast)
             )
-            .withVoltage(
-                new VoltageConfigs()
-                    .withPeakReverseVoltage(Volts.of(0))
-            )
+            // .withVoltage(
+            //     new VoltageConfigs()
+            //         .withPeakReverseVoltage(Volts.of(0))
+            // )
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))

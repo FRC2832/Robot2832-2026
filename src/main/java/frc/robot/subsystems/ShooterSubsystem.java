@@ -26,9 +26,9 @@ public class ShooterSubsystem extends SubsystemBase {
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
 
     public ShooterSubsystem() {
-        rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID);
-        leftShooterMotor = new TalonFX(Constants.LEFT_SHOOTER_ID);
-        accelerator = new TalonFX(Constants.ACCELERATOR_ID);
+        rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID, Constants.CANivoreCANBus);
+        leftShooterMotor = new TalonFX(Constants.LEFT_SHOOTER_ID, Constants.CANivoreCANBus);
+        accelerator = new TalonFX(Constants.ACCELERATOR_ID, Constants.CANivoreCANBus);
 
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID
