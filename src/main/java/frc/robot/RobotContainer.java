@@ -51,12 +51,8 @@ public class RobotContainer {
     private double speedMultiplier = 1.0;
 
     // Subsytem declaration
-    private final HopperSubsystem hopperSubsystem = new HopperSubsystem();
-    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
     private final TurretSubsystem turretSubsystem = new TurretSubsystem();
-
-    // Subsystem instantiation
     public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
     public final PPTSubsystem pptSubsystem = new PPTSubsystem();
