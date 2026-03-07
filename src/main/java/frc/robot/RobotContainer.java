@@ -24,9 +24,9 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
+    private double MaxSpeed = 0.5 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
                                                                                         // speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
+    private double MaxAngularRate = 0.8 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
                                                                                       // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -108,6 +108,8 @@ public class RobotContainer {
         // // Turtle
         // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4));
         // // Snail
+        driverController.y().toggleOnTrue(RobotContainer.drivetrain.applyRequest(() -> brake));
+        
     }
 
     public Command getAutonomousCommand() {
