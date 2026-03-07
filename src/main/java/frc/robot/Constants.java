@@ -8,8 +8,14 @@ import static edu.wpi.first.units.Units.RPM;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.AngularVelocity;
 import com.ctre.phoenix6.CANBus;
+
+
 
 
 /** Add your docs here. */
@@ -43,5 +49,11 @@ public class Constants {
 
     // Other CAN ID Constants
     public static final CANBus CANivoreCANBus = new CANBus("CANIvore");
+    public static final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    
+    public static final Transform3d leftCamPose = new Transform3d(.01905, .31115, .5334, new Rotation3d(0, 25*Math.PI/180, 90*Math.PI/180));
+    public static final String leftCamName = "Left Camera";
 
+    public static final Transform3d rightCamPose = new Transform3d(.01905, -.31115, .5334, new Rotation3d(0, 25*Math.PI/180, -90*Math.PI/180));
+    public static final String rightCamName = "Right Camera";
 }

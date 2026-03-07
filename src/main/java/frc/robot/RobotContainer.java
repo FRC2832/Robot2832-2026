@@ -17,16 +17,20 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PPTSubsystem;
+import frc.robot.commands.DriveSpeedCMDs;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
-    private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
+    private double MaxSpeed = 0.5 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
                                                                                         // speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
+    private double MaxAngularRate = 0.8 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
                                                                                       // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -41,7 +45,16 @@ public class RobotContainer {
     private final CommandXboxController driverController = new CommandXboxController(0);
     private final CommandXboxController operatorController = new CommandXboxController(1);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
+    // Variables added in non-swerve project creation
+    private double speedMultiplier = 1.0;
+
+    // Subsytem declaration
+    private final HopperSubsystem hopperSubsystem = new HopperSubsystem();
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
+    private final TurretSubsystem turretSubsystem = new TurretSubsystem();
 
     // Subsystem instantiation
     public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -58,12 +71,20 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(() -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed) // Drive forward with
-                                                                                                   // negative Y
-                                                                                                   // (forward)
-                        .withVelocityY(-driverController.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                        .withRotationalRate(-driverController.getRightX() * MaxAngularRate) // Drive counterclockwise with
-                                                                                    // negative X (left)
+                drivetrain.applyRequest(
+                        () -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed * speedMultiplier) // Drive
+                                                                                                             // forward
+                                                                                                             // with
+                                // negative Y
+                                // (forward)
+                                .withVelocityY(-driverController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left
+                                                                                                          // with
+                                                                                                          // negative X
+                                                                                                          // (left)
+                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate * speedMultiplier) // Drive
+                                                                                                                      // counterclockwise
+                                                                                                                      // with
+                // negative X (left)
                 ));
 
         // Idle while the robot is disabled. This ensures the configured
@@ -74,7 +95,8 @@ public class RobotContainer {
 
         driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driverController.b().whileTrue(drivetrain.applyRequest(
-                () -> point.withModuleDirection(new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))));
+                () -> point.withModuleDirection(
+                        new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -83,6 +105,7 @@ public class RobotContainer {
         driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+        // TODO: Test if this works to actually reset field orientation
         // Reset the field-centric heading on start press.
         driverController.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -101,6 +124,15 @@ public class RobotContainer {
         // Default Commands
         indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
 
+        // Speed control keys (Variable speed control)
+        driverController.leftTrigger(0.15)
+                .whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
+        // driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 0.7));
+        // // Turtle
+        // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4));
+        // // Snail
+        driverController.y().toggleOnTrue(RobotContainer.drivetrain.applyRequest(() -> brake));
+        
     }
 
     public Command getAutonomousCommand() {
@@ -117,5 +149,10 @@ public class RobotContainer {
                         .withTimeout(5.0),
                 // Finally idle for the rest of auton
                 drivetrain.applyRequest(() -> idle));
+    }
+
+    // Used in DriveSpeedCMDs to set speedMultiplier
+    public void setSpeedMultiplier(double multiplier) {
+        speedMultiplier = multiplier;
     }
 }
