@@ -30,7 +30,7 @@ public class MoveTurretCommand extends Command {
     public void execute() {
         if(TurretSubsystem.autoAim){
             //TODO add auto aim controls
-            RobotContainer.turretSubsystem.setAngle(0, 0);
+            RobotContainer.turretSubsystem.setTurretAngle(0, 0);
         }else{
             double joystick = RobotContainer.operatorController.getLeftX();
             RobotContainer.turretSubsystem.setTurretVoltage(joystick * 4, joystick * 4);
