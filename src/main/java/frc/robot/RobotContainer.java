@@ -27,14 +27,16 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PPTSubsystem;
 import frc.robot.commands.DriveSpeedCMDs;
+import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 0.5 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
                                                                                         // speed
-    private double MaxAngularRate = 0.8 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
-                                                                                      // max angular velocity
+    private double MaxAngularRate = 0.8 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
+                                                                                            // second
+    // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -45,27 +47,37 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController driverController = new CommandXboxController(0);
-    private final CommandXboxController operatorController = new CommandXboxController(1);
+    public static CommandXboxController driverController;
+    public static CommandXboxController operatorController;
 
-    public final static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    public static CommandSwerveDrivetrain drivetrain;
 
     // Variables added in non-swerve project creation
     private double speedMultiplier = 1.0;
 
     // Subsytem declaration
-    private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-    private final TurretSubsystem turretSubsystem = new TurretSubsystem();
-    public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-    public final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
-    public final PPTSubsystem pptSubsystem = new PPTSubsystem();
+    public static ShooterSubsystem shooterSubsystem;
+    public static TurretSubsystem turretSubsystem;
+    public static IntakeSubsystem intakeSubsystem;
+    public static IndexerSubsystem indexerSubsystem;
+    public static PPTSubsystem pptSubsystem;
 
+    private static final double shooterManualStepSize = 0.1;
 
     public RobotContainer() {
         // PathPlannerLogging.clearLoggingCallbacks();
         // SignalLogger.enableAutoLogging(false);
         // StatusLogger.disableAutoLogging();
+        drivetrain = TunerConstants.createDrivetrain();
+        shooterSubsystem = new ShooterSubsystem();
+        turretSubsystem = new TurretSubsystem();
+        intakeSubsystem = new IntakeSubsystem();
+        indexerSubsystem = new IndexerSubsystem();
+        pptSubsystem = new PPTSubsystem();
+        driverController = new CommandXboxController(0);
+        operatorController = new CommandXboxController(1);
         configureBindings();
+        
     }
 
     private void configureBindings() {
@@ -113,15 +125,14 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-
         // Operator controls
         operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
-        
+
         operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
         operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
-        //operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
-        //operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
+        // operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
+        // operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
 
         // Default Commands
         indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
@@ -134,7 +145,24 @@ public class RobotContainer {
         // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4));
         // // Snail
         driverController.y().toggleOnTrue(RobotContainer.drivetrain.applyRequest(() -> brake));
-        
+
+        shooterSubsystem.setDefaultCommand(new SpinShooterCommand());
+        // Shooter manual speed adjustment
+        operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
+            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
+                    ShooterSubsystem::getLastAcceleratorSpeed);
+            ShooterSubsystem.leftSpeed += shooterManualStepSize;
+            ShooterSubsystem.rightSpeed += shooterManualStepSize;
+        }));
+        operatorController.povDown().onTrue(shooterSubsystem.runOnce(() -> {
+            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
+                    ShooterSubsystem::getLastAcceleratorSpeed);
+            ShooterSubsystem.leftSpeed -= shooterManualStepSize;
+            ShooterSubsystem.rightSpeed -= shooterManualStepSize;
+        }));
+        // TODO add switch back to automatic targeting
+        // On operator Y press, call ShootCommand.setSuppliers with the automatic
+        // targeting suppliers
     }
 
     public Command getAutonomousCommand() {

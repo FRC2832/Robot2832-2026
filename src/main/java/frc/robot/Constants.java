@@ -46,6 +46,13 @@ public class Constants {
     public static final int RIGHT_ROTATOR_ID = 26;
     public static final int LEFT_ROTATOR_CANCODER_ID = 4;
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
+    
+    //First word is the hood the servo is on, relative to robot orientation
+    //Second direction is the side of that hood the servo is on
+    public static final int LEFT_HOOD_LEFT_PORT = 0;
+    public static final int LEFT_HOOD_RIGHT_PORT = 1;
+    public static final int RIGHT_HOOD_LEFT_PORT = 5;
+    public static final int RIGHT_HOOD_RIGHT_PORT = 4;
 
     // Other CAN ID Constants
     public static final CANBus CANivoreCANBus = new CANBus("CANivore");

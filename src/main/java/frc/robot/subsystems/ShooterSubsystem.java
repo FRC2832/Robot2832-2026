@@ -24,17 +24,17 @@ import frc.robot.Constants.KrakenX60;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
+    public static double leftSpeed = 0.2, rightSpeed = 0.2, acceleratorSpeed = 0.15;
 
     public ShooterSubsystem() {
         rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID, Constants.CANivoreCANBus);
         leftShooterMotor = new TalonFX(Constants.LEFT_SHOOTER_ID, Constants.CANivoreCANBus);
         accelerator = new TalonFX(Constants.ACCELERATOR_ID, Constants.CANivoreCANBus);
 
-        // TODO: Figure out inversion state of motors
-        // Confirm appropriate inversion, voltage limits, current limits, and PID
+        // TODO Confirm appropriate voltage limits, current limits, and PID
         // constants
-        configureMotor(rightShooterMotor, InvertedValue.CounterClockwise_Positive);
-        configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
+        configureMotor(rightShooterMotor, InvertedValue.Clockwise_Positive);
+        configureMotor(leftShooterMotor, InvertedValue.Clockwise_Positive); // inverted
         configureMotor(accelerator, InvertedValue.Clockwise_Positive);
     }
 
@@ -74,5 +74,17 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+    }
+
+    public static double getLastLeftSpeed(){
+        return leftSpeed;
+    }
+
+    public static double getLastRightSpeed(){
+        return rightSpeed;
+    }
+
+    public static double getLastAcceleratorSpeed(){
+        return acceleratorSpeed;
     }
 }
