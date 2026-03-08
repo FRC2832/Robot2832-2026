@@ -41,6 +41,7 @@ public class Constants {
     public static final int LEFT_SHOOTER_ID = 14;
     public static final int RIGHT_SHOOTER_ID = 24;
 
+
     // Constants for Turret subsystem
     public static final int LEFT_ROTATOR_ID = 16;
     public static final int RIGHT_ROTATOR_ID = 26;

@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+import edu.wpi.first.wpilibj.Servo;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -97,7 +98,7 @@ public class TurretSubsystem extends SubsystemBase {
             motor.getConfigurator().apply(config);
     }
 
-    public void setAngle(double leftAngle, double rightAngle) {
+    public void setTurretAngle(double leftAngle, double rightAngle) {
         //TODO update when the turret range increases
         rightAngle = MathUtil.clamp(rightAngle, 0, 90);
         leftAngle = MathUtil.clamp(leftAngle, -90, 0);
