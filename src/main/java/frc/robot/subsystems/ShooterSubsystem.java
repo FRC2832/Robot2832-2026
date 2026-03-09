@@ -34,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
         // TODO Confirm appropriate voltage limits, current limits, and PID
         // constants
         configureMotor(rightShooterMotor, InvertedValue.Clockwise_Positive);
-        configureMotor(leftShooterMotor, InvertedValue.Clockwise_Positive); // inverted
+        configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
         configureMotor(accelerator, InvertedValue.Clockwise_Positive);
     }
 

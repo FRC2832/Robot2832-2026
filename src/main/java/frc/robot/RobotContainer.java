@@ -19,14 +19,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PPTSubsystem;
 import frc.robot.commands.DriveSpeedCMDs;
+import frc.robot.commands.MoveHoodCommand;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -61,8 +64,9 @@ public class RobotContainer {
     public static IntakeSubsystem intakeSubsystem;
     public static IndexerSubsystem indexerSubsystem;
     public static PPTSubsystem pptSubsystem;
+    public static HoodSubsystem hoodSubsystem;
 
-    private static final double shooterManualStepSize = 0.1;
+    private static final double shooterManualStepSize = 0.05;
 
     public RobotContainer() {
         // PathPlannerLogging.clearLoggingCallbacks();
@@ -74,6 +78,7 @@ public class RobotContainer {
         intakeSubsystem = new IntakeSubsystem();
         indexerSubsystem = new IndexerSubsystem();
         pptSubsystem = new PPTSubsystem();
+        hoodSubsystem = new HoodSubsystem();
         driverController = new CommandXboxController(0);
         operatorController = new CommandXboxController(1);
         configureBindings();
@@ -163,6 +168,7 @@ public class RobotContainer {
         // TODO add switch back to automatic targeting
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
         // targeting suppliers
+        new Trigger(() -> Math.abs(operatorController.getRightY()) > 0.1).whileTrue(new MoveHoodCommand());
     }
 
     public Command getAutonomousCommand() {
