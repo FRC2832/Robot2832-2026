@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Servo;
@@ -30,6 +31,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Utils;
 import frc.robot.Constants.KrakenX60;
 
 public class TurretSubsystem extends SubsystemBase {
@@ -37,29 +39,17 @@ public class TurretSubsystem extends SubsystemBase {
     private TalonFX leftRotationMotor, rightRotationMotor;
     private CANcoder leftCANcoder, rightCANcoder;
     //First word is the hood the servo is on, relative to robot orientation
-    private Servo leftHoodLeftServo, leftHoodRightServo, rightHoodLeftServo, rightHoodRightServo;
     private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
 
-    private double leftHoodPosition, rightHoodPosition;
+    private double turretTargetAngle = 0;
 
-    public static boolean autoAim = false;
-
-    /**The sensitivity of the manual control for hood angle*/
-    private static final double HOOD_SENSITIVITY = 0.1;
+    public static boolean isAutoAim = false;
 
     public TurretSubsystem() {
         leftRotationMotor = new TalonFX(Constants.LEFT_ROTATOR_ID, Constants.CANivoreCANBus);
         rightRotationMotor = new TalonFX(Constants.RIGHT_ROTATOR_ID, Constants.CANivoreCANBus);
         leftCANcoder = new CANcoder(Constants.LEFT_ROTATOR_CANCODER_ID, Constants.CANivoreCANBus);
         rightCANcoder = new CANcoder(Constants.RIGHT_ROTATOR_CANCODER_ID, Constants.CANivoreCANBus);
-        leftHoodLeftServo = new Servo(Constants.LEFT_HOOD_LEFT_PORT);
-        leftHoodRightServo = new Servo(Constants.LEFT_HOOD_RIGHT_PORT);
-        rightHoodLeftServo = new Servo(Constants.RIGHT_HOOD_LEFT_PORT);
-        rightHoodRightServo = new Servo(Constants.RIGHT_HOOD_RIGHT_PORT);
-        leftHoodLeftServo.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
-        leftHoodRightServo.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
-        rightHoodLeftServo.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
-        rightHoodRightServo.setBoundsMicroseconds(2000, 1800, 1500, 1200, 1000);
 
         leftRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
         rightRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
@@ -98,45 +88,48 @@ public class TurretSubsystem extends SubsystemBase {
             motor.getConfigurator().apply(config);
     }
 
+    public double getLeftTurretAngle(){
+        return Constants.TURRET_GEAR_RATIO * leftCANcoder.getAbsolutePosition().getValue().in(Degrees);
+    }
+
+    public double getRightTurretAngle(){
+        return Constants.TURRET_GEAR_RATIO * rightCANcoder.getAbsolutePosition().getValue().in(Degrees);
+    }
+
+    public double getLeftMotorAngle(){
+        return leftRotationMotor.getPosition().getValue().in(Degrees);
+    }
+
+    public double getRightMotorAngle(){
+        return rightRotationMotor.getPosition().getValue().in(Degrees);
+    }
+
     public void setTurretAngle(double leftAngle, double rightAngle) {
-        //TODO update when the turret range increases
-        rightAngle = MathUtil.clamp(rightAngle, 0, 90);
-        leftAngle = MathUtil.clamp(leftAngle, -90, 0);
-        leftRotationMotor.setControl(motionMagicRequest.withPosition(Angle.ofRelativeUnits(leftAngle, Units.Rotations)));
-        rightRotationMotor.setControl(motionMagicRequest.withPosition(Angle.ofRelativeUnits(rightAngle, Units.Rotations)));
+        rightAngle = MathUtil.clamp(rightAngle, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.RIGHT_TURRET_MAX_ANGLE);
+        leftAngle = MathUtil.clamp(leftAngle, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE);
+        leftRotationMotor.setPosition(Angle.ofRelativeUnits(leftAngle, Units.Degrees));
+        rightRotationMotor.setPosition(Angle.ofRelativeUnits(rightAngle, Units.Degrees));
+    }
+
+    public void moveTurretTargetAngle(double offset){
+        turretTargetAngle += offset;
+        double leftTarget = MathUtil.clamp(turretTargetAngle, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE);
+        double rightTarget = MathUtil.clamp(turretTargetAngle, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE);
+        leftRotationMotor.setPosition(Angle.ofRelativeUnits(leftTarget, Units.Degrees));
+        rightRotationMotor.setPosition(Angle.ofRelativeUnits(rightTarget, Units.Degrees));
     }
 
     public void setTurretVoltage(double leftVoltage, double rightVoltage){
         leftVoltage = MathUtil.clamp(leftVoltage, -12, 12);
         rightVoltage = MathUtil.clamp(rightVoltage, -12, 12);
-        leftRotationMotor.setVoltage(leftVoltage);
-        rightRotationMotor.setVoltage(rightVoltage);
-    }
-
-    public void setHoodPositions(double leftHoodPosition, double rightHoodPosition){
-        this.leftHoodPosition = leftHoodPosition;
-        this.rightHoodPosition = rightHoodPosition;
-        leftHoodLeftServo.set(leftHoodPosition);
-        leftHoodRightServo.set(leftHoodPosition);
-        rightHoodLeftServo.set(rightHoodPosition);
-        rightHoodRightServo.set(rightHoodPosition);
-    }
-
-    public double getLeftHoodPosition(){
-        return leftHoodPosition;
-    }
-
-    public double getRightHoodPosition(){
-        return rightHoodPosition;
-    }
-
-    public void setHoodSpeeds(double leftHoodSpeed, double rightHoodSpeed){
-        leftHoodPosition += HOOD_SENSITIVITY * leftHoodSpeed;
-        rightHoodPosition += HOOD_SENSITIVITY * rightHoodSpeed;
-        leftHoodLeftServo.set(leftHoodPosition);
-        leftHoodRightServo.set(leftHoodPosition);
-        rightHoodLeftServo.set(rightHoodPosition);
-        rightHoodRightServo.set(rightHoodPosition);
+        double leftAngle = getLeftTurretAngle();
+        double rightAngle = getRightTurretAngle();
+        double leftFactor = Utils.approachFactor(leftAngle, Constants.LEFT_TURRET_MAX_ANGLE, Constants.LEFT_UPPER_APPROACH_ANGLE) 
+                    * Utils.approachFactor(leftAngle, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_LOWER_APPROACH_ANGLE);
+        double rightFactor = Utils.approachFactor(rightAngle, Constants.RIGHT_TURRET_MAX_ANGLE, Constants.RIGHT_UPPER_APPROACH_ANGLE) 
+                    * Utils.approachFactor(rightAngle, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.RIGHT_LOWER_APPROACH_ANGLE);
+        leftRotationMotor.setVoltage(leftVoltage * leftFactor);
+        rightRotationMotor.setVoltage(rightVoltage * rightFactor);
     }
 
     @Override
