@@ -35,7 +35,7 @@ public class Constants {
     // Constants for Intake subsystem
     public static final int INTAKE_INTERNAL_ROTATOR_ID = 19;
     public static final int INTAKE_EXTENDER_ID = 18;
-    
+    public static final int INTAKE_EXTEND_VOLTAGE = 2;
 
     // Constants for Shooter subsytem
     public static final int LEFT_SHOOTER_ID = 14;
@@ -47,7 +47,23 @@ public class Constants {
     public static final int RIGHT_ROTATOR_ID = 26;
     public static final int LEFT_ROTATOR_CANCODER_ID = 4;
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
+    public static final int SERVO_HUB_ID = 7;
     
+    public static final double TURRET_GEAR_RATIO = 1.2;
+    /**The sensitivity of the manual control for hood angle*/
+    public static final double HOOD_SENSITIVITY = 0.02;
+    public static final double TURRET_MAX_VOLTAGE = .4;
+    //TODO update when the turret range increases
+    public static final double LEFT_TURRET_MIN_ANGLE = -90;
+    public static final double LEFT_TURRET_MAX_ANGLE = 0;
+    public static final double RIGHT_TURRET_MIN_ANGLE = 0;
+    public static final double RIGHT_TURRET_MAX_ANGLE = 90;
+    //Used for approaching the edges of the firing arc slower
+    public static final double LEFT_UPPER_APPROACH_ANGLE = (2*LEFT_TURRET_MAX_ANGLE + LEFT_TURRET_MIN_ANGLE) / 3;
+    public static final double RIGHT_UPPER_APPROACH_ANGLE = (2*RIGHT_TURRET_MAX_ANGLE + RIGHT_TURRET_MIN_ANGLE) / 3;
+    public static final double LEFT_LOWER_APPROACH_ANGLE = (LEFT_TURRET_MAX_ANGLE + 2*LEFT_TURRET_MIN_ANGLE) / 3;
+    public static final double RIGHT_LOWER_APPROACH_ANGLE = (RIGHT_TURRET_MAX_ANGLE + 2*RIGHT_TURRET_MIN_ANGLE) / 3;
+
     //First word is the hood the servo is on, relative to robot orientation
     //Second direction is the side of that hood the servo is on
     public static final int LEFT_HOOD_LEFT_PORT = 0;

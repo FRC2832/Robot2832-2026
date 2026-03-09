@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.KrakenX60;
+import frc.robot.commands.MoveIntake;
 
 public class IntakeSubsystem extends SubsystemBase {
     /** Creates a new IntakeSubsystem. */
@@ -71,7 +72,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // --------------------------------------------------
     // Motor setup --------------------------------------
 
-    private TalonFX intakeInternalRotatorMotor, intakeExtenderMotor;
+    public TalonFX intakeInternalRotatorMotor, intakeExtenderMotor;
 
     private final MotionMagicVoltage extenderMotionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
     private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
@@ -79,7 +80,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public IntakeSubsystem() {
         intakeInternalRotatorMotor = new TalonFX(Constants.INTAKE_INTERNAL_ROTATOR_ID, Constants.CANivoreCANBus);
         intakeExtenderMotor = new TalonFX(Constants.INTAKE_EXTENDER_ID, Constants.CANivoreCANBus);
-
         // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
         configureMotor(intakeInternalRotatorMotor, InvertedValue.Clockwise_Positive);
@@ -139,17 +139,11 @@ public class IntakeSubsystem extends SubsystemBase {
     // COMMANDS -------------------------------------------------------------------------
     
     public Command extendIntakeCommand() {
-        return startEnd(
-            () -> setIntakePosition(Position.INTAKE),
-            () -> {}
-        );
+        return new MoveIntake(true);
     }
 
     public Command retractIntakeCommand() {
-        return startEnd(
-            () -> setIntakePosition(Position.STOWED),
-            () -> {}
-        );
+        return new MoveIntake(false);
     }
 
     public Command runIntakeCommand() {
