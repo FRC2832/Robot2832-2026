@@ -38,8 +38,8 @@ public class IntakeSubsystem extends SubsystemBase {
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
      public enum Speed {
         STOP(0),
-        INTAKE(0.2),
-        REVERSE(-0.2);
+        INTAKE(0.7),
+        REVERSE(-0.7);
 
         private final double percentOutput;
 

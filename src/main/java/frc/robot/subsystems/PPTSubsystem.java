@@ -31,8 +31,8 @@ public class PPTSubsystem extends SubsystemBase {
 
     public enum Speed {
         STOP(0),
-        FORWARD(0.2),
-        REVERSE(-0.2);
+        FORWARD(0.67),
+        REVERSE(-0.67);
 
         private final double percentOutput;
 
