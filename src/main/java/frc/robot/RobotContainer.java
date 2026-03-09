@@ -30,6 +30,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PPTSubsystem;
 import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.commands.MoveHoodCommand;
+import frc.robot.commands.MoveIntake;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -159,6 +160,7 @@ public class RobotContainer {
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
             ShooterSubsystem.acceleratorSpeed += shooterManualStepSize * .4;
+            System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         operatorController.povDown().onTrue(shooterSubsystem.runOnce(() -> {
             SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
@@ -171,6 +173,8 @@ public class RobotContainer {
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
         // targeting suppliers
         new Trigger(() -> Math.abs(operatorController.getRightY()) > 0.1).whileTrue(new MoveHoodCommand());
+        operatorController.back().whileTrue(new MoveIntake(false));
+        operatorController.start().whileTrue(new MoveIntake(true));
     }
 
     public Command getAutonomousCommand() {

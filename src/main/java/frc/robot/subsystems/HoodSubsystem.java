@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.revrobotics.ResetMode;
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
@@ -35,6 +36,7 @@ public class HoodSubsystem extends SubsystemBase {
         configureServo(leftHoodRightServo);
         configureServo(rightHoodLeftServo);
         configureServo(rightHoodRightServo);
+        servoHub.configure(config, ResetMode.kResetSafeParameters);
     }
 
     private void configureServo(ServoChannel channel){

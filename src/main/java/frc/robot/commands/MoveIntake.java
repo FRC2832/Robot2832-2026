@@ -16,6 +16,7 @@ public class MoveIntake extends Command {
     /** Creates a new LowerIntake. */
     private static final Timer timer = new Timer();
     boolean isDown;
+    double voltage;
     public MoveIntake(boolean down) {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(RobotContainer.intakeSubsystem);
@@ -28,6 +29,7 @@ public class MoveIntake extends Command {
         double voltage = Constants.INTAKE_EXTEND_VOLTAGE;
         if(isDown)
             voltage *= -1;
+        this.voltage = voltage;
         RobotContainer.intakeSubsystem.intakeExtenderMotor.setVoltage(voltage);
         timer.reset();
         timer.start();
@@ -36,7 +38,7 @@ public class MoveIntake extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.intakeSubsystem.intakeExtenderMotor.setVoltage(Constants.INTAKE_EXTEND_VOLTAGE);
+        RobotContainer.intakeSubsystem.intakeExtenderMotor.setVoltage(this.voltage);
     }
 
     // Called once the command ends or is interrupted.
@@ -50,6 +52,6 @@ public class MoveIntake extends Command {
     @Override
     public boolean isFinished() {
         //Supply current increases when the resistance increases
-        return timer.get() > 3 || Math.abs(RobotContainer.intakeSubsystem.intakeExtenderMotor.getSupplyCurrent().getValue().in(Amps)) > 7;
+        return timer.get() > 4 || Math.abs(RobotContainer.intakeSubsystem.intakeExtenderMotor.getSupplyCurrent().getValue().in(Amps)) > 12;
     }
 }

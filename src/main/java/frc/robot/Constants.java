@@ -35,7 +35,7 @@ public class Constants {
     // Constants for Intake subsystem
     public static final int INTAKE_INTERNAL_ROTATOR_ID = 19;
     public static final int INTAKE_EXTENDER_ID = 18;
-    public static final int INTAKE_EXTEND_VOLTAGE = 2;
+    public static final double INTAKE_EXTEND_VOLTAGE = 1.5;
 
     // Constants for Shooter subsytem
     public static final int LEFT_SHOOTER_ID = 14;
@@ -47,7 +47,7 @@ public class Constants {
     public static final int RIGHT_ROTATOR_ID = 26;
     public static final int LEFT_ROTATOR_CANCODER_ID = 4;
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
-    public static final int SERVO_HUB_ID = 7;
+    public static final int SERVO_HUB_ID = 3; //meant to be 7 but refuses to update in rev hardware client
     
     public static final double TURRET_GEAR_RATIO = 1.2;
     /**The sensitivity of the manual control for hood angle*/

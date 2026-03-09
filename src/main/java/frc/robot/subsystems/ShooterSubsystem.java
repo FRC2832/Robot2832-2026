@@ -35,7 +35,7 @@ public class ShooterSubsystem extends SubsystemBase {
         // constants
         configureMotor(rightShooterMotor, InvertedValue.Clockwise_Positive);
         configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
-        configureMotor(accelerator, InvertedValue.Clockwise_Positive);
+        configureMotor(accelerator, InvertedValue.CounterClockwise_Positive);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
