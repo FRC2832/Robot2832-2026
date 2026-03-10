@@ -51,7 +51,7 @@ public class Constants {
     
     public static final double TURRET_GEAR_RATIO = 1.2;
     /**The sensitivity of the manual control for hood angle*/
-    public static final double HOOD_SENSITIVITY = 0.02;
+    public static final double HOOD_SENSITIVITY = 0.05;
     public static final double TURRET_MAX_VOLTAGE = .4;
     //TODO update when the turret range increases
     public static final double LEFT_TURRET_MIN_ANGLE = -90;

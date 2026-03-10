@@ -28,6 +28,7 @@ public class HoodSubsystem extends SubsystemBase {
         config.channel1.pulseRange(500, 1500, 2500);
         config.channel4.pulseRange(500, 1500, 2500);
         config.channel5.pulseRange(500, 1500, 2500);
+        servoHub.configure(config, ResetMode.kResetSafeParameters);
         leftHoodLeftServo = servoHub.getServoChannel(ChannelId.kChannelId0);
         leftHoodRightServo = servoHub.getServoChannel(ChannelId.kChannelId1);
         rightHoodLeftServo = servoHub.getServoChannel(ChannelId.kChannelId5);
@@ -36,7 +37,6 @@ public class HoodSubsystem extends SubsystemBase {
         configureServo(leftHoodRightServo);
         configureServo(rightHoodLeftServo);
         configureServo(rightHoodRightServo);
-        servoHub.configure(config, ResetMode.kResetSafeParameters);
     }
 
     private void configureServo(ServoChannel channel){
@@ -59,7 +59,9 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     private void setServo(ServoChannel servo, double position){
-        servo.setPulseWidth((int) (1500+1000*position));
+        int pulseWidth = (int) (1500+1000*position);
+        System.out.println("Pulse width: " + pulseWidth);
+        servo.setPulseWidth(pulseWidth);
     }
 
     public double getLeftHoodPosition(){
@@ -73,6 +75,8 @@ public class HoodSubsystem extends SubsystemBase {
     public void setHoodSpeeds(double leftHoodSpeed, double rightHoodSpeed){
         leftHoodPosition += Constants.HOOD_SENSITIVITY * leftHoodSpeed;
         rightHoodPosition += Constants.HOOD_SENSITIVITY * rightHoodSpeed;
+        leftHoodPosition = MathUtil.clamp(leftHoodPosition, -1, 1);
+        rightHoodPosition = MathUtil.clamp(rightHoodPosition, -1, 1);
         System.out.println("Hood target positions: " + leftHoodPosition + ", " + rightHoodPosition);
         setHoodPositions(leftHoodPosition, rightHoodPosition);
     }
