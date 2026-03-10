@@ -24,7 +24,7 @@ import frc.robot.Constants.KrakenX60;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.90, rightSpeed = 0.90, acceleratorSpeed = 0.90;
+    public static double leftSpeed = 0.4, rightSpeed = 0.4, acceleratorSpeed = 0.4;
 
     public ShooterSubsystem() {
         rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID, Constants.CANivoreCANBus);
@@ -68,7 +68,6 @@ public class ShooterSubsystem extends SubsystemBase {
         rightShooterMotor.set(rightSpeed);
         leftShooterMotor.set(leftSpeed);
         accelerator.set(accelSpeed);
-
     }
 
     @Override

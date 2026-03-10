@@ -159,7 +159,7 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeed);
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
-            ShooterSubsystem.acceleratorSpeed += shooterManualStepSize * .4;
+            ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
             System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         operatorController.povDown().onTrue(shooterSubsystem.runOnce(() -> {
@@ -167,7 +167,7 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeed);
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
-            ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize *.4;
+            ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
         }));
         // TODO add switch back to automatic targeting
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
