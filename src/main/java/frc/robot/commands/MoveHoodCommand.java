@@ -18,14 +18,14 @@ public class MoveHoodCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        System.out.println("Moving hood by " + RobotContainer.operatorController.getRightY());
+        System.out.println("Moving hood by " + (-RobotContainer.operatorController.getRightY()));
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
         double joystick = RobotContainer.operatorController.getRightY();
-        RobotContainer.hoodSubsystem.setHoodSpeeds(joystick, joystick);
+        RobotContainer.hoodSubsystem.setHoodSpeeds(-joystick, -joystick);
     }
 
     // Called once the command ends or is interrupted.
