@@ -24,10 +24,10 @@ public class HoodSubsystem extends SubsystemBase {
     public HoodSubsystem() {
         servoHub = new ServoHub(Constants.SERVO_HUB_ID);
         ServoHubConfig config = new ServoHubConfig();
-        config.channel0.pulseRange(500, 1500, 2500);
-        config.channel1.pulseRange(500, 1500, 2500);
-        config.channel4.pulseRange(500, 1500, 2500);
-        config.channel5.pulseRange(500, 1500, 2500);
+        config.channel0.pulseRange(1000, 1500, 2000);
+        config.channel1.pulseRange(1000, 1500, 2000);
+        config.channel4.pulseRange(1000, 1500, 2000);
+        config.channel5.pulseRange(1000, 1500, 2000);
         servoHub.configure(config, ResetMode.kResetSafeParameters);
         leftHoodLeftServo = servoHub.getServoChannel(ChannelId.kChannelId0);
         leftHoodRightServo = servoHub.getServoChannel(ChannelId.kChannelId1);
@@ -39,7 +39,7 @@ public class HoodSubsystem extends SubsystemBase {
         configureServo(rightHoodRightServo);
     }
 
-    private void configureServo(ServoChannel channel){
+    private void configureServo(ServoChannel channel) {
         channel.setEnabled(true);
         channel.setPowered(true);
     }
@@ -49,35 +49,35 @@ public class HoodSubsystem extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    public void setHoodPositions(double leftHoodPosition, double rightHoodPosition){
+    public void setHoodPositions(double leftHoodPosition, double rightHoodPosition) {
         this.leftHoodPosition = leftHoodPosition;
         this.rightHoodPosition = rightHoodPosition;
-        setServo(leftHoodLeftServo, 0.3*MathUtil.clamp(leftHoodPosition, -1, 1));
-        setServo(leftHoodRightServo, 0.3*MathUtil.clamp(leftHoodPosition, -1, 1));
-        setServo(rightHoodLeftServo, 0.3*MathUtil.clamp(rightHoodPosition, -1, 1));
-        setServo(rightHoodRightServo, 0.3*MathUtil.clamp(rightHoodPosition, -1, 1));
+        setServo(leftHoodLeftServo, 0.3 * MathUtil.clamp(leftHoodPosition, -1, 1));
+        setServo(leftHoodRightServo, 0.3 * MathUtil.clamp(leftHoodPosition, -1, 1));
+        setServo(rightHoodLeftServo, 0.3 * MathUtil.clamp(rightHoodPosition, -1, 1));
+        setServo(rightHoodRightServo, 0.3 * MathUtil.clamp(rightHoodPosition, -1, 1));
     }
 
-    private void setServo(ServoChannel servo, double position){
-        int pulseWidth = (int) (1500+1000*position);
-        System.out.println("Pulse width: " + pulseWidth);
+    private void setServo(ServoChannel servo, double position) {
+        int pulseWidth = (int) (1500 + 500 * position);
         servo.setPulseWidth(pulseWidth);
     }
 
-    public double getLeftHoodPosition(){
+    public double getLeftHoodPosition() {
         return leftHoodPosition;
     }
 
-    public double getRightHoodPosition(){
+    public double getRightHoodPosition() {
         return rightHoodPosition;
     }
 
-    public void setHoodSpeeds(double leftHoodSpeed, double rightHoodSpeed){
+    public void setHoodSpeeds(double leftHoodSpeed, double rightHoodSpeed) {
         leftHoodPosition += Constants.HOOD_SENSITIVITY * leftHoodSpeed;
         rightHoodPosition += Constants.HOOD_SENSITIVITY * rightHoodSpeed;
         leftHoodPosition = MathUtil.clamp(leftHoodPosition, -1, 1);
         rightHoodPosition = MathUtil.clamp(rightHoodPosition, -1, 1);
-        System.out.println("Hood target positions: " + leftHoodPosition + ", " + rightHoodPosition);
+        // System.out.println("Hood target positions: " + leftHoodPosition + ", " +
+        // rightHoodPosition);
         setHoodPositions(leftHoodPosition, rightHoodPosition);
     }
 

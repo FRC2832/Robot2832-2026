@@ -47,7 +47,7 @@ public class Constants {
     public static final int RIGHT_ROTATOR_ID = 26;
     public static final int LEFT_ROTATOR_CANCODER_ID = 4;
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
-    public static final int SERVO_HUB_ID = 3; //meant to be 7 but refuses to update in rev hardware client
+    public static final int SERVO_HUB_ID = 7; //meant to be 7 but refuses to update in rev hardware client
     
     public static final double TURRET_GEAR_RATIO = 1.2;
     /**The sensitivity of the manual control for hood angle*/
