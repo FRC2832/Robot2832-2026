@@ -87,6 +87,11 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+
+        // Default Commands -------------------------------------------------------------------------------------------------------------------------------
+        indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
+        shooterSubsystem.setDefaultCommand(shooterSubsystem.stopShooter());
+
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
@@ -131,18 +136,6 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // Operator controls
-        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
-        operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
-
-        operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
-        operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
-        // operatorController.start().onTrue(intakeSubsystem.extendIntakeCommand());
-        // operatorController.back().onTrue(intakeSubsystem.retractIntakeCommand());
-
-        // Default Commands
-        indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
-
         // Speed control keys (Variable speed control)
         driverController.leftTrigger(0.15)
                 .whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
@@ -152,7 +145,21 @@ public class RobotContainer {
         // // Snail
         driverController.y().toggleOnTrue(RobotContainer.drivetrain.applyRequest(() -> brake));
 
-        shooterSubsystem.setDefaultCommand(new SpinShooterCommand());
+        // Operator controls -------------------------------------------------------------------------------------------------------------------------------
+        // Intake ************************
+        operatorController.back().whileTrue(new MoveIntake(false));
+        operatorController.start().whileTrue(new MoveIntake(true));
+
+        operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
+        operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
+
+        // PPT / Delivering ***************
+        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
+        operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
+
+        // Shooter ************************
+        operatorController.y().whileTrue(new SpinShooterCommand());
+
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
             SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
@@ -168,13 +175,12 @@ public class RobotContainer {
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
             ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
+            System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         // TODO add switch back to automatic targeting
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
         // targeting suppliers
         new Trigger(() -> Math.abs(operatorController.getRightY()) > 0.1).whileTrue(new MoveHoodCommand());
-        operatorController.back().whileTrue(new MoveIntake(false));
-        operatorController.start().whileTrue(new MoveIntake(true));
     }
 
     public Command getAutonomousCommand() {
