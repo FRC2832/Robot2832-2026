@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -47,6 +48,7 @@ public class RobotContainer {
         autoBuilder = AutoBuilder.buildAutoChooserWithOptionsModifier(
             stream -> stream.filter(s -> s.getName().startsWith("Woodhaven"))
         );
+        SmartDashboard.putData(autoBuilder);
     }
 
     private void configureBindings() {
