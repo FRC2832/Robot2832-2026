@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Shoot near Bump"
+            "pathName": "Woodhaven Left Bump Shoot"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Cross Bump To Neutral"
+            "pathName": "Woodhaven Left Trench Approach Pile"
           }
         },
         {
@@ -31,7 +31,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Collect from Pile"
+            "pathName": "Left Bump Collect From Pile"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Return from Neutral"
+            "pathName": "Woodhaven Left Bump Return From Neutral"
           }
         },
         {
