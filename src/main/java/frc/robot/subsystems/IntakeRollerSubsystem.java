@@ -73,7 +73,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(40))
+                    .withSupplyCurrentLimit(Amps.of(50))
                     .withSupplyCurrentLimitEnable(true)
             )
             .withSlot0(
