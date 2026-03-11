@@ -154,7 +154,7 @@ public class RobotContainer {
         operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
 
         // PPT / Delivering ***************
-        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
+        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
 
         // Shooter ************************
