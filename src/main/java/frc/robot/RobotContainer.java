@@ -26,7 +26,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.IntakeExtenderSubsystem;
 import frc.robot.subsystems.PPTSubsystem;
 import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.commands.MoveHoodCommand;
@@ -62,7 +63,8 @@ public class RobotContainer {
     // Subsytem declaration
     public static ShooterSubsystem shooterSubsystem;
     public static TurretSubsystem turretSubsystem;
-    public static IntakeSubsystem intakeSubsystem;
+    public static IntakeRollerSubsystem intakeRollerSubsystem;
+    public static IntakeExtenderSubsystem intakeExtenderSubsystem;
     public static IndexerSubsystem indexerSubsystem;
     public static PPTSubsystem pptSubsystem;
     public static HoodSubsystem hoodSubsystem;
@@ -76,7 +78,8 @@ public class RobotContainer {
         drivetrain = TunerConstants.createDrivetrain();
         shooterSubsystem = new ShooterSubsystem();
         turretSubsystem = new TurretSubsystem();
-        intakeSubsystem = new IntakeSubsystem();
+        intakeRollerSubsystem = new IntakeRollerSubsystem();
+        intakeExtenderSubsystem = new IntakeExtenderSubsystem();
         indexerSubsystem = new IndexerSubsystem();
         pptSubsystem = new PPTSubsystem();
         hoodSubsystem = new HoodSubsystem();
@@ -150,8 +153,8 @@ public class RobotContainer {
         operatorController.back().whileTrue(new MoveIntake(false));
         operatorController.start().whileTrue(new MoveIntake(true));
 
-        operatorController.rightTrigger(.3).whileTrue(intakeSubsystem.runIntakeCommand());
-        operatorController.leftTrigger(.3).whileTrue(intakeSubsystem.reverseIntakeCommand());
+        operatorController.rightTrigger(.3).whileTrue(intakeRollerSubsystem.runIntakeCommand());
+        operatorController.leftTrigger(.3).whileTrue(intakeRollerSubsystem.reverseIntakeCommand());
 
         // PPT / Delivering ***************
         operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));

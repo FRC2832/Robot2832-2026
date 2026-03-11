@@ -5,8 +5,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -14,25 +12,19 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.KrakenX60;
-import frc.robot.commands.MoveIntake;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class IntakeRollerSubsystem extends SubsystemBase {
     /** Creates a new IntakeSubsystem. */
 
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
@@ -52,43 +44,20 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    public enum Position {
-        // FIXME: This is wrong - See what the real life values should be. Genuinely do not run the code like this it will NOT be pretty. VS code only has todo but this is like a death siren.
-        // HOMED(110),
-        STOWED(5),
-        INTAKE(1);
-
-        private final double rotations;
-
-        private Position(double rotations) {
-            this.rotations = rotations;
-        }
-
-        public Angle angle() {
-            return Rotations.of(rotations);
-        }
-    }
-
     // --------------------------------------------------
     // Motor setup --------------------------------------
 
-    public TalonFX intakeInternalRotatorMotor, intakeExtenderMotor;
+    public TalonFX intakeInternalRotatorMotor;
 
-    private final MotionMagicVoltage extenderMotionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
     private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
 
-    public IntakeSubsystem() {
+    public IntakeRollerSubsystem() {
         intakeInternalRotatorMotor = new TalonFX(Constants.INTAKE_INTERNAL_ROTATOR_ID, Constants.CANivoreCANBus);
-        intakeExtenderMotor = new TalonFX(Constants.INTAKE_EXTENDER_ID, Constants.CANivoreCANBus);
-        // TODO: Figure out inversion state of motors
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
         configureMotor(intakeInternalRotatorMotor, InvertedValue.Clockwise_Positive);
-        configureMotor(intakeExtenderMotor, InvertedValue.CounterClockwise_Positive); // inverted
 
         SmartDashboard.putData(this); 
     }
-
-    // TODO: These should probably be changed eventually
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
         final TalonFXConfiguration config = new TalonFXConfiguration()
             .withMotorOutput(
@@ -120,14 +89,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // ------------------------------------------------------------------
     // ACTUAL FUNCTIONS -------------------------------------------------
 
-    // QUESTION: Do we want a manual override for intake position ????????
-    public void setIntakePosition(Position position) {
-        intakeExtenderMotor.setControl(
-            extenderMotionMagicRequest
-                .withPosition(position.angle())
-        );
-    }
-
     public void setIntakeSpeed(Speed speed) {
         intakeInternalRotatorMotor.setControl(
             rollerVoltageRequest
@@ -138,14 +99,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // ----------------------------------------------------------------------------------
     // COMMANDS -------------------------------------------------------------------------
     
-    public Command extendIntakeCommand() {
-        return new MoveIntake(true);
-    }
-
-    public Command retractIntakeCommand() {
-        return new MoveIntake(false);
-    }
-
     public Command runIntakeCommand() {
         return startEnd(
             () -> setIntakeSpeed(Speed.INTAKE),

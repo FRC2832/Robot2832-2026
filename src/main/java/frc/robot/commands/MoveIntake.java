@@ -19,7 +19,7 @@ public class MoveIntake extends Command {
     double voltage;
     public MoveIntake(boolean down) {
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(RobotContainer.intakeSubsystem);
+        addRequirements(RobotContainer.intakeExtenderSubsystem);
         this.isDown = down;
     }
 
@@ -30,7 +30,7 @@ public class MoveIntake extends Command {
         if(isDown)
             voltage *= -1;
         this.voltage = voltage;
-        RobotContainer.intakeSubsystem.intakeExtenderMotor.setVoltage(voltage);
+        RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor.setVoltage(voltage);
         timer.reset();
         timer.start();
     }
@@ -38,13 +38,13 @@ public class MoveIntake extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        RobotContainer.intakeSubsystem.intakeExtenderMotor.setVoltage(this.voltage);
+        RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor.setVoltage(this.voltage);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        RobotContainer.intakeSubsystem.intakeExtenderMotor.setVoltage(0);
+        RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor.setVoltage(0);
         timer.stop();
     }
 
@@ -52,6 +52,6 @@ public class MoveIntake extends Command {
     @Override
     public boolean isFinished() {
         //Supply current increases when the resistance increases
-        return timer.get() > 4 || Math.abs(RobotContainer.intakeSubsystem.intakeExtenderMotor.getSupplyCurrent().getValue().in(Amps)) > 12;
+        return timer.get() > 4 || Math.abs(RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor.getSupplyCurrent().getValue().in(Amps)) > 12;
     }
 }
