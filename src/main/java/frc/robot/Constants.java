@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -75,9 +77,17 @@ public class Constants {
     public static final CANBus CANivoreCANBus = new CANBus("CANivore");
     public static final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
     
-    public static final Transform3d leftCamPose = new Transform3d(.01905, .31115, .5334, new Rotation3d(0, 25*Math.PI/180, 90*Math.PI/180));
+    public static final Transform3d leftCamPose = new Transform3d(
+        Inches.of(1.1875), 
+        Inches.of(14.125), 
+        Inches.of(15.25), 
+        new Rotation3d(0, 25*Math.PI/180, 90*Math.PI/180));
     public static final String leftCamName = "Left Camera";
 
-    public static final Transform3d rightCamPose = new Transform3d(.01905, -.31115, .5334, new Rotation3d(0, 25*Math.PI/180, -90*Math.PI/180));
+    public static final Transform3d rightCamPose = new Transform3d(
+        Inches.of(1.1875), 
+        Inches.of(-14.125), 
+        Inches.of(15.25), 
+        new Rotation3d(0, 25*Math.PI/180, -90*Math.PI/180));
     public static final String rightCamName = "Right Camera";
 }
