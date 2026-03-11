@@ -35,6 +35,7 @@ import frc.robot.commands.MoveIntake;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 0.5 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
@@ -68,6 +69,7 @@ public class RobotContainer {
     public static IndexerSubsystem indexerSubsystem;
     public static PPTSubsystem pptSubsystem;
     public static HoodSubsystem hoodSubsystem;
+    public static VisionSubsystem visionSubsystem;
 
     private static final double shooterManualStepSize = 0.05;
 
@@ -85,6 +87,7 @@ public class RobotContainer {
         hoodSubsystem = new HoodSubsystem();
         driverController = new CommandXboxController(0);
         operatorController = new CommandXboxController(1);
+        visionSubsystem = new VisionSubsystem();
         configureBindings();
         
     }
@@ -161,7 +164,7 @@ public class RobotContainer {
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
 
         // Shooter ************************
-        operatorController.y().whileTrue(new SpinShooterCommand());
+        operatorController.y().toggleOnTrue(new SpinShooterCommand());
 
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
