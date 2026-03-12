@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.revrobotics.util.StatusLogger;
@@ -17,10 +18,12 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -181,7 +184,7 @@ public class RobotContainer {
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
             ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
-            System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
+            //System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         operatorController.povDown().onTrue(shooterSubsystem.runOnce(() -> {
             SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
@@ -189,12 +192,18 @@ public class RobotContainer {
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
             ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
-            System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
+            //System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         // TODO add switch back to automatic targeting
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
         // targeting suppliers
         new Trigger(() -> Math.abs(operatorController.getRightY()) > 0.1).whileTrue(new MoveHoodCommand());
+        //Commands for auton
+        NamedCommands.registerCommand("Shoot", new SpinShooterCommand().withTimeout(6).alongWith(
+                new WaitCommand(3).andThen(pptSubsystem.deliverCommand().withTimeout(3))
+        ));
+        NamedCommands.registerCommand("Reverse PPT", pptSubsystem.reverseDeliverCommand().withTimeout(3));
+        NamedCommands.registerCommand("Extend Ingestor", intakeExtenderSubsystem.extendIntakeCommand());
     }
 
     public Command getAutonomousCommand() {
