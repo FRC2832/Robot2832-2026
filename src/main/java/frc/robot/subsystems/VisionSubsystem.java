@@ -64,6 +64,7 @@ public class VisionSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     leftResults = estimatePose(leftCam, leftCamSim, leftPoseEstimator);
     rightResults = estimatePose(rightCam, rightCamSim, rightPoseEstimator);
+    RobotContainer.logger.updateAprilTagDetections(leftResults, rightResults);
     if(Robot.isSimulation()){
       visionSim.update(RobotContainer.drivetrain.getState().Pose);
     }
@@ -80,7 +81,8 @@ public class VisionSubsystem extends SubsystemBase {
         continue;
       EstimatedRobotPose est = maybeEst.get();
       //TODO add camera std dev
-      // RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
+      RobotContainer.logger.estimatedRobotPose.set(est.estimatedPose.toPose2d(), (long) (1000000 * est.timestampSeconds));
+      RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
     }
     return results;
   }

@@ -1,14 +1,21 @@
 package frc.robot;
 
+import java.util.List;
+
+import org.photonvision.targeting.PhotonPipelineResult;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.IntegerArrayTopic;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -60,6 +67,18 @@ public class Telemetry {
     private final NetworkTable table = inst.getTable("Pose");
     private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
+
+    /* AprilTag detections from PhotonVision */
+    private final NetworkTable visionTable = inst.getTable("VisionData");
+    private final NetworkTable leftCamTable = visionTable.getSubTable("LeftCamera");
+    private final NetworkTable rightCamTable = visionTable.getSubTable("RightCamera");
+    private final StructArrayPublisher<Pose3d> leftCamDetects = leftCamTable
+            .getStructArrayTopic("TagPoses", Pose3d.struct).publish();
+    private final IntegerArrayPublisher leftCamIds = leftCamTable.getIntegerArrayTopic("FiducialIDs").publish();
+    private final StructArrayPublisher<Pose3d> rightCamDetects = rightCamTable
+            .getStructArrayTopic("TagPoses", Pose3d.struct).publish();
+    private final IntegerArrayPublisher rightCamIds = rightCamTable.getIntegerArrayTopic("FiducialIDs").publish();
+    public final StructPublisher<Pose2d> estimatedRobotPose = visionTable.getStructTopic("EstimatedPose", Pose2d.struct).publish();
 
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
@@ -124,6 +143,33 @@ public class Telemetry {
             m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
             m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
+        }
+    }
+
+    public void updateAprilTagDetections(List<PhotonPipelineResult> left, List<PhotonPipelineResult> right) {
+        for (var result : left) {
+            var targets = result.getTargets();
+            Pose3d[] targetsArr = new Pose3d[targets.size()];
+            long[] targetIds = new long[targetsArr.length];
+            for(int i = 0; i < targetsArr.length; i++){
+                targetIds[i] = targets.get(i).getFiducialId();
+                targetsArr[i] = Constants.tagLayout.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
+            }
+            long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
+            leftCamDetects.set(targetsArr, timestampMicros);
+            leftCamIds.set(targetIds, timestampMicros);
+        }
+        for (var result : right){
+            var targets = result.getTargets();
+            Pose3d[] targetsArr = new Pose3d[targets.size()];
+            long[] targetIds = new long[targetsArr.length];
+            for(int i = 0; i < targetsArr.length; i++){
+                targetIds[i] = targets.get(i).getFiducialId();
+                targetsArr[i] = Constants.tagLayout.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
+            }
+            long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
+            rightCamDetects.set(targetsArr, timestampMicros);
+            rightCamIds.set(targetIds, timestampMicros);
         }
     }
 }
