@@ -88,6 +88,7 @@ public class Constants {
         Inches.of(1.1875), 
         Inches.of(-14.125), 
         Inches.of(15.25), 
-        new Rotation3d(0, 25*Math.PI/180, -90*Math.PI/180));
+        //Right camera is 90 degrees clockwise, making the image have to be 90 degrees counterclockwise
+        new Rotation3d(-90*Math.PI/180, 25*Math.PI/180, -90*Math.PI/180));
     public static final String rightCamName = "Right Camera";
 }
