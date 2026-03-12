@@ -3,41 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.351,
-        "y": 5.977
+        "x": 7.651786885245903,
+        "y": 5.651508064516129
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1385928059751684,
-        "y": 5.960642968665087
+        "x": 2.199217754659128,
+        "y": 5.642919675731207
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.34914742812818,
-        "y": 5.976630650883189
+        "x": 3.617967741935484,
+        "y": 5.651508064516129
       },
       "prevControl": {
-        "x": 1.0442297510887217,
-        "y": 6.01706191256448
-      },
-      "nextControl": {
-        "x": 1.5969782351164064,
-        "y": 5.94376895422029
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.472,
-        "y": 5.363107142857143
-      },
-      "prevControl": {
-        "x": 2.0291411790646476,
-        "y": 5.5606932969965435
+        "x": 4.021587899109591,
+        "y": 5.657136164608289
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,11 +30,25 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7210191082802602,
+      "waypointRelativePos": 0.1631874298540961,
       "rotationDegrees": 180.0
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.4953183520599251,
+      "maxWaypointRelativePos": 0.6760299625468161,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -63,13 +61,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 148.602
+    "rotation": 180.0
   },
   "reversed": false,
-  "folder": "Woodhaven",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

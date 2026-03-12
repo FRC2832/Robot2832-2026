@@ -3,53 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.351,
-        "y": 5.977
+        "x": 1.943,
+        "y": 1.595
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1385928059751684,
-        "y": 5.960642968665087
+        "x": 2.2442659858366727,
+        "y": 1.8971727909113596
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.34914742812818,
-        "y": 5.976630650883189
+        "x": 3.597,
+        "y": 2.353
       },
       "prevControl": {
-        "x": 1.0442297510887217,
-        "y": 6.01706191256448
-      },
-      "nextControl": {
-        "x": 1.5969782351164064,
-        "y": 5.94376895422029
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.472,
-        "y": 5.363107142857143
-      },
-      "prevControl": {
-        "x": 2.0291411790646476,
-        "y": 5.5606932969965435
+        "x": 3.8381857854111017,
+        "y": 2.4187983048081794
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.7210191082802602,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -63,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 148.602
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": "Woodhaven",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -138.431
   },
   "useDefaultConstraints": true
 }

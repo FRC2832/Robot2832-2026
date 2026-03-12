@@ -3,6 +3,7 @@
   "robotLength": 0.635,
   "holonomicMode": true,
   "pathFolders": [
+    "Folder",
     "Woodhaven"
   ],
   "autoFolders": [
