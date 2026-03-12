@@ -9,12 +9,16 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.revrobotics.util.StatusLogger;
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -50,6 +54,9 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    //For use with pathplanner
+    public static final SwerveRequest.RobotCentric robotCentricDrive = new SwerveRequest.RobotCentric()
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     public static final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -89,7 +96,8 @@ public class RobotContainer {
         operatorController = new CommandXboxController(1);
         visionSubsystem = new VisionSubsystem();
         configureBindings();
-        
+        SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("Hub Shoot Once");
+        SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
     private void configureBindings() {
@@ -190,19 +198,20 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // Simple drive forward auton
-        final var idle = new SwerveRequest.Idle();
-        return Commands.sequence(
-                // Reset our field centric heading to match the robot
-                // facing away from our alliance station wall (0 deg).
-                drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
-                // Then slowly drive forward (away from us) for 5 seconds.
-                drivetrain.applyRequest(() -> drive.withVelocityX(0.5)
-                        .withVelocityY(0)
-                        .withRotationalRate(0))
-                        .withTimeout(5.0),
-                // Finally idle for the rest of auton
-                drivetrain.applyRequest(() -> idle));
+        return new PathPlannerAuto("Hub Shoot Once");
+        // // Simple drive forward auton
+        // final var idle = new SwerveRequest.Idle();
+        // return Commands.sequence(
+        //         // Reset our field centric heading to match the robot
+        //         // facing away from our alliance station wall (0 deg).
+        //         drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
+        //         // Then slowly drive forward (away from us) for 5 seconds.
+        //         drivetrain.applyRequest(() -> drive.withVelocityX(0.5)
+        //                 .withVelocityY(0)
+        //                 .withRotationalRate(0))
+        //                 .withTimeout(5.0),
+        //         // Finally idle for the rest of auton
+        //         drivetrain.applyRequest(() -> idle));
     }
 
     // Used in DriveSpeedCMDs to set speedMultiplier
