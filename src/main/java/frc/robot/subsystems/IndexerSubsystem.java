@@ -25,7 +25,7 @@ public class IndexerSubsystem extends SubsystemBase {
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
     public enum Speed {
         STOP(0),
-        FORWARD(0.1),
+        FORWARD(0.2),
         REVERSE(-0.1);
 
         private final double percentOutput;

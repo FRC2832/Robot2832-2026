@@ -45,9 +45,9 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
-    private static double MaxSpeed = 0.5 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
+    private static double MaxSpeed = 0.6 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
                                                                                         // speed
-    private double MaxAngularRate = 0.8 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
+    private double MaxAngularRate = 0.9 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
                                                                                             // second
     // max angular velocity
 
@@ -171,7 +171,7 @@ public class RobotContainer {
         operatorController.leftTrigger(.3).whileTrue(intakeRollerSubsystem.reverseIntakeCommand());
 
         // PPT / Delivering ***************
-        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
+        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand()
                                         .alongWith(indexerSubsystem.reverseDeliverCommand()
                                         .alongWith(shooterSubsystem.reverseShooter())));

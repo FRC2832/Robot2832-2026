@@ -29,7 +29,7 @@ import frc.robot.Constants.KrakenX60;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.3, rightSpeed = 0.3, acceleratorSpeed = 0.4;
+    public static double leftSpeed = 0.28, rightSpeed = 0.28, acceleratorSpeed = 0.33;
 
     private VelocityTorqueCurrentFOC control = new VelocityTorqueCurrentFOC(0).withSlot(0);
 
@@ -60,18 +60,18 @@ public class ShooterSubsystem extends SubsystemBase {
                         new CurrentLimitsConfigs()
                                 .withStatorCurrentLimit(Amps.of(60))
                                 .withStatorCurrentLimitEnable(true)
-                                .withSupplyCurrentLimit(Amps.of(50))
+                                .withSupplyCurrentLimit(Amps.of(55))
                                 .withSupplyCurrentLimitEnable(true))
                 .withSlot0(
                         new Slot0Configs()
-                                .withKP(3)
-                                .withKI(0.5)
-                                .withKD(0.01)
+                                .withKP(13)
+                                .withKI(0)
+                                .withKD(0.1)
                                 .withKS(0.05)
                                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                                 // I changed the KV.
-                                .withKV(8.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting
-                                                                                            // max RPS
+                                .withKV(26.31 / 31.277344) //current for rps, over rps
+                                .withKA(17.25 / 44.38)
                 );
         motor.getConfigurator().apply(config);
     }
@@ -103,7 +103,9 @@ public class ShooterSubsystem extends SubsystemBase {
     { 
         return startEnd(
             () -> {
-                setMotorSpeed(0, 0, 0);
+                leftShooterMotor.set(0);
+                rightShooterMotor.set(0);
+                accelerator.set(0);
             },
             () -> {}
         );
