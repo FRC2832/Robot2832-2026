@@ -30,8 +30,8 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
      public enum Speed {
         STOP(0),
-        INTAKE(0.75),
-        REVERSE(-0.75);
+        INTAKE(0.67),
+        REVERSE(-0.67);
 
         private final double percentOutput;
 
@@ -81,7 +81,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
                     .withKP(0.5)
                     .withKI(2)
                     .withKD(0)
-                    .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
+                    .withKV(10.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
             );
             motor.getConfigurator().apply(config);
     }

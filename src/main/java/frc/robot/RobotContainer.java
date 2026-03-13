@@ -172,7 +172,9 @@ public class RobotContainer {
 
         // PPT / Delivering ***************
         operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
-        operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand());
+        operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand()
+                                        .alongWith(indexerSubsystem.reverseDeliverCommand()
+                                        .alongWith(shooterSubsystem.reverseShooter())));
 
         // Shooter ************************
         operatorController.y().toggleOnTrue(new SpinShooterCommand());

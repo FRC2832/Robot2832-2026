@@ -66,7 +66,8 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withKD(0.01)
                                 .withKS(0.05)
                                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
-                                .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting
+                                // I changed the KV.
+                                .withKV(8.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting
                                                                                             // max RPS
                 );
         motor.getConfigurator().apply(config);
@@ -100,6 +101,16 @@ public class ShooterSubsystem extends SubsystemBase {
         return startEnd(
             () -> {
                 setMotorSpeed(0, 0, 0);
+            },
+            () -> {}
+        );
+    }
+
+    public Command reverseShooter() 
+    { 
+        return startEnd(
+            () -> {
+                setMotorSpeed(-.4, -.4, -.4);
             },
             () -> {}
         );
