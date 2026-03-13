@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -58,6 +59,8 @@ public class TurretSubsystem extends SubsystemBase {
         // Confirm appropriate inversion, voltage limits, current limits, and PID constants
         configureMotor(leftRotationMotor, InvertedValue.CounterClockwise_Positive);
         configureMotor(rightRotationMotor, InvertedValue.CounterClockwise_Positive); // inverted
+
+        SmartDashboard.putData(this); 
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {

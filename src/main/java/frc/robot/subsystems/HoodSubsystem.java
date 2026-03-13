@@ -12,6 +12,7 @@ import com.revrobotics.servohub.config.ServoHubConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -37,6 +38,8 @@ public class HoodSubsystem extends SubsystemBase {
         configureServo(leftHoodRightServo);
         configureServo(rightHoodLeftServo);
         configureServo(rightHoodRightServo);
+
+        SmartDashboard.putData(this); 
     }
 
     private void configureServo(ServoChannel channel) {

@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -42,6 +43,8 @@ public class ShooterSubsystem extends SubsystemBase {
         configureMotor(rightShooterMotor, InvertedValue.Clockwise_Positive);
         configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
         configureMotor(accelerator, InvertedValue.CounterClockwise_Positive);
+
+        SmartDashboard.putData(this); 
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
