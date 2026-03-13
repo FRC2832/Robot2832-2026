@@ -49,13 +49,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Left Bump Prep Cross"
+            "pathName": "Left Bump Prep Cross"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Left Bump Cross"
+            "pathName": "Left Bump Cross"
           }
         },
         {
@@ -73,7 +73,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Left Bump Intake"
+            "pathName": "Left Bump Intake"
           }
         },
         {
@@ -85,13 +85,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Prep Return Cross"
+            "pathName": "Left-Side Prep Return Cross"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Cross Back"
+            "pathName": "Left-Side Cross Back"
           }
         },
         {

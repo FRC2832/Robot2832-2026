@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.6909098360655737,
-        "y": 5.580532786885246
+        "x": 5.6749426229508195,
+        "y": 5.429573770491802
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.054092955558137,
-        "y": 5.574336566125378
+        "x": 4.256395128456969,
+        "y": 5.441112021194405
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.545549180324009,
-        "y": 5.580532786885246
+        "x": 3.5615163934426235,
+        "y": 5.429573770491802
       },
       "prevControl": {
-        "x": 5.295554858506947,
-        "y": 5.5822177376938535
+        "x": 4.09451350206238,
+        "y": 5.43222452615408
       },
       "nextControl": null,
       "isLocked": false,
@@ -32,8 +32,8 @@
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.3633004926108377,
-      "maxWaypointRelativePos": 0.6046798029556653,
+      "minWaypointRelativePos": 0.18596059113300525,
+      "maxWaypointRelativePos": 0.41945812807881766,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
@@ -55,14 +55,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 180.0
+    "velocity": 1.5,
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Woodhaven",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.471678571428572,
-        "y": 5.363107142857143
+        "x": 7.687729508196721,
+        "y": 5.429573770491802
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8022177638908388,
-        "y": 5.390248041360205
+        "x": 5.9599911926682125,
+        "y": 5.437238152147884
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.6909098360655737,
-        "y": 5.580532786885246
+        "x": 5.6749426229508195,
+        "y": 5.429573770491802
       },
       "prevControl": {
-        "x": 3.3864326962455573,
-        "y": 5.556483860382046
+        "x": 6.3203889843466925,
+        "y": 5.427444115502222
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 180.0
+    "velocity": 1.0,
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "Woodhaven",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 148.602
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

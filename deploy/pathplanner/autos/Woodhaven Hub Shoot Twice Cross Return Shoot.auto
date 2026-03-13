@@ -55,13 +55,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Hub Cross"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Hub Prep Intake"
+            "pathName": "Hub Cross & Prep Intake"
           }
         },
         {

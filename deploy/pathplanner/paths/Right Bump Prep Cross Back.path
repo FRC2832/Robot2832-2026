@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.943,
-        "y": 1.595
+        "x": 7.63022131147541,
+        "y": 2.6188606557377043
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2442659858366727,
-        "y": 1.8971727909113596
+        "x": 8.066751389210454,
+        "y": 2.6914698703172015
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.597,
+        "x": 5.955,
         "y": 2.353
       },
       "prevControl": {
-        "x": 3.8381857854111017,
-        "y": 2.4187983048081794
+        "x": 6.3267261159009704,
+        "y": 2.4236142994363816
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,10 +45,10 @@
     "rotation": 90.0
   },
   "reversed": false,
-  "folder": "Woodhaven",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -138.431
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }
