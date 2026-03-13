@@ -9,13 +9,16 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,7 +28,9 @@ import frc.robot.Constants.KrakenX60;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.4, rightSpeed = 0.4, acceleratorSpeed = 0.4;
+    public static double leftSpeed = 0.3, rightSpeed = 0.3, acceleratorSpeed = 0.4;
+
+    private VelocityTorqueCurrentFOC control = new VelocityTorqueCurrentFOC(0).withSlot(0);
 
     public ShooterSubsystem() {
         rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID, Constants.CANivoreCANBus);
@@ -52,13 +57,15 @@ public class ShooterSubsystem extends SubsystemBase {
                         new CurrentLimitsConfigs()
                                 .withStatorCurrentLimit(Amps.of(60))
                                 .withStatorCurrentLimitEnable(true)
-                                .withSupplyCurrentLimit(Amps.of(40))
+                                .withSupplyCurrentLimit(Amps.of(50))
                                 .withSupplyCurrentLimitEnable(true))
                 .withSlot0(
                         new Slot0Configs()
-                                .withKP(0.5)
-                                .withKI(2)
-                                .withKD(0)
+                                .withKP(3)
+                                .withKI(0.5)
+                                .withKD(0.01)
+                                .withKS(0.05)
+                                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                                 .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting
                                                                                             // max RPS
                 );
@@ -66,9 +73,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
-        rightShooterMotor.set(rightSpeed);
-        leftShooterMotor.set(leftSpeed);
-        accelerator.set(accelSpeed);
+        rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
+        leftShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(leftSpeed)));
+        accelerator.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(accelSpeed)));
     }
 
     @Override
