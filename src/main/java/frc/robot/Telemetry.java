@@ -12,10 +12,12 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
 import edu.wpi.first.networktables.IntegerArrayTopic;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -79,6 +81,17 @@ public class Telemetry {
             .getStructArrayTopic("TagPoses", Pose3d.struct).publish();
     private final IntegerArrayPublisher rightCamIds = rightCamTable.getIntegerArrayTopic("FiducialIDs").publish();
     public final StructPublisher<Pose2d> estimatedRobotPose = visionTable.getStructTopic("EstimatedPose", Pose2d.struct).publish();
+
+    private final NetworkTable shooterTable = inst.getTable("ShooterData");
+    private final NetworkTable leftShooter = shooterTable.getSubTable("Left");
+    private final NetworkTable rightShooter = shooterTable.getSubTable("Right");
+    private final NetworkTable accelerator = shooterTable.getSubTable("Accelerator");
+    public final DoublePublisher leftShooterSpeed = leftShooter.getDoubleTopic("Speed").publish();
+    public final DoublePublisher rightShooterSpeed = rightShooter.getDoubleTopic("Speed").publish();
+    public final DoublePublisher acceleratorSpeed = accelerator.getDoubleTopic("Speed").publish();
+    public final BooleanPublisher leftShooterAtSpeed = leftShooter.getBooleanTopic("AtSpeed").publish();
+    public final BooleanPublisher rightShooterAtSpeed = rightShooter.getBooleanTopic("AtSpeed").publish();
+    public final BooleanPublisher acceleratorAtSpeed = accelerator.getBooleanTopic("AtSpeed").publish();
 
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {

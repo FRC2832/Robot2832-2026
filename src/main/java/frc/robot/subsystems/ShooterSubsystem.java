@@ -20,11 +20,13 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.KrakenX60;
+import frc.robot.RobotContainer;
 
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
@@ -85,6 +87,16 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        double left, right, acc;
+        left = leftShooterMotor.getVelocity().getValueAsDouble();
+        right = rightShooterMotor.getVelocity().getValueAsDouble();
+        acc = accelerator.getVelocity().getValueAsDouble();
+        RobotContainer.logger.leftShooterSpeed.set(left);
+        RobotContainer.logger.rightShooterSpeed.set(right);
+        RobotContainer.logger.acceleratorSpeed.set(acc);
+        RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 28, 1));
+        RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 28, 1));
+        RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
     }
 
     public static double getLastLeftSpeed(){
