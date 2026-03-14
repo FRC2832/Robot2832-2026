@@ -171,13 +171,13 @@ public class RobotContainer {
         operatorController.leftTrigger(.3).whileTrue(intakeRollerSubsystem.reverseIntakeCommand());
 
         // PPT / Delivering ***************
-        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand());
+        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand()
                                         .alongWith(indexerSubsystem.reverseDeliverCommand()
                                         .alongWith(shooterSubsystem.reverseShooter())));
 
         // Shooter ************************
-        operatorController.y().toggleOnTrue(new SpinShooterCommand());
+        operatorController.y().whileTrue(new SpinShooterCommand());
 
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
