@@ -15,6 +15,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -33,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
     public static double leftSpeed = 0.28, rightSpeed = 0.28, acceleratorSpeed = 0.33;
 
-    private VelocityTorqueCurrentFOC control = new VelocityTorqueCurrentFOC(0).withSlot(0);
+    private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 
     public ShooterSubsystem() {
         rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID, Constants.CANivoreCANBus);
@@ -55,9 +56,9 @@ public class ShooterSubsystem extends SubsystemBase {
                         new MotorOutputConfigs()
                                 .withInverted(invertDirection)
                                 .withNeutralMode(NeutralModeValue.Coast))
-                .withVoltage(
-                        new VoltageConfigs()
-                                .withPeakReverseVoltage(Volts.of(0)))
+                // .withVoltage(
+                //         new VoltageConfigs()
+                //                 .withPeakReverseVoltage(Volts.of(0)))
                 .withCurrentLimits(
                         new CurrentLimitsConfigs()
                                 .withStatorCurrentLimit(Amps.of(60))
@@ -72,8 +73,8 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withKS(0.05)
                                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                                 // I changed the KV.
-                                .withKV(26.31 / 31.277344) //current for rps, over rps
-                                .withKA(17.25 / 44.38)
+                                .withKV(5.5/30.0) //.withKV(26.31 / 31.277344) //current for rps, over rps
+                                .withKA(12/44.38) //.withKA(17.25 / 44.38)
                 );
         motor.getConfigurator().apply(config);
     }
@@ -131,5 +132,17 @@ public class ShooterSubsystem extends SubsystemBase {
             },
             () -> {}
         );
+    }
+
+    public double getLeftMotorSpeed(){
+        return leftShooterMotor.getVelocity().getValueAsDouble();
+    }
+
+    public double getRightMotorSpeed(){
+        return rightShooterMotor.getVelocity().getValueAsDouble();
+    }
+
+    public double getAccelMotorSpeed(){
+        return accelerator.getVelocity().getValueAsDouble();
     }
 }

@@ -55,10 +55,10 @@ public class HoodSubsystem extends SubsystemBase {
     public void setHoodPositions(double leftHoodPosition, double rightHoodPosition) {
         this.leftHoodPosition = leftHoodPosition;
         this.rightHoodPosition = rightHoodPosition;
-        setServo(leftHoodLeftServo, 0.3 * MathUtil.clamp(leftHoodPosition, -1, 1));
-        setServo(leftHoodRightServo, 0.3 * MathUtil.clamp(leftHoodPosition, -1, 1));
-        setServo(rightHoodLeftServo, 0.3 * MathUtil.clamp(rightHoodPosition, -1, 1));
-        setServo(rightHoodRightServo, 0.3 * MathUtil.clamp(rightHoodPosition, -1, 1));
+        setServo(leftHoodLeftServo, 0.6 * MathUtil.clamp(leftHoodPosition, -1, 1));
+        setServo(leftHoodRightServo, 0.6 * MathUtil.clamp(leftHoodPosition, -1, 1));
+        setServo(rightHoodLeftServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
+        setServo(rightHoodRightServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
     }
 
     private void setServo(ServoChannel servo, double position) {

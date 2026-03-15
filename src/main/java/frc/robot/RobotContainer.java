@@ -39,6 +39,7 @@ import frc.robot.subsystems.PPTSubsystem;
 import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.commands.MoveHoodCommand;
 import frc.robot.commands.MoveIntake;
+import frc.robot.commands.SpinAndShootWhileReady;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
@@ -178,7 +179,7 @@ public class RobotContainer {
 
         // Shooter ************************
         operatorController.y().whileTrue(new SpinShooterCommand());
-
+        operatorController.a().whileTrue(new SpinAndShootWhileReady());
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
             SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
