@@ -32,7 +32,7 @@ public class PPTSubsystem extends SubsystemBase {
 
     public enum Speed {
         STOP(0),
-        FORWARD(0.8),
+        FORWARD(0.6),
         REVERSE(-0.67);
 
         private final double percentOutput;
@@ -96,10 +96,10 @@ public class PPTSubsystem extends SubsystemBase {
 
     // Speed controls ----------------------------------
     public void setPPTSpeed(Speed rightSpeed, Speed leftSpeed) {
-        rightPPT.setControl(
-            rightPPTVoltageRequest
-                .withOutput(rightSpeed.voltage())
-        );
+        // rightPPT.setControl(
+        //     rightPPTVoltageRequest
+        //         .withOutput(rightSpeed.voltage())
+        // );
         leftPPT.setControl(
             leftPPTVoltageRequest
                 .withOutput(leftSpeed.voltage())

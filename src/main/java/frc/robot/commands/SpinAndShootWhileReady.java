@@ -15,7 +15,7 @@ import frc.robot.subsystems.PPTSubsystem;
 public class SpinAndShootWhileReady extends Command {
 
     private final double TARGET_SPEED = 27;
-    int cyclesSinceLastPush = 0;
+    int cyclesSinceLastPush = Integer.MAX_VALUE;
     /** Creates a new ShootWhileReady. */
     public SpinAndShootWhileReady() {
         // Use addRequirements() here to declare subsystem dependencies.
@@ -38,14 +38,15 @@ public class SpinAndShootWhileReady extends Command {
         double rightSpeed = 0.285;//SpinShooterCommand.rightSpeed.getAsDouble();
         double accelSpeed = 0.34;//SpinShooterCommand.acceleratorSpeed.getAsDouble();
         RobotContainer.shooterSubsystem.setMotorSpeed(rightSpeed, leftSpeed, accelSpeed);
-        if(RobotContainer.shooterSubsystem.getLeftMotorSpeed() > TARGET_SPEED 
-                && RobotContainer.shooterSubsystem.getRightMotorSpeed() > TARGET_SPEED){
-            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.FORWARD, PPTSubsystem.Speed.FORWARD);
+        if(RobotContainer.shooterSubsystem.getLeftMotorSpeed() > TARGET_SPEED){
+                //&& RobotContainer.shooterSubsystem.getRightMotorSpeed() > TARGET_SPEED){
+            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.FORWARD);
             cyclesSinceLastPush = 0;
-        }else if(cyclesSinceLastPush++ < 3){
-            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.FORWARD, PPTSubsystem.Speed.FORWARD);
+        }else if(cyclesSinceLastPush < 1){
+            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.FORWARD);
+            cyclesSinceLastPush++;
         }else{
-            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.STOP);
+            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.REVERSE);
         }
     }
 
@@ -54,6 +55,7 @@ public class SpinAndShootWhileReady extends Command {
     public void end(boolean interrupted) {
         RobotContainer.shooterSubsystem.setMotorSpeed(0, 0, 0);
         RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.STOP);
+        cyclesSinceLastPush = Integer.MAX_VALUE;
     }
 
     // Returns true when the command should end.

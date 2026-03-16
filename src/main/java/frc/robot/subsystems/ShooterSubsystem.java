@@ -80,7 +80,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
-        rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
+        //rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
         leftShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(leftSpeed)));
         accelerator.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(accelSpeed)));
     }

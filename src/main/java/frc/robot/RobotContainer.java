@@ -210,7 +210,8 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new PathPlannerAuto("Hub Shoot Once");
+        return turretSubsystem.runOnce(() -> turretSubsystem.setTurretVoltage(6, 6));
+        //return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();
         // return Commands.sequence(
