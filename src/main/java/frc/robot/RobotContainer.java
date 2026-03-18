@@ -84,6 +84,8 @@ public class RobotContainer {
 
     private static final double shooterManualStepSize = 0.05;
 
+    SendableChooser<Command> autoChooser;
+
     public RobotContainer() {
         // PathPlannerLogging.clearLoggingCallbacks();
         // SignalLogger.enableAutoLogging(false);
@@ -100,7 +102,11 @@ public class RobotContainer {
         operatorController = new CommandXboxController(1);
         visionSubsystem = new VisionSubsystem();
         configureBindings();
-        SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("Hub Shoot Once");
+        // Auto Chooser Setup -----------------------------------------------------------------------------------------------------------------------------
+        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot Once"));
+        autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven Left Bump Shoot Once"));
+        autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven Right Bump Shoot Once"));
         SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
@@ -210,7 +216,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return turretSubsystem.runOnce(() -> turretSubsystem.setTurretVoltage(6, 6));
+        return autoChooser.getSelected();
         //return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();
