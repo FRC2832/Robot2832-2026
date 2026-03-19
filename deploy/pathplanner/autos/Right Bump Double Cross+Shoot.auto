@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Bump Shoot near Bump"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Cross Bump To Neutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Start Ingestor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Collect from Pile"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Ingestor"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Return from Neutral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
