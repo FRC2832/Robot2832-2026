@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.stream.Stream;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -103,7 +105,7 @@ public class RobotContainer {
         visionSubsystem = new VisionSubsystem();
         configureBindings();
         // Auto Chooser Setup -----------------------------------------------------------------------------------------------------------------------------
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Stream.of());
         autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot Once"));
         autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven Left Bump Shoot Once"));
         autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven Right Bump Shoot Once"));
