@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.stream.Stream;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -84,6 +86,8 @@ public class RobotContainer {
 
     private static final double shooterManualStepSize = 0.05;
 
+    SendableChooser<Command> autoChooser;
+
     public RobotContainer() {
         // PathPlannerLogging.clearLoggingCallbacks();
         // SignalLogger.enableAutoLogging(false);
@@ -100,7 +104,11 @@ public class RobotContainer {
         operatorController = new CommandXboxController(1);
         visionSubsystem = new VisionSubsystem();
         configureBindings();
-        SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser("Hub Shoot Once");
+        // Auto Chooser Setup -----------------------------------------------------------------------------------------------------------------------------
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Stream.of());
+        autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot Once"));
+        autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven Left Bump Shoot Once"));
+        autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven Right Bump Shoot Once"));
         SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
@@ -210,7 +218,7 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return turretSubsystem.runOnce(() -> turretSubsystem.setTurretVoltage(6, 6));
+        return autoChooser.getSelected();
         //return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();
