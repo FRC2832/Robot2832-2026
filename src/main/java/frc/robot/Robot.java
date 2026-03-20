@@ -35,7 +35,6 @@ public class Robot extends TimedRobot {
                                                                   "GO HOOOOOMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
                                                             5000);
 
-
     /* log and replay timestamp and joystick data */
     private final HootAutoReplay m_timeAndJoystickReplay = new HootAutoReplay()
             .withTimestampReplay()
@@ -44,6 +43,8 @@ public class Robot extends TimedRobot {
     public Robot() {
         m_robotContainer = new RobotContainer();
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+        Elastic.selectTab("Autonomous"); // I heard a rumor that if you don't run an elastic command in init the robot explodes?
     }
 
     @Override
@@ -77,6 +78,8 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             CommandScheduler.getInstance().schedule(m_autonomousCommand);
         }
+
+        Elastic.selectTab("Autonomous");
     }
 
     @Override
@@ -94,16 +97,21 @@ public class Robot extends TimedRobot {
         }
 
         nextPhaseIndex = 0;
+
+        Elastic.selectTab("Teleop");
     }
 
     @Override
     public void teleopPeriodic() {
         // Checks if we're 1. in bounds 2. near a phase shift and 3. The hub will be active during that shift. This is an insane way to write this code.
         // Then waits till the next phase by iterating upon next phase index.
-        if(nextPhaseIndex < NEAR_SHIFT_TIMES.length && matchTime <= NEAR_SHIFT_TIMES[nextPhaseIndex] && PhaseChecker.isHubActive(matchTime + 5)){
-            // I didn't add a rumble because I personally hate those but if you want one it should go here. Better yet, you could make it toggleable.
-            Elastic.sendNotification(hubActiveSoonNotification);
-            nextPhaseIndex++;
+        // Also checks if the match time is above -1 because otherwise you get one million notifications when just running teleop.
+        if(matchTime > -1){
+            if(nextPhaseIndex < NEAR_SHIFT_TIMES.length && matchTime <= NEAR_SHIFT_TIMES[nextPhaseIndex] && PhaseChecker.isHubActive(matchTime + 4)){
+                // I didn't add a rumble because I personally hate those but if you want one it should go here. Better yet, you could make it toggleable.
+                Elastic.sendNotification(hubActiveSoonNotification);
+                nextPhaseIndex++;
+            }
         }
     }
 
