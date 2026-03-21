@@ -17,9 +17,11 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.revrobotics.util.StatusLogger;
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,6 +48,7 @@ import frc.robot.commands.SpinAndShootWhileReady;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretSubsystem_Old;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
@@ -77,12 +80,15 @@ public class RobotContainer {
 
     // Subsytem declaration
     public static ShooterSubsystem shooterSubsystem;
-    public static TurretSubsystem turretSubsystem;
+    //public static TurretSubsystem_Old turretSubsystem;
+    public static TurretSubsystem leftTurretSubsystem;
+    public static TurretSubsystem rightTurretSubsystem;
     public static IntakeRollerSubsystem intakeRollerSubsystem;
     public static IntakeExtenderSubsystem intakeExtenderSubsystem;
     public static IndexerSubsystem indexerSubsystem;
     public static PPTSubsystem pptSubsystem;
-    public static HoodSubsystem hoodSubsystem;
+    public static HoodSubsystem leftHoodSubsystem;
+    public static HoodSubsystem rightHoodSubsystem;
     public static VisionSubsystem visionSubsystem;
 
     private static final double shooterManualStepSize = 0.05;
@@ -95,12 +101,16 @@ public class RobotContainer {
         // StatusLogger.disableAutoLogging();
         drivetrain = TunerConstants.createDrivetrain();
         shooterSubsystem = new ShooterSubsystem();
-        turretSubsystem = new TurretSubsystem();
+        leftTurretSubsystem = new TurretSubsystem(Constants.LEFT_ROTATOR_ID, Constants.LEFT_ROTATOR_CANCODER_ID,
+                         InvertedValue.CounterClockwise_Positive, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE, true);
+        rightTurretSubsystem = new TurretSubsystem(Constants.RIGHT_ROTATOR_ID, Constants.RIGHT_ROTATOR_CANCODER_ID,
+                         InvertedValue.CounterClockwise_Positive, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.RIGHT_TURRET_MAX_ANGLE, false);
         intakeRollerSubsystem = new IntakeRollerSubsystem();
         intakeExtenderSubsystem = new IntakeExtenderSubsystem();
         indexerSubsystem = new IndexerSubsystem();
         pptSubsystem = new PPTSubsystem();
-        hoodSubsystem = new HoodSubsystem();
+        leftHoodSubsystem = new HoodSubsystem(leftTurretSubsystem);
+        rightHoodSubsystem = new HoodSubsystem(rightTurretSubsystem);
         driverController = new CommandXboxController(0);
         operatorController = new CommandXboxController(1);
         visionSubsystem = new VisionSubsystem();
@@ -190,8 +200,11 @@ public class RobotContainer {
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
 
-        new Trigger(() -> Math.abs(operatorController.getLeftX()) > 0.1).whileTrue(new MoveTurretCommand());
-        new Trigger(() -> Math.abs(operatorController.getLeftX()) < 0.1).onTrue(turretSubsystem.stopTurretRotation());
+        operatorController.b().onTrue(leftTurretSubsystem.enableAutoAim().alongWith(rightTurretSubsystem.enableAutoAim()));
+        leftTurretSubsystem.setDefaultCommand(new MoveTurretCommand(leftTurretSubsystem));
+        rightTurretSubsystem.setDefaultCommand(new MoveTurretCommand(rightTurretSubsystem));
+        
+        
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
             SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
@@ -212,7 +225,8 @@ public class RobotContainer {
         // TODO add switch back to automatic targeting
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
         // targeting suppliers
-        new Trigger(() -> Math.abs(operatorController.getRightY()) > 0.1).whileTrue(new MoveHoodCommand());
+        leftHoodSubsystem.setDefaultCommand(new MoveHoodCommand(leftHoodSubsystem));
+        rightHoodSubsystem.setDefaultCommand(new MoveHoodCommand(rightHoodSubsystem));
         //Commands for auton
         NamedCommands.registerCommand("Shoot", new SpinShooterCommand().withTimeout(6).alongWith(
                 new WaitCommand(3).andThen(pptSubsystem.deliverCommand().withTimeout(3))
@@ -243,4 +257,6 @@ public class RobotContainer {
     public void setSpeedMultiplier(double multiplier) {
         speedMultiplier = multiplier;
     }
+
+    
 }

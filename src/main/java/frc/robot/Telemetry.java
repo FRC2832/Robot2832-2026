@@ -166,7 +166,7 @@ public class Telemetry {
             long[] targetIds = new long[targetsArr.length];
             for(int i = 0; i < targetsArr.length; i++){
                 targetIds[i] = targets.get(i).getFiducialId();
-                targetsArr[i] = Constants.tagLayout.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
+                targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             leftCamDetects.set(targetsArr, timestampMicros);
@@ -178,7 +178,7 @@ public class Telemetry {
             long[] targetIds = new long[targetsArr.length];
             for(int i = 0; i < targetsArr.length; i++){
                 targetIds[i] = targets.get(i).getFiducialId();
-                targetsArr[i] = Constants.tagLayout.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
+                targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             rightCamDetects.set(targetsArr, timestampMicros);

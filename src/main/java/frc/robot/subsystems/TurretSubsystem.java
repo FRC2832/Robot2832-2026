@@ -9,37 +9,29 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.MissingFormatArgumentException;
-
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.Supplier;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.controls.ControlRequest;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.AngleUnit;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Utils;
 import frc.robot.Constants.KrakenX60;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -50,41 +42,23 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.remote.TalonFXWrapper;
 
 public class TurretSubsystem extends SubsystemBase {
-    /** Creates a new TurretSubsystem. */
-    private TalonFX leftRotationMotor, rightRotationMotor;
-    private CANcoder leftCANcoder, rightCANcoder;
-    //First word is the hood the servo is on, relative to robot orientation
-    private final MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0).withSlot(0);
+    TalonFX motor;
+    CANcoder cancoder;
+    TalonFXWrapper motorWrapper;
+    Pivot turret;
+    Angle minAngle, maxAngle;
+    Translation3d position;
+    boolean isLeft;
+    public boolean isAutoAim;
 
-    private TalonFXWrapper leftRotationMotorWrapper, rightRotationMotorWrapper;
-
-    private Pivot leftTurret, rightTurret;
-
-    private double turretTargetAngle = 0;
-
-    public static boolean isAutoAim = false;
-
-    public TurretSubsystem() {
-        leftRotationMotor = new TalonFX(Constants.LEFT_ROTATOR_ID, Constants.CANivoreCANBus);
-        rightRotationMotor = new TalonFX(Constants.RIGHT_ROTATOR_ID, Constants.CANivoreCANBus);
-        leftCANcoder = new CANcoder(Constants.LEFT_ROTATOR_CANCODER_ID, Constants.CANivoreCANBus);
-        rightCANcoder = new CANcoder(Constants.RIGHT_ROTATOR_CANCODER_ID, Constants.CANivoreCANBus);
-
-        leftRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
-        rightRotationMotor.setPosition(Angle.ofBaseUnits(0, Units.Degrees));
-
-        // TODO: Figure out inversion state of motors
-        // Confirm appropriate inversion, voltage limits, current limits, and PID constants
-        configureMotor(leftRotationMotor, InvertedValue.CounterClockwise_Positive);
-        configureMotor(rightRotationMotor, InvertedValue.CounterClockwise_Positive); // inverted
-
-        leftRotationMotorWrapper = configureSmartMotor(leftRotationMotor, InvertedValue.CounterClockwise_Positive, leftCANcoder);
-        rightRotationMotorWrapper = configureSmartMotor(rightRotationMotor, InvertedValue.CounterClockwise_Positive, rightCANcoder);
-
-        leftTurret = configurePivot(leftRotationMotorWrapper);
-        rightTurret = configurePivot(rightRotationMotorWrapper);
-
-        SmartDashboard.putData(this); 
+    public TurretSubsystem(int motor_id, int encoder_id, InvertedValue inverted, Angle minAngle, Angle maxAngle, boolean isLeft) {
+        motor = new TalonFX(motor_id, Constants.CANivoreCANBus);
+        cancoder = new CANcoder(encoder_id, Constants.CANivoreCANBus);
+        motorWrapper = configureSmartMotor(motor, inverted, cancoder);
+        turret = configurePivot(motorWrapper);
+        this.isLeft = isLeft;
+        position = isLeft ? Constants.LEFT_TURRET_POS : Constants.RIGHT_TURRET_POS;
+        isAutoAim = true;
     }
 
     private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder){
@@ -92,7 +66,8 @@ public class TurretSubsystem extends SubsystemBase {
             new SmartMotorControllerConfig(this)
                 .withGearing(new MechanismGearing(GearBox.fromStages("1:10", "30:40", "15:140")))
                 .withExternalEncoder(cancoder)
-                .withExternalEncoderGearing(new MechanismGearing(GearBox.fromStages("12:1", "15:140")))
+                .withExternalEncoderGearing(new MechanismGearing(GearBox.fromReductionStages(1/Constants.TURRET_ENCODER_RATIO)))
+                .withSoftLimit(minAngle, maxAngle)
                 .withVendorConfig(
                     new TalonFXConfiguration()
                         .withMotorOutput(
@@ -116,7 +91,7 @@ public class TurretSubsystem extends SubsystemBase {
                                 .withKP(0.5)
                                 .withKI(2)
                                 .withKD(0)
-                                .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
+                                .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting max RPS
                         )
                     )
         );
@@ -128,105 +103,45 @@ public class TurretSubsystem extends SubsystemBase {
         return new Pivot(config);
     }
 
-    private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
-        final TalonFXConfiguration config = new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(invertDirection)
-                    .withNeutralMode(NeutralModeValue.Coast)
-            )
-            .withVoltage(
-                new VoltageConfigs()
-                    .withPeakReverseVoltage(Volts.of(0))
-            )
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(40))
-                    .withSupplyCurrentLimitEnable(true)
-            )
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(0.5)
-                    .withKI(2)
-                    .withKD(0)
-                    .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
-            );
-            motor.getConfigurator().apply(config);
+    public Command stopRotation(){
+        return turret.setVoltage(Volts.of(0));
     }
 
-    public void setTurretPositions(Angle left, Angle right){
-        leftTurret.setAngle(left);
-        rightTurret.setAngle(right);
+    public Command setVoltage(Supplier<Voltage> voltage){
+        return turret.setVoltage(voltage);
     }
 
-    public void setTurretRotationSpeed(double left, double right){
-        leftTurret.setVoltage(Volts.of(left * 3));
-        rightTurret.setVoltage(Volts.of(right * 3));
+    public Command setTurretAngle(Supplier<Angle> angles){
+        return turret.setAngle(angles);
     }
 
-    public double getLeftTurretAngle(){
-        return 1/Constants.TURRET_ENCODER_RATIO * leftCANcoder.getAbsolutePosition().getValue().in(Degrees);
+    public Angle getTurretAngle(){
+        return turret.getAngle();
     }
 
-    public double getRightTurretAngle(){
-        return 1/Constants.TURRET_ENCODER_RATIO * rightCANcoder.getAbsolutePosition().getValue().in(Degrees);
+    public Voltage getTurretVoltage(){
+        return motorWrapper.getVoltage();
     }
 
-    public double getLeftMotorAngle(){
-        return leftRotationMotor.getPosition().getValue().in(Degrees);
+    public boolean isLeftTurret(){
+        return isLeft;
     }
 
-    public double getRightMotorAngle(){
-        return rightRotationMotor.getPosition().getValue().in(Degrees);
+    public Command aimAtPosition(Supplier<Translation2d> target, Supplier<Pose2d> robotPose){
+        return setTurretAngle(() -> {
+            Pose2d targetPose = new Pose2d(target.get(), Rotation2d.kZero);
+            Pose2d turretPose = robotPose.get().plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
+            Pose2d offset = targetPose.relativeTo(turretPose);
+            return Degrees.of(90).minus(offset.getTranslation().getAngle().getMeasure());
+        });
     }
 
-    public void setTurretAngle(double leftAngle, double rightAngle) {
-        rightAngle = MathUtil.clamp(rightAngle, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.RIGHT_TURRET_MAX_ANGLE);
-        leftAngle = MathUtil.clamp(leftAngle, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE);
-        leftRotationMotor.setPosition(Angle.ofRelativeUnits(leftAngle, Units.Degrees));
-        rightRotationMotor.setPosition(Angle.ofRelativeUnits(rightAngle, Units.Degrees));
-    }
-
-    public void moveTurretTargetAngle(double offset){
-        turretTargetAngle += offset;
-        double leftTarget = MathUtil.clamp(turretTargetAngle, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE);
-        double rightTarget = MathUtil.clamp(turretTargetAngle, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.LEFT_TURRET_MAX_ANGLE);
-        leftRotationMotor.setPosition(Angle.ofRelativeUnits(leftTarget, Units.Degrees));
-        rightRotationMotor.setPosition(Angle.ofRelativeUnits(rightTarget, Units.Degrees));
-    }
-
-    public void setTurretVoltage(double leftVoltage, double rightVoltage){
-        leftVoltage = MathUtil.clamp(leftVoltage, -12, 12);
-        rightVoltage = MathUtil.clamp(rightVoltage, -12, 12);
-        double leftAngle = getLeftTurretAngle();
-        if(leftAngle < Constants.LEFT_TURRET_MIN_ANGLE){
-            //leftRotationMotor.setControl(motionMagicRequest.withPosition(Degrees.of(Constants.LEFT_TURRET_MIN_ANGLE)));
-        }else if(leftAngle > Constants.LEFT_TURRET_MAX_ANGLE){
-            //leftRotationMotor.setControl(motionMagicRequest.withPosition(Degrees.of(Constants.LEFT_TURRET_MAX_ANGLE)));
-        }else{
-            leftRotationMotor.setVoltage(leftVoltage);
-        }
-        double rightAngle = getRightTurretAngle();
-        if(rightAngle < Constants.RIGHT_TURRET_MIN_ANGLE * 1.1){
-            rightVoltage = MathUtil.clamp(rightVoltage, -12, 0);
-        }else if(rightAngle > Constants.RIGHT_TURRET_MAX_ANGLE * 1.1){
-            rightVoltage = MathUtil.clamp(rightVoltage, 0, 12);
-        }
-        rightRotationMotor.setVoltage(rightVoltage);
-        // double leftFactor = Utils.approachFactor(leftAngle, Constants.LEFT_TURRET_MAX_ANGLE, Constants.LEFT_UPPER_APPROACH_ANGLE) 
-        //             * Utils.approachFactor(leftAngle, Constants.LEFT_TURRET_MIN_ANGLE, Constants.LEFT_LOWER_APPROACH_ANGLE);
-        // double rightFactor = Utils.approachFactor(rightAngle, Constants.RIGHT_TURRET_MAX_ANGLE, Constants.RIGHT_UPPER_APPROACH_ANGLE) 
-        //             * Utils.approachFactor(rightAngle, Constants.RIGHT_TURRET_MIN_ANGLE, Constants.RIGHT_LOWER_APPROACH_ANGLE);
-    }
-
-    public Command stopTurretRotation(){
-        return runOnce(() -> setTurretVoltage(0, 0));
+    public Command enableAutoAim(){
+        return runOnce(() -> this.isAutoAim = true);
     }
 
     @Override
     public void periodic() {
-        
+        // This method will be called once per scheduler run
     }
 }

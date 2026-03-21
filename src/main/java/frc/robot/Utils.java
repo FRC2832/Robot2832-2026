@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.util.FlippingUtil;
+
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /** A set of utility functions*/
 public class Utils {
@@ -34,5 +38,16 @@ public class Utils {
         if(Math.abs(dist) > Math.abs(approachRange)) //not in approach range yet
             return 1; //continue as we are
         return dist / approachRange;
+    }
+
+    public static boolean inAllianceZone(Pose2d robotPose){
+        if(isOnRed()){
+            return robotPose.getMeasureX().gt(Constants.RED_HUB_POS.getMeasureX());
+        }
+        return robotPose.getMeasureX().lt(Constants.BLUE_HUB_POS.getMeasureX());
+    }
+
+    public static boolean isOnRed(){
+        return DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false);
     }
 }

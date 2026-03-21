@@ -232,13 +232,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this::driveRequest, 
             new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)), 
             config, 
-            () -> DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false),
+            frc.robot.Utils::isOnRed,
             this);
     }
 
     public Pose2d getPose(){
         return this.getState().Pose;
     }
+
+    
 
     public void driveRequest(ChassisSpeeds speeds, DriveFeedforwards feedforwards){
         //ChassisSpeeds relative = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getPose().getRotation());

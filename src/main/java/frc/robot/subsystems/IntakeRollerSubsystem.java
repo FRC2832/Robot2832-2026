@@ -81,7 +81,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
                     .withKP(0.5)
                     .withKI(2)
                     .withKD(0)
-                    .withKV(10.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
+                    .withKV(10.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting max RPS
             );
             motor.getConfigurator().apply(config);
     }

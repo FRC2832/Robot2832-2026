@@ -38,15 +38,15 @@ public class VisionSubsystem extends SubsystemBase {
 
   public VisionSubsystem() {
     super();
-    leftCam = new PhotonCamera(Constants.leftCamName);
-    leftPoseEstimator = new PhotonPoseEstimator(Constants.tagLayout, Constants.leftCamPose);
-    rightCam = new PhotonCamera(Constants.rightCamName);
-    rightPoseEstimator = new PhotonPoseEstimator(Constants.tagLayout, Constants.rightCamPose);
+    leftCam = new PhotonCamera(Constants.LEFT_CAM_NAME);
+    leftPoseEstimator = new PhotonPoseEstimator(Constants.TAG_LAYOUT, Constants.LEFT_CAM_POSE);
+    rightCam = new PhotonCamera(Constants.RIGHT_CAM_NAME);
+    rightPoseEstimator = new PhotonPoseEstimator(Constants.TAG_LAYOUT, Constants.RIGHT_CAM_POSE);
     leftResults = new LinkedList<>();
     rightResults = new LinkedList<>();
     if(Robot.isSimulation()){
       visionSim = new VisionSystemSim("Vision");
-      visionSim.addAprilTags(Constants.tagLayout);
+      visionSim.addAprilTags(Constants.TAG_LAYOUT);
       var camProp = new SimCameraProperties();
       camProp.setCalibration(1920, 1080, Rotation2d.fromDegrees(120));
       camProp.setFPS(20);
@@ -55,8 +55,8 @@ public class VisionSubsystem extends SubsystemBase {
       camProp.setLatencyStdDevMs(5);
       leftCamSim = new PhotonCameraSim(leftCam);
       rightCamSim = new PhotonCameraSim(rightCam);
-      visionSim.addCamera(leftCamSim, Constants.leftCamPose);
-      visionSim.addCamera(rightCamSim, Constants.rightCamPose);
+      visionSim.addCamera(leftCamSim, Constants.LEFT_CAM_POSE);
+      visionSim.addCamera(rightCamSim, Constants.RIGHT_CAM_POSE);
     }
 
     // NOTE: Possibly remove?
