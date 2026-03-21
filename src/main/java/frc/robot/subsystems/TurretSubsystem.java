@@ -51,7 +51,8 @@ public class TurretSubsystem extends SubsystemBase {
     boolean isLeft;
     public boolean isAutoAim;
 
-    public TurretSubsystem(int motor_id, int encoder_id, InvertedValue inverted, Angle minAngle, Angle maxAngle, boolean isLeft) {
+    public TurretSubsystem(int motor_id, int encoder_id, InvertedValue inverted, Angle minAngle, Angle maxAngle,
+            boolean isLeft) {
         motor = new TalonFX(motor_id, Constants.CANivoreCANBus);
         cancoder = new CANcoder(encoder_id, Constants.CANivoreCANBus);
         motorWrapper = configureSmartMotor(motor, inverted, cancoder);
@@ -61,73 +62,68 @@ public class TurretSubsystem extends SubsystemBase {
         isAutoAim = true;
     }
 
-    private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder){
-        return new TalonFXWrapper(motor, DCMotor.getKrakenX60(1), 
-            new SmartMotorControllerConfig(this)
-                .withGearing(new MechanismGearing(GearBox.fromStages("1:10", "30:40", "15:140")))
-                .withExternalEncoder(cancoder)
-                .withExternalEncoderGearing(new MechanismGearing(GearBox.fromReductionStages(1/Constants.TURRET_ENCODER_RATIO)))
-                .withSoftLimit(minAngle, maxAngle)
-                .withVendorConfig(
-                    new TalonFXConfiguration()
-                        .withMotorOutput(
-                            new MotorOutputConfigs()
-                                .withInverted(invertDirection)
-                                .withNeutralMode(NeutralModeValue.Coast)
-                        )
-                        // .withVoltage(
-                        //     new VoltageConfigs()
-                        //         .withPeakReverseVoltage(Volts.of(0))
-                        // )
-                        .withCurrentLimits(
-                            new CurrentLimitsConfigs()
-                                .withStatorCurrentLimit(Amps.of(60))
-                                .withStatorCurrentLimitEnable(true)
-                                .withSupplyCurrentLimit(Amps.of(40))
-                                .withSupplyCurrentLimitEnable(true)
-                        )
-                        .withSlot0(
-                            new Slot0Configs()
-                                .withKP(0.5)
-                                .withKI(2)
-                                .withKD(0)
-                                .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting max RPS
-                        )
-                    )
-        );
+    private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder) {
+
+        MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
+                .withInverted(invertDirection)
+                .withNeutralMode(NeutralModeValue.Coast);
+        CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs()
+                .withStatorCurrentLimit(Amps.of(60))
+                .withStatorCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(Amps.of(40))
+                .withSupplyCurrentLimitEnable(true);
+        Slot0Configs slotConfigs = new Slot0Configs()
+                .withKP(0.5)
+                .withKI(2)
+                .withKD(0)
+                // 12 volts when requesting max RPS
+                .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond));
+        TalonFXConfiguration config = new TalonFXConfiguration()
+                .withMotorOutput(motorOutputConfigs)
+                .withCurrentLimits(currentLimits)
+                .withSlot0(slotConfigs);
+        return new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),
+                new SmartMotorControllerConfig(this)
+                        .withGearing(new MechanismGearing(GearBox.fromStages("1:10", "30:40", "15:140")))
+                        .withExternalEncoder(cancoder)
+                        .withExternalEncoderGearing(
+                                new MechanismGearing(GearBox.fromReductionStages(1 / Constants.TURRET_ENCODER_RATIO)))
+                        .withSoftLimit(minAngle, maxAngle)
+                        .withVendorConfig(config));
+
     }
 
-    private Pivot configurePivot(SmartMotorController motorWrapper){
+    private Pivot configurePivot(SmartMotorController motorWrapper) {
         PivotConfig config = new PivotConfig(motorWrapper)
-                .withHardLimit(Degrees.of(-90), Degrees.of(90));
+                .withHardLimit(Degrees.of(-120), Degrees.of(120));
         return new Pivot(config);
     }
 
-    public Command stopRotation(){
+    public Command stopRotation() {
         return turret.setVoltage(Volts.of(0));
     }
 
-    public Command setVoltage(Supplier<Voltage> voltage){
+    public Command setVoltage(Supplier<Voltage> voltage) {
         return turret.setVoltage(voltage);
     }
 
-    public Command setTurretAngle(Supplier<Angle> angles){
+    public Command setTurretAngle(Supplier<Angle> angles) {
         return turret.setAngle(angles);
     }
 
-    public Angle getTurretAngle(){
+    public Angle getTurretAngle() {
         return turret.getAngle();
     }
 
-    public Voltage getTurretVoltage(){
+    public Voltage getTurretVoltage() {
         return motorWrapper.getVoltage();
     }
 
-    public boolean isLeftTurret(){
+    public boolean isLeftTurret() {
         return isLeft;
     }
 
-    public Command aimAtPosition(Supplier<Translation2d> target, Supplier<Pose2d> robotPose){
+    public Command aimAtPosition(Supplier<Translation2d> target, Supplier<Pose2d> robotPose) {
         return setTurretAngle(() -> {
             Pose2d targetPose = new Pose2d(target.get(), Rotation2d.kZero);
             Pose2d turretPose = robotPose.get().plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
@@ -136,7 +132,7 @@ public class TurretSubsystem extends SubsystemBase {
         });
     }
 
-    public Command enableAutoAim(){
+    public Command enableAutoAim() {
         return runOnce(() -> this.isAutoAim = true);
     }
 
