@@ -32,7 +32,7 @@ import frc.robot.RobotContainer;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.28, rightSpeed = 0.28, acceleratorSpeed = 0.33;
+    public static double leftSpeed = 0.75, rightSpeed = 0, acceleratorSpeed = 0.33;
 
     private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 

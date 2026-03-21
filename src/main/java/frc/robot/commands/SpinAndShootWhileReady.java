@@ -14,7 +14,7 @@ import frc.robot.subsystems.PPTSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SpinAndShootWhileReady extends Command {
 
-    private final double TARGET_SPEED = 27;
+    private final double TARGET_SPEED = 75;
     int cyclesSinceLastPush = Integer.MAX_VALUE;
     /** Creates a new ShootWhileReady. */
     public SpinAndShootWhileReady() {
@@ -34,7 +34,7 @@ public class SpinAndShootWhileReady extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double leftSpeed = 0.29;//SpinShooterCommand.leftSpeed.getAsDouble();
+        double leftSpeed = 0.8;//SpinShooterCommand.leftSpeed.getAsDouble();
         double rightSpeed = 0.285;//SpinShooterCommand.rightSpeed.getAsDouble();
         double accelSpeed = 0.34;//SpinShooterCommand.acceleratorSpeed.getAsDouble();
         RobotContainer.shooterSubsystem.setMotorSpeed(rightSpeed, leftSpeed, accelSpeed);
