@@ -23,8 +23,7 @@ public class MoveTurretCommand extends Command {
 
     // Called when the command is initially scheduled.
     @Override
-    public void initialize() {
-    }
+    public void initialize() {}
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
@@ -34,7 +33,7 @@ public class MoveTurretCommand extends Command {
             RobotContainer.turretSubsystem.setTurretAngle(0, 0);
         }else{
             double joystick = RobotContainer.operatorController.getLeftX();
-            RobotContainer.turretSubsystem.setTurretVoltage(joystick * Constants.TURRET_MAX_VOLTAGE, joystick * Constants.TURRET_MAX_VOLTAGE);
+            RobotContainer.turretSubsystem.setTurretVoltage(0, 6*joystick);
         }
     }
 

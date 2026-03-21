@@ -51,14 +51,15 @@ public class Constants {
     public static final int RIGHT_ROTATOR_CANCODER_ID = 5;
     public static final int SERVO_HUB_ID = 7; //meant to be 7 but refuses to update in rev hardware client
     
-    public static final double TURRET_GEAR_RATIO = 1.2;
+    public static final double TURRET_GEAR_RATIO = 9d/1120d;
+    public static final double TURRET_ENCODER_RATIO = 0.88; //140d/180d;
     /**The sensitivity of the manual control for hood angle*/
     public static final double HOOD_SENSITIVITY = 0.05;
     public static final double TURRET_MAX_VOLTAGE = .4;
     //TODO update when the turret range increases
     public static final double LEFT_TURRET_MIN_ANGLE = -90;
-    public static final double LEFT_TURRET_MAX_ANGLE = 0;
-    public static final double RIGHT_TURRET_MIN_ANGLE = 0;
+    public static final double LEFT_TURRET_MAX_ANGLE = 90;
+    public static final double RIGHT_TURRET_MIN_ANGLE = -90;
     public static final double RIGHT_TURRET_MAX_ANGLE = 90;
     //Used for approaching the edges of the firing arc slower
     public static final double LEFT_UPPER_APPROACH_ANGLE = (2*LEFT_TURRET_MAX_ANGLE + LEFT_TURRET_MIN_ANGLE) / 3;
