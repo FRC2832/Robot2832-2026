@@ -218,32 +218,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putData("Field", matchField);
     }
 
-    public void configurePathPlanner(){
+    public void configurePathPlanner() {
         RobotConfig config = null;
-        try{
+        try {
             config = RobotConfig.fromGUISettings();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         AutoBuilder.configure(
-            this::getPose, 
-            this::resetPose, 
-            () -> this.getKinematics().toChassisSpeeds(this.getState().ModuleStates), 
-            this::driveRequest, 
-            new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)), 
-            config, 
-            frc.robot.Utils::isOnRed,
-            this);
+                this::getPose,
+                this::resetPose,
+                () -> this.getKinematics().toChassisSpeeds(this.getState().ModuleStates),
+                this::driveRequest,
+                new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)),
+                config,
+                frc.robot.Utils::isOnRed,
+                this);
     }
 
-    public Pose2d getPose(){
+    public Pose2d getPose() {
         return this.getState().Pose;
     }
 
-    
-
-    public void driveRequest(ChassisSpeeds speeds, DriveFeedforwards feedforwards){
-        //ChassisSpeeds relative = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getPose().getRotation());
+    public void driveRequest(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+        // ChassisSpeeds relative = ChassisSpeeds.fromRobotRelativeSpeeds(speeds,
+        // getPose().getRotation());
         SwerveRequest.RobotCentric request = RobotContainer.robotCentricDrive
                 .withVelocityX(speeds.vxMetersPerSecond)
                 .withVelocityY(speeds.vyMetersPerSecond)

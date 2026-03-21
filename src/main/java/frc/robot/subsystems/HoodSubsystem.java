@@ -13,7 +13,6 @@ import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.config.ServoHubConfig;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.util.function.BooleanConsumer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -29,7 +28,7 @@ public class HoodSubsystem extends SubsystemBase {
     public HoodSubsystem(TurretSubsystem turret) {
         this.isLeftTurret = turret.isLeftTurret();
         isAutoAim = () -> turret.isAutoAim;
-        if(servoHub == null){
+        if (servoHub == null) {
             servoHub = new ServoHub(Constants.SERVO_HUB_ID);
             ServoHubConfig config = new ServoHubConfig();
             config.channel0.pulseRange(1000, 1500, 2000);
@@ -38,17 +37,17 @@ public class HoodSubsystem extends SubsystemBase {
             config.channel5.pulseRange(1000, 1500, 2000);
             servoHub.configure(config, ResetMode.kResetSafeParameters);
         }
-        if(isLeftTurret){
+        if (isLeftTurret) {
             leftServo = servoHub.getServoChannel(ChannelId.kChannelId0);
             rightServo = servoHub.getServoChannel(ChannelId.kChannelId1);
-        }else{
+        } else {
             leftServo = servoHub.getServoChannel(ChannelId.kChannelId5);
             rightServo = servoHub.getServoChannel(ChannelId.kChannelId4);
         }
         configureServo(leftServo);
         configureServo(rightServo);
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
 
     private void configureServo(ServoChannel channel) {
@@ -64,8 +63,9 @@ public class HoodSubsystem extends SubsystemBase {
     public void setHoodPosition(double hoodPosition) {
         setServo(leftServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
         setServo(rightServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
-        //setServo(rightHoodLeftServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
-        //setServo(rightHoodRightServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
+        // setServo(rightHoodLeftServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
+        // setServo(rightHoodRightServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1,
+        // 1));
     }
 
     private void setServo(ServoChannel servo, double position) {
@@ -83,11 +83,11 @@ public class HoodSubsystem extends SubsystemBase {
         setHoodPosition(hoodPosition);
     }
 
-    public boolean isAutoAim(){
+    public boolean isAutoAim() {
         return isAutoAim.getAsBoolean();
     }
 
-    public boolean isLeftTurretHood(){
+    public boolean isLeftTurretHood() {
         return isLeftTurret;
     }
 

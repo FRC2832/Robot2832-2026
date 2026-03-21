@@ -12,7 +12,6 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -28,7 +27,8 @@ import frc.robot.Constants.KrakenX60;
 public class PPTSubsystem extends SubsystemBase {
     /** Creates a new HopperSubsystem. */
 
-    // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
+    // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // -------------------------
 
     public enum Speed {
         STOP(0),
@@ -54,56 +54,54 @@ public class PPTSubsystem extends SubsystemBase {
     private final VoltageOut leftPPTVoltageRequest = new VoltageOut(0);
 
     public PPTSubsystem() {
-        rightPPT = new TalonFX(Constants.RIGHT_PPT_ID, Constants.CANivoreCANBus); 
+        rightPPT = new TalonFX(Constants.RIGHT_PPT_ID, Constants.CANivoreCANBus);
         leftPPT = new TalonFX(Constants.LEFT_PPT_ID, Constants.CANivoreCANBus);
 
         // TODO: Figure out inversion state of motors
-        // Confirm appropriate inversion, voltage limits, current limits, and PID constants
+        // Confirm appropriate inversion, voltage limits, current limits, and PID
+        // constants
         configureMotor(rightPPT, InvertedValue.Clockwise_Positive);
         configureMotor(leftPPT, InvertedValue.CounterClockwise_Positive); // inverted
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
 
     // TODO: These should probably be changed eventually
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
         final TalonFXConfiguration config = new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(invertDirection)
-                    .withNeutralMode(NeutralModeValue.Coast)
-            )
-            // .withVoltage(
-            //     new VoltageConfigs()
-            //         .withPeakReverseVoltage(Volts.of(0))
-            // )
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(40))
-                    .withSupplyCurrentLimitEnable(true)
-            )
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(0.5)
-                    .withKI(2)
-                    .withKD(0)
-                    .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting max RPS
-            );
-            motor.getConfigurator().apply(config);
+                .withMotorOutput(
+                        new MotorOutputConfigs()
+                                .withInverted(invertDirection)
+                                .withNeutralMode(NeutralModeValue.Coast))
+                // .withVoltage(
+                // new VoltageConfigs()
+                // .withPeakReverseVoltage(Volts.of(0))
+                // )
+                .withCurrentLimits(
+                        new CurrentLimitsConfigs()
+                                .withStatorCurrentLimit(Amps.of(60))
+                                .withStatorCurrentLimitEnable(true)
+                                .withSupplyCurrentLimit(Amps.of(40))
+                                .withSupplyCurrentLimitEnable(true))
+                .withSlot0(
+                        new Slot0Configs()
+                                .withKP(0.5)
+                                .withKI(2)
+                                .withKD(0)
+                                .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting
+                                                                                            // max RPS
+                );
+        motor.getConfigurator().apply(config);
     }
 
     // Speed controls ----------------------------------
     public void setPPTSpeed(Speed rightSpeed, Speed leftSpeed) {
         rightPPT.setControl(
-            rightPPTVoltageRequest
-                .withOutput(rightSpeed.voltage())
-        );
+                rightPPTVoltageRequest
+                        .withOutput(rightSpeed.voltage()));
         leftPPT.setControl(
-            leftPPTVoltageRequest
-                .withOutput(leftSpeed.voltage())
-        );
+                leftPPTVoltageRequest
+                        .withOutput(leftSpeed.voltage()));
     }
 
     // ---------------------------------------------------
@@ -111,23 +109,17 @@ public class PPTSubsystem extends SubsystemBase {
 
     public Command deliverCommand() {
         return startEnd(
-            () -> setPPTSpeed(Speed.FORWARD, Speed.FORWARD),
-            () -> setPPTSpeed(Speed.STOP,Speed.STOP)
-        );
+                () -> setPPTSpeed(Speed.FORWARD, Speed.FORWARD),
+                () -> setPPTSpeed(Speed.STOP, Speed.STOP));
     }
 
     public Command reverseDeliverCommand() {
         return startEnd(
-            () -> setPPTSpeed(Speed.REVERSE, Speed.REVERSE),
-            () -> setPPTSpeed(Speed.STOP,Speed.STOP)
-        );
+                () -> setPPTSpeed(Speed.REVERSE, Speed.REVERSE),
+                () -> setPPTSpeed(Speed.STOP, Speed.STOP));
     }
 
-
-    //--------------------------------------------------------
-
-
-
+    // --------------------------------------------------------
 
     @Override
     public void periodic() {

@@ -14,18 +14,20 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class SpinShooterCommand extends Command {
     /** Creates a new ShootCommand. */
     static DoubleSupplier leftSpeed, rightSpeed, acceleratorSpeed;
-   
+
     public SpinShooterCommand(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed, DoubleSupplier acceleratorSpeed) {
         addRequirements(RobotContainer.shooterSubsystem);
         setSuppliers(leftSpeed, rightSpeed, acceleratorSpeed);
     }
 
-    //TODO set to use automatic suppliers
-    public SpinShooterCommand(){
-        this(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed, ShooterSubsystem::getLastAcceleratorSpeed);
+    // TODO set to use automatic suppliers
+    public SpinShooterCommand() {
+        this(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
+                ShooterSubsystem::getLastAcceleratorSpeed);
     }
 
-    public static void setSuppliers(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed, DoubleSupplier acceleratorSpeed){
+    public static void setSuppliers(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed,
+            DoubleSupplier acceleratorSpeed) {
         SpinShooterCommand.leftSpeed = leftSpeed;
         SpinShooterCommand.rightSpeed = rightSpeed;
         SpinShooterCommand.acceleratorSpeed = acceleratorSpeed;
@@ -42,7 +44,8 @@ public class SpinShooterCommand extends Command {
         ShooterSubsystem.leftSpeed = leftSpeed.getAsDouble();
         ShooterSubsystem.rightSpeed = rightSpeed.getAsDouble();
         ShooterSubsystem.acceleratorSpeed = acceleratorSpeed.getAsDouble();
-        RobotContainer.shooterSubsystem.setMotorSpeed(ShooterSubsystem.rightSpeed, ShooterSubsystem.leftSpeed, ShooterSubsystem.acceleratorSpeed);
+        RobotContainer.shooterSubsystem.setMotorSpeed(ShooterSubsystem.rightSpeed, ShooterSubsystem.leftSpeed,
+                ShooterSubsystem.acceleratorSpeed);
     }
 
     // Called once the command ends or is interrupted.

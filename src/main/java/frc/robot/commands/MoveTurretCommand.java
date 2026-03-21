@@ -4,28 +4,18 @@
 
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
 import java.util.function.DoubleSupplier;
 
-import javax.lang.model.util.ElementScanner14;
-
-import com.pathplanner.lib.path.PathPoint;
-import com.pathplanner.lib.util.FlippingUtil;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Utils;
 import frc.robot.subsystems.TurretSubsystem;
-import frc.robot.subsystems.TurretSubsystem_Old;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveTurretCommand extends Command {
@@ -54,28 +44,30 @@ public class MoveTurretCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(Math.abs(joystickX.getAsDouble()) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
+        if (Math.abs(joystickX.getAsDouble()) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
             turret.isAutoAim = false;
-        if(turret.isAutoAim){
+        if (turret.isAutoAim) {
             turret.aimAtPosition(MoveTurretCommand::getTargetPosition, RobotContainer.drivetrain::getPose);
-        }else{
-            if(isLeft){
-                turret.setVoltage(() -> Volts.of(MathUtil.applyDeadband(RobotContainer.operatorController.getLeftX(), 0.1) * 6));
-            }else{
-                turret.setVoltage(() -> Volts.of(MathUtil.applyDeadband(RobotContainer.operatorController.getRightX(), 0.1) * 6));
+        } else {
+            if (isLeft) {
+                turret.setVoltage(
+                        () -> Volts.of(MathUtil.applyDeadband(RobotContainer.operatorController.getLeftX(), 0.1) * 6));
+            } else {
+                turret.setVoltage(
+                        () -> Volts.of(MathUtil.applyDeadband(RobotContainer.operatorController.getRightX(), 0.1) * 6));
             }
         }
     }
 
-    private DoubleSupplier getJoystickX(){
-        if(isLeft){
+    private DoubleSupplier getJoystickX() {
+        if (isLeft) {
             return () -> RobotContainer.operatorController.getLeftX();
         }
         return () -> RobotContainer.operatorController.getRightX();
     }
 
-    private DoubleSupplier getJoystickY(){
-        if(isLeft){
+    private DoubleSupplier getJoystickY() {
+        if (isLeft) {
             return () -> RobotContainer.operatorController.getLeftY();
         }
         return () -> RobotContainer.operatorController.getRightY();
@@ -92,31 +84,30 @@ public class MoveTurretCommand extends Command {
         return false;
     }
 
-    private static Translation2d getTargetPosition(){
+    private static Translation2d getTargetPosition() {
         Pose2d robotPose = RobotContainer.drivetrain.getPose();
-        
-        if(Utils.inAllianceZone(robotPose)){
-            if(isOnRed){
+
+        if (Utils.inAllianceZone(robotPose)) {
+            if (isOnRed) {
                 return Constants.RED_HUB_POS;
-            }else{
+            } else {
                 return Constants.BLUE_HUB_POS;
             }
-        }else{
-            if(isOnRed){
-                if(robotPose.getMeasureY().gt(Constants.RED_HUB_POS.getMeasureY())){
+        } else {
+            if (isOnRed) {
+                if (robotPose.getMeasureY().gt(Constants.RED_HUB_POS.getMeasureY())) {
                     return Constants.RED_RIGHT_SNOWBLOW_TARGET;
-                }else{
+                } else {
                     return Constants.RED_LEFT_SNOWBLOW_TARGET;
                 }
-            }else{
-                if(robotPose.getMeasureY().gt(Constants.BLUE_HUB_POS.getMeasureY())){
+            } else {
+                if (robotPose.getMeasureY().gt(Constants.BLUE_HUB_POS.getMeasureY())) {
                     return Constants.BLUE_LEFT_SNOWBLOW_TARGET;
-                }else{
+                } else {
                     return Constants.BLUE_RIGHT_SNOWBLOW_TARGET;
                 }
             }
         }
     }
 
-    
 }

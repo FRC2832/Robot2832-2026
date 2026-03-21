@@ -5,16 +5,10 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -47,7 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
         configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
         configureMotor(accelerator, InvertedValue.CounterClockwise_Positive);
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
@@ -57,8 +51,8 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withInverted(invertDirection)
                                 .withNeutralMode(NeutralModeValue.Coast))
                 // .withVoltage(
-                //         new VoltageConfigs()
-                //                 .withPeakReverseVoltage(Volts.of(0)))
+                // new VoltageConfigs()
+                // .withPeakReverseVoltage(Volts.of(0)))
                 .withCurrentLimits(
                         new CurrentLimitsConfigs()
                                 .withStatorCurrentLimit(Amps.of(60))
@@ -73,14 +67,14 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withKS(0.05)
                                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                                 // I changed the KV.
-                                .withKV(5.5/30.0) //.withKV(26.31 / 31.277344) //current for rps, over rps
-                                .withKA(12/44.38) //.withKA(17.25 / 44.38)
+                                .withKV(5.5 / 30.0) // .withKV(26.31 / 31.277344) //current for rps, over rps
+                                .withKA(12 / 44.38) // .withKA(17.25 / 44.38)
                 );
         motor.getConfigurator().apply(config);
     }
 
     public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
-        //rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
+        // rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
         leftShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(leftSpeed)));
         accelerator.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(accelSpeed)));
     }
@@ -100,49 +94,47 @@ public class ShooterSubsystem extends SubsystemBase {
         RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
     }
 
-    public static double getLastLeftSpeed(){
+    public static double getLastLeftSpeed() {
         return leftSpeed;
     }
 
-    public static double getLastRightSpeed(){
+    public static double getLastRightSpeed() {
         return rightSpeed;
     }
 
-    public static double getLastAcceleratorSpeed(){
+    public static double getLastAcceleratorSpeed() {
         return acceleratorSpeed;
     }
 
-    public Command stopShooter() 
-    { 
+    public Command stopShooter() {
         return startEnd(
-            () -> {
-                leftShooterMotor.set(0);
-                rightShooterMotor.set(0);
-                accelerator.set(0);
-            },
-            () -> {}
-        );
+                () -> {
+                    leftShooterMotor.set(0);
+                    rightShooterMotor.set(0);
+                    accelerator.set(0);
+                },
+                () -> {
+                });
     }
 
-    public Command reverseShooter() 
-    { 
+    public Command reverseShooter() {
         return startEnd(
-            () -> {
-                setMotorSpeed(-.4, -.4, -.4);
-            },
-            () -> {}
-        );
+                () -> {
+                    setMotorSpeed(-.4, -.4, -.4);
+                },
+                () -> {
+                });
     }
 
-    public double getLeftMotorSpeed(){
+    public double getLeftMotorSpeed() {
         return leftShooterMotor.getVelocity().getValueAsDouble();
     }
 
-    public double getRightMotorSpeed(){
+    public double getRightMotorSpeed() {
         return rightShooterMotor.getVelocity().getValueAsDouble();
     }
 
-    public double getAccelMotorSpeed(){
+    public double getAccelMotorSpeed() {
         return accelerator.getVelocity().getValueAsDouble();
     }
 }

@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 
@@ -16,6 +14,7 @@ public class SpinAndShootWhileReady extends Command {
 
     private final double TARGET_SPEED = 75;
     int cyclesSinceLastPush = Integer.MAX_VALUE;
+
     /** Creates a new ShootWhileReady. */
     public SpinAndShootWhileReady() {
         // Use addRequirements() here to declare subsystem dependencies.
@@ -34,18 +33,18 @@ public class SpinAndShootWhileReady extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double leftSpeed = 0.8;//SpinShooterCommand.leftSpeed.getAsDouble();
-        double rightSpeed = 0.285;//SpinShooterCommand.rightSpeed.getAsDouble();
-        double accelSpeed = 0.34;//SpinShooterCommand.acceleratorSpeed.getAsDouble();
+        double leftSpeed = 0.8;// SpinShooterCommand.leftSpeed.getAsDouble();
+        double rightSpeed = 0.285;// SpinShooterCommand.rightSpeed.getAsDouble();
+        double accelSpeed = 0.34;// SpinShooterCommand.acceleratorSpeed.getAsDouble();
         RobotContainer.shooterSubsystem.setMotorSpeed(rightSpeed, leftSpeed, accelSpeed);
-        if(RobotContainer.shooterSubsystem.getLeftMotorSpeed() > TARGET_SPEED){
-                //&& RobotContainer.shooterSubsystem.getRightMotorSpeed() > TARGET_SPEED){
+        if (RobotContainer.shooterSubsystem.getLeftMotorSpeed() > TARGET_SPEED) {
+            // && RobotContainer.shooterSubsystem.getRightMotorSpeed() > TARGET_SPEED){
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.FORWARD);
             cyclesSinceLastPush = 0;
-        }else if(cyclesSinceLastPush < 1){
+        } else if (cyclesSinceLastPush < 1) {
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.FORWARD);
             cyclesSinceLastPush++;
-        }else{
+        } else {
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.REVERSE);
         }
     }
