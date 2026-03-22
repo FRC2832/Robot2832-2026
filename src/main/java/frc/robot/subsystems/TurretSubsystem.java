@@ -48,6 +48,7 @@ public class TurretSubsystem extends SubsystemBase {
     Angle minAngle, maxAngle;
     Translation3d position;
     boolean isLeft;
+    
     public boolean isAutoAim;
 
     public TurretSubsystem(int motor_id, int encoder_id, InvertedValue inverted, Angle minAngle, Angle maxAngle,
@@ -94,20 +95,20 @@ public class TurretSubsystem extends SubsystemBase {
 
     private Pivot configurePivot(SmartMotorController motorWrapper) {
         PivotConfig config = new PivotConfig(motorWrapper)
-                .withHardLimit(Degrees.of(-120), Degrees.of(120));
+                .withHardLimit(minAngle.times(1.2), maxAngle.times(1.2));
         return new Pivot(config);
     }
 
-    public Command stopRotation() {
-        return turret.setVoltage(Volts.of(0));
+    public void stopRotation() {
+        turret.setVoltageSetpoint(Volts.of(0));
     }
 
-    public Command setVoltage(Supplier<Voltage> voltage) {
-        return turret.setVoltage(voltage);
+    public void setVoltage(Voltage voltage) {
+        turret.setVoltageSetpoint(voltage);
     }
 
-    public Command setTurretAngle(Supplier<Angle> angles) {
-        return turret.setAngle(angles);
+    public void setTurretAngle(Angle angle) {
+        turret.setMechanismPositionSetpoint(angle);
     }
 
     public Angle getTurretAngle() {
@@ -122,13 +123,12 @@ public class TurretSubsystem extends SubsystemBase {
         return isLeft;
     }
 
-    public Command aimAtPosition(Supplier<Translation2d> target, Supplier<Pose2d> robotPose) {
-        return setTurretAngle(() -> {
-            Pose2d targetPose = new Pose2d(target.get(), Rotation2d.kZero);
-            Pose2d turretPose = robotPose.get().plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
-            Pose2d offset = targetPose.relativeTo(turretPose);
-            return Degrees.of(90).minus(offset.getTranslation().getAngle().getMeasure());
-        });
+    public void aimAtPosition(Translation2d target, Pose2d robotPose) {
+        Pose2d targetPose = new Pose2d(target, Rotation2d.kZero);
+        Pose2d turretPose = robotPose.plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
+        Pose2d offset = targetPose.relativeTo(turretPose);
+        Angle angle = Degrees.of(90).minus(offset.getTranslation().getAngle().getMeasure());
+        setTurretAngle(angle);
     }
 
     public Command enableAutoAim() {

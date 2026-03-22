@@ -44,18 +44,13 @@ public class MoveTurretCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (Math.abs(joystickX.getAsDouble()) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
+        double xPos = joystickX.getAsDouble();
+        if (Math.abs(xPos) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
             turret.isAutoAim = false;
         if (turret.isAutoAim) {
-            turret.aimAtPosition(MoveTurretCommand::getTargetPosition, RobotContainer.drivetrain::getPose);
+            turret.aimAtPosition(MoveTurretCommand.getTargetPosition(), RobotContainer.drivetrain.getPose());
         } else {
-            if (isLeft) {
-                turret.setVoltage(
-                        () -> Volts.of(MathUtil.applyDeadband(RobotContainer.operatorController.getLeftX(), 0.1) * 6));
-            } else {
-                turret.setVoltage(
-                        () -> Volts.of(MathUtil.applyDeadband(RobotContainer.operatorController.getRightX(), 0.1) * 6));
-            }
+            turret.setVoltage(Volts.of(6 * MathUtil.applyDeadband(xPos, 0.1)));
         }
     }
 
