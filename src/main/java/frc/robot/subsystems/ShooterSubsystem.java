@@ -32,7 +32,7 @@ import frc.robot.RobotContainer;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.28, rightSpeed = 0.28, acceleratorSpeed = 0.33;
+    public static double leftSpeed = 0.8, rightSpeed = 0.8, acceleratorSpeed = 0.33;
 
     private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 
@@ -95,8 +95,8 @@ public class ShooterSubsystem extends SubsystemBase {
         RobotContainer.logger.leftShooterSpeed.set(left);
         RobotContainer.logger.rightShooterSpeed.set(right);
         RobotContainer.logger.acceleratorSpeed.set(acc);
-        RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 28, 1));
-        RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 28, 1));
+        RobotContainer.logger.leftShooterAtSpeed.set(left > 80);
+        RobotContainer.logger.rightShooterAtSpeed.set(right > 80);
         RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
     }
 
