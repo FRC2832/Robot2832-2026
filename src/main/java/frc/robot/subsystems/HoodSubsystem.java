@@ -51,8 +51,10 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     private void configureServo(ServoChannel channel) {
-        channel.setEnabled(true);
-        channel.setPowered(true);
+        if(isHoodEnabled()){
+            channel.setEnabled(true);
+            channel.setPowered(true);
+        }
     }
 
     @Override
@@ -61,8 +63,10 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public void setHoodPosition(double hoodPosition) {
-        setServo(leftServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
-        setServo(rightServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
+        if(isHoodEnabled()){
+            setServo(leftServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
+            setServo(rightServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
+        }
         // setServo(rightHoodLeftServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
         // setServo(rightHoodRightServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1,
         // 1));
@@ -91,4 +95,7 @@ public class HoodSubsystem extends SubsystemBase {
         return isLeftTurret;
     }
 
+    private boolean isHoodEnabled(){
+        return isLeftTurret ? Constants.LEFT_HOOD_ENABLED : Constants.RIGHT_HOOD_ENABLED;
+    }
 }

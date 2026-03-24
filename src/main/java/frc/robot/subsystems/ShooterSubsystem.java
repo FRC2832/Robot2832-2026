@@ -74,6 +74,10 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
+        if(!Constants.LEFT_SHOOTER_ENABLED)
+            leftSpeed = 0;
+        if(!Constants.RIGHT_SHOOTER_ENABLED)
+            rightSpeed = 0;
         rightShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(rightSpeed)));
         leftShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(leftSpeed)));
         accelerator.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(accelSpeed)));

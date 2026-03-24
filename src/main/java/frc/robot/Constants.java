@@ -30,6 +30,16 @@ public class Constants {
         public static final AngularVelocity FREE_SPEED = RPM.of(6000);
     }
 
+    // Enable each shooter, PPT, hood, turret
+    public static final boolean LEFT_TURRET_ENABLED = true;
+    public static final boolean RIGHT_TURRET_ENABLED = true;
+    public static final boolean LEFT_HOOD_ENABLED = true;
+    public static final boolean RIGHT_HOOD_ENABLED = true;
+    public static final boolean LEFT_SHOOTER_ENABLED = true;
+    public static final boolean RIGHT_SHOOTER_ENABLED = true;
+    public static final boolean LEFT_PPT_ENABLED = true;
+    public static final boolean RIGHT_PPT_ENABLED = true;
+
     // Constants for Hopper subsystem
     public static final int RIGHT_PPT_ID = 25;
     public static final int LEFT_PPT_ID = 15;

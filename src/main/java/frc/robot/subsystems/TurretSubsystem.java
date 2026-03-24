@@ -10,8 +10,6 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Supplier;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -108,11 +106,17 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setVoltage(Voltage voltage) {
-        turret.setVoltageSetpoint(voltage);
+        if(isTurretEnabled())
+            turret.setVoltageSetpoint(voltage);
+        else
+            stopRotation();
     }
 
     public void setTurretAngle(Angle angle) {
-        turret.setMechanismPositionSetpoint(angle);
+        if(isTurretEnabled())
+            turret.setMechanismPositionSetpoint(angle);
+        else
+            stopRotation();
     }
 
     public Angle getTurretAngle() {
@@ -128,6 +132,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void aimAtPosition(Translation2d target, Pose2d robotPose) {
+        if(!isTurretEnabled())
+            return;
         Pose2d targetPose = new Pose2d(target, Rotation2d.kZero);
         Pose2d turretPose = robotPose.plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
         Pose2d offset = targetPose.relativeTo(turretPose);
@@ -142,5 +148,9 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+    }
+
+    private boolean isTurretEnabled(){
+        return isLeft ? Constants.LEFT_TURRET_ENABLED : Constants.RIGHT_TURRET_ENABLED;
     }
 }

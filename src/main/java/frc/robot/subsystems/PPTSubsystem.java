@@ -96,6 +96,10 @@ public class PPTSubsystem extends SubsystemBase {
 
     // Speed controls ----------------------------------
     public void setPPTSpeed(Speed rightSpeed, Speed leftSpeed) {
+        if(!Constants.RIGHT_PPT_ENABLED)
+            rightSpeed = Speed.STOP;
+        if(!Constants.LEFT_PPT_ENABLED)
+            leftSpeed = Speed.STOP;
         rightPPT.setControl(
                 rightPPTVoltageRequest
                         .withOutput(rightSpeed.voltage()));
