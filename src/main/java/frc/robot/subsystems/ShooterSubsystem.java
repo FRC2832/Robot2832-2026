@@ -26,7 +26,7 @@ import frc.robot.RobotContainer;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.75, rightSpeed = 0, acceleratorSpeed = 0.33;
+    public static double leftSpeed = 0.55, rightSpeed = 0.55, acceleratorSpeed = 0.33;
 
     private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 
@@ -74,7 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
-        // rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
+        rightShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(rightSpeed)));
         leftShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(leftSpeed)));
         accelerator.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(accelSpeed)));
     }

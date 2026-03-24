@@ -60,13 +60,13 @@ public class Constants {
     public static final double TURRET_MAX_VOLTAGE = .4;
     // TODO update when the turret range increases
     public static final Angle LEFT_TURRET_MIN_ANGLE = Degrees.of(-90);
-    public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(90);
-    public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(-90);
+    public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(0);//90);
+    public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(0);//-90);
     public static final Angle RIGHT_TURRET_MAX_ANGLE = Degrees.of(90);
 
     // FIXME measure robot turret positions relative to robot origin
-    public static final Translation3d LEFT_TURRET_POS = new Translation3d();
-    public static final Translation3d RIGHT_TURRET_POS = new Translation3d();
+    public static final Translation3d LEFT_TURRET_POS = new Translation3d(Inches.of(6.75), Inches.of(8.75), Inches.of(20));
+    public static final Translation3d RIGHT_TURRET_POS = new Translation3d(Inches.of(6.75), Inches.of(-8.75), Inches.of(20));
     // Used for approaching the edges of the firing arc slower
     // public static final double LEFT_UPPER_APPROACH_ANGLE =
     // (2*LEFT_TURRET_MAX_ANGLE + LEFT_TURRET_MIN_ANGLE) / 3;

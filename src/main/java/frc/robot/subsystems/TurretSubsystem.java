@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -53,16 +54,18 @@ public class TurretSubsystem extends SubsystemBase {
 
     public TurretSubsystem(int motor_id, int encoder_id, InvertedValue inverted, Angle minAngle, Angle maxAngle,
             boolean isLeft) {
+        this.minAngle = minAngle;
+        this.maxAngle = maxAngle;
         motor = new TalonFX(motor_id, Constants.CANivoreCANBus);
         cancoder = new CANcoder(encoder_id, Constants.CANivoreCANBus);
-        motorWrapper = configureSmartMotor(motor, inverted, cancoder);
+        motorWrapper = configureSmartMotor(motor, inverted, cancoder, isLeft);
         turret = configurePivot(motorWrapper);
         this.isLeft = isLeft;
         position = isLeft ? Constants.LEFT_TURRET_POS : Constants.RIGHT_TURRET_POS;
         isAutoAim = true;
     }
 
-    private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder) {
+    private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder, boolean isLeft) {
 
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(invertDirection)
@@ -88,6 +91,7 @@ public class TurretSubsystem extends SubsystemBase {
                         .withExternalEncoder(cancoder)
                         .withExternalEncoderGearing(
                                 new MechanismGearing(GearBox.fromReductionStages(1 / Constants.TURRET_ENCODER_RATIO)))
+                        .withExternalEncoderZeroOffset(Rotations.of(isLeft ? 0.02 : .461))
                         .withSoftLimit(minAngle, maxAngle)
                         .withVendorConfig(config));
 

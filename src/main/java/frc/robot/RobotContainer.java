@@ -138,7 +138,8 @@ public class RobotContainer {
                                 .withVelocityY(-driverController.getLeftX() * MaxSpeed
                                         * speedMultiplier) // Drive left with negative X (left)
                                 .withRotationalRate(-driverController.getRightX()
-                                        * MaxAngularRate * speedMultiplier) // Drive counterclockwise with negative X (left)
+                                        * MaxAngularRate * speedMultiplier) // Drive counterclockwise with negative X
+                                                                            // (left)
                 ));
 
         // Idle while the robot is disabled. This ensures the configured
@@ -212,7 +213,8 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeed);
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
-            ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
+            // ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
+            SpinAndShootWhileReady.TARGET_SPEED += 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
             // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
@@ -222,7 +224,8 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeed);
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
-            ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
+            // ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
+            SpinAndShootWhileReady.TARGET_SPEED -= 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
             // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
@@ -236,9 +239,12 @@ public class RobotContainer {
                 new WaitCommand(3).andThen(pptSubsystem.deliverCommand().withTimeout(3))));
         NamedCommands.registerCommand("Reverse PPT", pptSubsystem.reverseDeliverCommand().withTimeout(3));
         NamedCommands.registerCommand("Extend Ingestor", intakeExtenderSubsystem.extendIntakeCommand());
+
     }
 
     public Command getAutonomousCommand() {
+        PathPlannerAuto auto = (PathPlannerAuto) autoChooser.getSelected();
+        drivetrain.resetPose(auto.getStartingPose());
         return autoChooser.getSelected();
         // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
