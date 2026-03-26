@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.HoodSubsystem;
@@ -37,11 +38,12 @@ public class MoveHoodCommand extends Command {
     public void execute() {
         if (hood.isAutoAim()) {
             // FIXME implement auto controls, lookup table
-            hood.offsetHood(joystickY.getAsDouble());
+            double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), 0.1);
+            hood.offsetHood(joystick);
         } else {
-            hood.offsetHood(joystickY.getAsDouble());
+            double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), 0.1);
+            hood.offsetHood(joystick);
         }
-
     }
 
     // Called once the command ends or is interrupted.

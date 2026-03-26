@@ -31,7 +31,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     // -------------------------
     public enum Speed {
         STOP(0),
-        INTAKE(0.67),
+        INTAKE(0.8),
         REVERSE(-0.67);
 
         private final double percentOutput;
@@ -111,6 +111,14 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         return startEnd(
                 () -> setIntakeSpeed(Speed.REVERSE),
                 () -> setIntakeSpeed(Speed.STOP));
+    }
+
+    public Command startIntakeCommand(){
+        return runOnce(() -> setIntakeSpeed(Speed.INTAKE));
+    }
+
+    public Command stopIntakeCommand(){
+        return runOnce(() -> setIntakeSpeed(Speed.STOP));
     }
 
     // -----------------------------------------------------------------------------

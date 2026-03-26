@@ -13,14 +13,16 @@ import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.config.ServoHubConfig;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 public class HoodSubsystem extends SubsystemBase {
     private static ServoHub servoHub = null;
     private ServoChannel leftServo, rightServo;
-    private double hoodPosition;
+    private double hoodPosition = 0;
     private boolean isLeftTurret;
     private BooleanSupplier isAutoAim;
 
@@ -46,7 +48,7 @@ public class HoodSubsystem extends SubsystemBase {
         }
         configureServo(leftServo);
         configureServo(rightServo);
-
+        setHoodPosition(0);
         SmartDashboard.putData(this);
     }
 
@@ -63,9 +65,13 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public void setHoodPosition(double hoodPosition) {
+        if(isLeftTurret)
+            RobotContainer.logger.leftHoodValue.set(hoodPosition);
+        else
+            RobotContainer.logger.rightHoodValue.set(hoodPosition);
         if(isHoodEnabled()){
-            setServo(leftServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
-            setServo(rightServo, 0.6 * MathUtil.clamp(hoodPosition, -1, 1));
+            setServo(leftServo, MathUtil.clamp(hoodPosition, -1, 1));
+            setServo(rightServo, MathUtil.clamp(hoodPosition, -1, 1));
         }
         // setServo(rightHoodLeftServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1, 1));
         // setServo(rightHoodRightServo, 0.6 * MathUtil.clamp(rightHoodPosition, -1,
@@ -83,7 +89,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     public void offsetHood(double hoodOffset) {
         hoodPosition += Constants.HOOD_SENSITIVITY * hoodOffset;
-        hoodPosition = MathUtil.clamp(hoodPosition, -1, 1);
+        hoodPosition = MathUtil.clamp(hoodPosition, -1, 0);
         setHoodPosition(hoodPosition);
     }
 

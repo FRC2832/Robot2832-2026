@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -25,7 +27,9 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.MomentOfInertiaUnit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -89,15 +93,17 @@ public class TurretSubsystem extends SubsystemBase {
                         .withExternalEncoder(cancoder)
                         .withExternalEncoderGearing(
                                 new MechanismGearing(GearBox.fromReductionStages(1 / Constants.TURRET_ENCODER_RATIO)))
-                        .withExternalEncoderZeroOffset(Rotations.of(isLeft ? 0.02 : .461))
+                        .withExternalEncoderZeroOffset(isLeft ? Constants.LEFT_TURRET_ENCODER_OFFSET : Constants.RIGHT_TURRET_ENCODER_OFFSET)
                         .withSoftLimit(minAngle, maxAngle)
                         .withVendorConfig(config));
 
     }
 
     private Pivot configurePivot(SmartMotorController motorWrapper) {
+        Angle min = isLeftTurret() ? Constants.LEFT_TURRET_LOW_HARD_STOP : Constants.RIGHT_TURRET_LOW_HARD_STOP;
+        Angle max = isLeftTurret() ? Constants.LEFT_TURRET_HIGH_HARD_STOP : Constants.RIGHT_TURRET_HIGH_HARD_STOP;
         PivotConfig config = new PivotConfig(motorWrapper)
-                .withHardLimit(minAngle.times(1.2), maxAngle.times(1.2));
+                .withHardLimit(min, max);
         return new Pivot(config);
     }
 

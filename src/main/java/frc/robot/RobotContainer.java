@@ -14,9 +14,11 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -114,10 +116,15 @@ public class RobotContainer {
         configureBindings();
         // Auto Chooser Setup
         // -----------------------------------------------------------------------------------------------------------------------------
-        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Stream.of());
-        autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot Once"));
-        autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven Left Bump Shoot Once"));
-        autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven Right Bump Shoot Once"));
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+                stream -> stream.filter(auto -> auto.getName().startsWith("Woodhaven"))
+        );
+        // autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot
+        // Once"));
+        // autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven
+        // Left Bump Shoot Once"));
+        // autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven
+        // Right Bump Shoot Once"));
         SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
@@ -235,16 +242,20 @@ public class RobotContainer {
         leftHoodSubsystem.setDefaultCommand(new MoveHoodCommand(leftHoodSubsystem));
         rightHoodSubsystem.setDefaultCommand(new MoveHoodCommand(rightHoodSubsystem));
         // Commands for auton
-        NamedCommands.registerCommand("Shoot", new SpinShooterCommand().withTimeout(6).alongWith(
-                new WaitCommand(3).andThen(pptSubsystem.deliverCommand().withTimeout(3))));
+        NamedCommands.registerCommand("Shoot", new SpinAndShootWhileReady().withTimeout(6));
         NamedCommands.registerCommand("Reverse PPT", pptSubsystem.reverseDeliverCommand().withTimeout(3));
         NamedCommands.registerCommand("Extend Ingestor", intakeExtenderSubsystem.extendIntakeCommand());
-
+        NamedCommands.registerCommand("Start Ingestor", intakeRollerSubsystem.startIntakeCommand());
+        NamedCommands.registerCommand("Stop Ingestor", intakeRollerSubsystem.stopIntakeCommand());
+        NamedCommands.registerCommand("Raise Ingestor", intakeExtenderSubsystem.retractIntakeCommand());
     }
 
     public Command getAutonomousCommand() {
         PathPlannerAuto auto = (PathPlannerAuto) autoChooser.getSelected();
-        drivetrain.resetPose(auto.getStartingPose());
+        Pose2d start = auto.getStartingPose();
+        if (Utils.isOnRed())
+            start = FlippingUtil.flipFieldPose(start);
+        drivetrain.resetPose(start);
         return autoChooser.getSelected();
         // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton

@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.4568526560977006,
-        "y": 2.5152225989347894
+        "x": 3.924337660511716,
+        "y": 2.584825009226964
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.959786324786325,
+        "x": 2.7200238095238105,
         "y": 2.4693452380952383
       },
       "prevControl": {
-        "x": 3.312927479624257,
-        "y": 2.5527429777525437
+        "x": 2.9669697996785844,
+        "y": 2.430387851806137
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -136.333
+    "rotation": -140.336
   },
   "reversed": false,
   "folder": "Woodhaven",

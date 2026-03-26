@@ -93,6 +93,9 @@ public class Telemetry {
     public final BooleanPublisher rightShooterAtSpeed = rightShooter.getBooleanTopic("AtSpeed").publish();
     public final BooleanPublisher acceleratorAtSpeed = accelerator.getBooleanTopic("AtSpeed").publish();
 
+    public final DoublePublisher leftHoodValue = leftShooter.getDoubleTopic("HoodTarget").publish();
+    public final DoublePublisher rightHoodValue = rightShooter.getDoubleTopic("HoodTarget").publish();
+
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
             new Mechanism2d(1, 1),

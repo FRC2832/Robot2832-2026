@@ -27,7 +27,8 @@ public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
     public static double leftSpeed = 0.55, rightSpeed = 0.55, acceleratorSpeed = 0.33;
-
+    //public static double leftSpeed = 0.75, rightSpeed = 0.75, acceleratorSpeed = 0.33;
+    
     private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 
     public ShooterSubsystem() {
@@ -61,14 +62,14 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withSupplyCurrentLimitEnable(true))
                 .withSlot0(
                         new Slot0Configs()
-                                .withKP(13)
+                                .withKP(6.5)
                                 .withKI(0)
                                 .withKD(0.1)
                                 .withKS(0.05)
                                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
                                 // I changed the KV.
-                                .withKV(5.5 / 30.0) // .withKV(26.31 / 31.277344) //current for rps, over rps
-                                .withKA(12 / 44.38) // .withKA(17.25 / 44.38)
+                                .withKV(9.78 / 53.158203) // .withKV(26.31 / 31.277344) //current for rps, over rps
+                                .withKA(9.78/ 19.5) // .withKA(17.25 / 44.38)
                 );
         motor.getConfigurator().apply(config);
     }
@@ -93,8 +94,8 @@ public class ShooterSubsystem extends SubsystemBase {
         RobotContainer.logger.leftShooterSpeed.set(left);
         RobotContainer.logger.rightShooterSpeed.set(right);
         RobotContainer.logger.acceleratorSpeed.set(acc);
-        RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 28, 1));
-        RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 28, 1));
+        RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 54, 1));
+        RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 54, 1));
         RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
     }
 

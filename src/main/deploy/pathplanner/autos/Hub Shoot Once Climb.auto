@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Bump Shoot"
+            "pathName": "Hub Shoot Near Tower"
           }
         },
         {
@@ -15,11 +15,17 @@
           "data": {
             "name": "Shoot"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Hub Climb"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Woodhaven",
+  "folder": null,
   "choreoAuto": false
 }

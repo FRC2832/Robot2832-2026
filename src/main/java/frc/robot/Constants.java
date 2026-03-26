@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -31,13 +32,13 @@ public class Constants {
     }
 
     // Enable each shooter, PPT, hood, turret
-    public static final boolean LEFT_TURRET_ENABLED = true;
-    public static final boolean RIGHT_TURRET_ENABLED = true;
-    public static final boolean LEFT_HOOD_ENABLED = true;
+    public static final boolean LEFT_TURRET_ENABLED = false;
+    public static final boolean RIGHT_TURRET_ENABLED = false;
+    public static final boolean LEFT_HOOD_ENABLED = false;
     public static final boolean RIGHT_HOOD_ENABLED = true;
-    public static final boolean LEFT_SHOOTER_ENABLED = true;
+    public static final boolean LEFT_SHOOTER_ENABLED = false;
     public static final boolean RIGHT_SHOOTER_ENABLED = true;
-    public static final boolean LEFT_PPT_ENABLED = true;
+    public static final boolean LEFT_PPT_ENABLED = false;
     public static final boolean RIGHT_PPT_ENABLED = true;
 
     // Constants for Hopper subsystem
@@ -73,6 +74,15 @@ public class Constants {
     public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(0);//90);
     public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(0);//-90);
     public static final Angle RIGHT_TURRET_MAX_ANGLE = Degrees.of(90);
+    
+    public static final Angle LEFT_TURRET_LOW_HARD_STOP = Degrees.of(-100);
+    public static final Angle LEFT_TURRET_HIGH_HARD_STOP = Degrees.of(10);//90);
+    public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-10);//-90);
+    public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(100);
+
+    public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(0.007);
+    public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(.461);
+
 
     // FIXME measure robot turret positions relative to robot origin
     public static final Translation3d LEFT_TURRET_POS = new Translation3d(Inches.of(6.75), Inches.of(8.75), Inches.of(20));
@@ -102,17 +112,17 @@ public class Constants {
     public static final Transform3d LEFT_CAM_POSE = new Transform3d(
             Inches.of(1.1875),
             Inches.of(14.125),
-            Inches.of(15.25),
-            new Rotation3d(0, 25 * Math.PI / 180, 90 * Math.PI / 180));
+            Inches.of(20.5),
+            new Rotation3d(0, -25 * Math.PI / 180, 90 * Math.PI / 180));
     public static final String LEFT_CAM_NAME = "Left Camera";
 
     public static final Transform3d RIGHT_CAM_POSE = new Transform3d(
             Inches.of(1.1875),
             Inches.of(-14.125),
-            Inches.of(15.25),
+            Inches.of(20.5),
             // Right camera is 90 degrees clockwise, making the image have to be 90 degrees
             // counterclockwise
-            new Rotation3d(-90 * Math.PI / 180, 25 * Math.PI / 180, -90 * Math.PI / 180));
+            new Rotation3d(-90 * Math.PI / 180, -25 * Math.PI / 180, -90 * Math.PI / 180));
     public static final String RIGHT_CAM_NAME = "Right Camera";
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
