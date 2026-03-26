@@ -28,9 +28,15 @@ public class Robot extends TimedRobot {
     private int nextPhaseIndex = 0;
 
 
-    Elastic.Notification hubActiveSoonNotification = new Elastic.Notification(Elastic.NotificationLevel.WARNING,
+    Elastic.Notification hubActiveSoonNotification = new Elastic.Notification(Elastic.NotificationLevel.INFO,
                                                                         "HUB ACTIVATING!!!!!!!!!!",
                                                                   "GO HOOOOOMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+                                                            1000,
+                                                                        1000,
+                                                                        1000);
+    Elastic.Notification hubDeactivatingSoonNotification = new Elastic.Notification(Elastic.NotificationLevel.ERROR, // I used error cuz it's red but that might be scary.
+                                                                        "hub is going bye bye :(",
+                                                                  "hurry up!",
                                                             1000,
                                                                         1000,
                                                                         1000);
@@ -109,6 +115,11 @@ public class Robot extends TimedRobot {
         if(matchTime > -1){
             if(nextPhaseIndex < SHIFT_TIMES.length && matchTime <= (SHIFT_TIMES[nextPhaseIndex] + 3) && PhaseChecker.isHubActive(matchTime - 4)){
                 Elastic.sendNotification(hubActiveSoonNotification);
+                nextPhaseIndex++;
+            }
+            // This does the same thing but for an inactive hub.
+            else if(nextPhaseIndex < SHIFT_TIMES.length && matchTime <= (SHIFT_TIMES[nextPhaseIndex] + 3) && !PhaseChecker.isHubActive(matchTime - 4)){
+                Elastic.sendNotification(hubDeactivatingSoonNotification);
                 nextPhaseIndex++;
             }
         }
