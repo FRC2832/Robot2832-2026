@@ -24,16 +24,16 @@ public class Robot extends TimedRobot {
     // matchTime will always count DOWN. Because that's how drive station gives it to you.
     private double matchTime = -1;
     private boolean hubActive = false;
-
-    // This is 3 seconds before a shift but you may want to change it if, say, it takes more than 3 seconds to get across the field.
-    private static final double[] NEAR_SHIFT_TIMES = {133, 108, 83, 58, 33};
+    private static final double[] SHIFT_TIMES = {130, 105, 80, 55, 30};
     private int nextPhaseIndex = 0;
 
 
     Elastic.Notification hubActiveSoonNotification = new Elastic.Notification(Elastic.NotificationLevel.WARNING,
                                                                         "HUB ACTIVATING!!!!!!!!!!",
                                                                   "GO HOOOOOMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
-                                                            5000);
+                                                            1000,
+                                                                        1000,
+                                                                        1000);
 
     /* log and replay timestamp and joystick data */
     private final HootAutoReplay m_timeAndJoystickReplay = new HootAutoReplay()
@@ -107,8 +107,7 @@ public class Robot extends TimedRobot {
         // Then waits till the next phase by iterating upon next phase index.
         // Also checks if the match time is above -1 because otherwise you get one million notifications when just running teleop.
         if(matchTime > -1){
-            if(nextPhaseIndex < NEAR_SHIFT_TIMES.length && matchTime <= NEAR_SHIFT_TIMES[nextPhaseIndex] && PhaseChecker.isHubActive(matchTime + 4)){
-                // I didn't add a rumble because I personally hate those but if you want one it should go here. Better yet, you could make it toggleable.
+            if(nextPhaseIndex < SHIFT_TIMES.length && matchTime <= (SHIFT_TIMES[nextPhaseIndex] + 3) && PhaseChecker.isHubActive(matchTime - 4)){
                 Elastic.sendNotification(hubActiveSoonNotification);
                 nextPhaseIndex++;
             }
