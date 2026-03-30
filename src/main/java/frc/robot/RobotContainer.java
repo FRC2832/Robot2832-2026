@@ -46,7 +46,7 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
-    private static double MaxSpeed = 0.6 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts
+    private static double MaxSpeed = 0.8 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts
                                                                                                // desired top
                                                                                                // speed
     private double MaxAngularRate = 0.9 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
@@ -98,11 +98,11 @@ public class RobotContainer {
         drivetrain = TunerConstants.createDrivetrain();
         shooterSubsystem = new ShooterSubsystem();
         leftTurretSubsystem = new TurretSubsystem(Constants.LEFT_ROTATOR_ID, Constants.LEFT_ROTATOR_CANCODER_ID,
-                InvertedValue.CounterClockwise_Positive, Constants.LEFT_TURRET_MIN_ANGLE,
+                InvertedValue.Clockwise_Positive, Constants.LEFT_TURRET_MIN_ANGLE,
                 Constants.LEFT_TURRET_MAX_ANGLE, true);
         rightTurretSubsystem = new TurretSubsystem(Constants.RIGHT_ROTATOR_ID,
                 Constants.RIGHT_ROTATOR_CANCODER_ID,
-                InvertedValue.CounterClockwise_Positive, Constants.RIGHT_TURRET_MIN_ANGLE,
+                InvertedValue.Clockwise_Positive, Constants.RIGHT_TURRET_MIN_ANGLE,
                 Constants.RIGHT_TURRET_MAX_ANGLE, false);
         intakeRollerSubsystem = new IntakeRollerSubsystem();
         intakeExtenderSubsystem = new IntakeExtenderSubsystem();
@@ -208,31 +208,30 @@ public class RobotContainer {
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
 
-        operatorController.b().onTrue(
-                leftTurretSubsystem.enableAutoAim().alongWith(rightTurretSubsystem.enableAutoAim()));
+        operatorController.b().onTrue(startAutoAim());
         leftTurretSubsystem.setDefaultCommand(new MoveTurretCommand(leftTurretSubsystem));
         rightTurretSubsystem.setDefaultCommand(new MoveTurretCommand(rightTurretSubsystem));
 
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
-            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed,
-                    ShooterSubsystem::getLastRightSpeed,
-                    ShooterSubsystem::getLastAcceleratorSpeed);
+            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeedProportion,
+                    ShooterSubsystem::getLastRightSpeedProportion,
+                    ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
             // ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
-            SpinAndShootWhileReady.TARGET_SPEED += 5;
+            //SpinAndShootWhileReady.TARGET_SPEED += 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
             // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         operatorController.povDown().onTrue(shooterSubsystem.runOnce(() -> {
-            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed,
-                    ShooterSubsystem::getLastRightSpeed,
-                    ShooterSubsystem::getLastAcceleratorSpeed);
+            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeedProportion,
+                    ShooterSubsystem::getLastRightSpeedProportion,
+                    ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
             // ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
-            SpinAndShootWhileReady.TARGET_SPEED -= 5;
+            //SpinAndShootWhileReady.TARGET_SPEED -= 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
             // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
@@ -250,13 +249,17 @@ public class RobotContainer {
         NamedCommands.registerCommand("Raise Ingestor", intakeExtenderSubsystem.retractIntakeCommand());
     }
 
+    public Command startAutoAim(){
+        return leftTurretSubsystem.enableAutoAim().alongWith(rightTurretSubsystem.enableAutoAim());
+    }
+
     public Command getAutonomousCommand() {
         PathPlannerAuto auto = (PathPlannerAuto) autoChooser.getSelected();
         Pose2d start = auto.getStartingPose();
         if (Utils.isOnRed())
             start = FlippingUtil.flipFieldPose(start);
         drivetrain.resetPose(start);
-        return autoChooser.getSelected();
+        return startAutoAim().alongWith(autoChooser.getSelected());
         // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();

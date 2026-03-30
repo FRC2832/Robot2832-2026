@@ -48,9 +48,9 @@ public class MoveTurretCommand extends Command {
         if (Math.abs(xPos) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
             turret.isAutoAim = false;
         if (turret.isAutoAim) {
-            turret.aimAtPosition(MoveTurretCommand.getTargetPosition(), RobotContainer.drivetrain.getPose());
+            turret.aimAtPosition(Utils.getTargetPosition(), RobotContainer.drivetrain.getPose());
         } else {
-            turret.setVoltage(Volts.of(6 * MathUtil.applyDeadband(xPos, 0.1)));
+            turret.setVoltage(Volts.of(-6 * MathUtil.applyDeadband(xPos, 0.1)));
         }
     }
 
@@ -79,30 +79,6 @@ public class MoveTurretCommand extends Command {
         return false;
     }
 
-    private static Translation2d getTargetPosition() {
-        Pose2d robotPose = RobotContainer.drivetrain.getPose();
-
-        if (Utils.inAllianceZone(robotPose)) {
-            if (isOnRed) {
-                return Constants.RED_HUB_POS;
-            } else {
-                return Constants.BLUE_HUB_POS;
-            }
-        } else {
-            if (isOnRed) {
-                if (robotPose.getMeasureY().gt(Constants.RED_HUB_POS.getMeasureY())) {
-                    return Constants.RED_RIGHT_SNOWBLOW_TARGET;
-                } else {
-                    return Constants.RED_LEFT_SNOWBLOW_TARGET;
-                }
-            } else {
-                if (robotPose.getMeasureY().gt(Constants.BLUE_HUB_POS.getMeasureY())) {
-                    return Constants.BLUE_LEFT_SNOWBLOW_TARGET;
-                } else {
-                    return Constants.BLUE_RIGHT_SNOWBLOW_TARGET;
-                }
-            }
-        }
-    }
+    
 
 }

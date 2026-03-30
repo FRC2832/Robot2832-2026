@@ -46,10 +46,10 @@ public class Telemetry {
     }
 
     /* What to publish over networktables for telemetry */
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    public final NetworkTableInstance tableRoot = NetworkTableInstance.getDefault();
 
     /* Robot swerve drive state */
-    private final NetworkTable driveStateTable = inst.getTable("DriveState");
+    private final NetworkTable driveStateTable = tableRoot.getTable("DriveState");
     private final StructPublisher<Pose2d> drivePose = driveStateTable.getStructTopic("Pose", Pose2d.struct)
             .publish();
     private final StructPublisher<ChassisSpeeds> driveSpeeds = driveStateTable
@@ -65,12 +65,12 @@ public class Telemetry {
             .publish();
 
     /* Robot pose for field positioning */
-    private final NetworkTable table = inst.getTable("Pose");
+    private final NetworkTable table = tableRoot.getTable("Pose");
     private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
 
     /* AprilTag detections from PhotonVision */
-    private final NetworkTable visionTable = inst.getTable("VisionData");
+    private final NetworkTable visionTable = tableRoot.getTable("VisionData");
     private final NetworkTable leftCamTable = visionTable.getSubTable("LeftCamera");
     private final NetworkTable rightCamTable = visionTable.getSubTable("RightCamera");
     private final StructArrayPublisher<Pose3d> leftCamDetects = leftCamTable
@@ -82,7 +82,7 @@ public class Telemetry {
     public final StructPublisher<Pose2d> estimatedRobotPose = visionTable
             .getStructTopic("EstimatedPose", Pose2d.struct).publish();
 
-    private final NetworkTable shooterTable = inst.getTable("ShooterData");
+    private final NetworkTable shooterTable = tableRoot.getTable("ShooterData");
     private final NetworkTable leftShooter = shooterTable.getSubTable("Left");
     private final NetworkTable rightShooter = shooterTable.getSubTable("Right");
     private final NetworkTable accelerator = shooterTable.getSubTable("Accelerator");

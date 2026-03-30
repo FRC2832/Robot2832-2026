@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** A set of utility functions */
@@ -49,7 +50,34 @@ public class Utils {
         return robotPose.getMeasureX().lt(Constants.BLUE_HUB_POS.getMeasureX());
     }
 
+    private static boolean teamChecked = false, isOnRed;
+
     public static boolean isOnRed() {
-        return DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false);
+        if(!teamChecked){
+            isOnRed = DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false);
+            teamChecked = true;
+        }
+        return isOnRed;
+    }
+
+    public static Translation2d getTargetPosition() {
+        Pose2d robotPose = RobotContainer.drivetrain.getPose();
+
+        if (Utils.inAllianceZone(robotPose)) {
+            if (isOnRed()) {
+                return Constants.RED_HUB_POS;
+            }
+            return Constants.BLUE_HUB_POS;
+        }
+        if (isOnRed()) {
+            if (robotPose.getMeasureY().gt(Constants.RED_HUB_POS.getMeasureY())) {
+                return Constants.RED_RIGHT_SNOWBLOW_TARGET;
+            }
+            return Constants.RED_LEFT_SNOWBLOW_TARGET;
+        }
+        if (robotPose.getMeasureY().gt(Constants.BLUE_HUB_POS.getMeasureY())) {
+            return Constants.BLUE_LEFT_SNOWBLOW_TARGET;
+        }
+        return Constants.BLUE_RIGHT_SNOWBLOW_TARGET;
     }
 }

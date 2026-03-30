@@ -31,8 +31,8 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     // -------------------------
     public enum Speed {
         STOP(0),
-        INTAKE(0.8),
-        REVERSE(-0.67);
+        INTAKE(0.6),
+        REVERSE(-0.6);
 
         private final double percentOutput;
 
@@ -50,7 +50,8 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public TalonFX intakeInternalRotatorMotor;
 
-    private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
+    private final VoltageOut rollerVoltageRequest = new VoltageOut(0)
+        .withEnableFOC(true);
 
     public IntakeRollerSubsystem() {
         intakeInternalRotatorMotor = new TalonFX(Constants.INTAKE_INTERNAL_ROTATOR_ID, Constants.CANivoreCANBus);

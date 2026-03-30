@@ -77,6 +77,15 @@ public class IntakeExtenderSubsystem extends SubsystemBase {
         return new MoveIntake(false);
     }
 
+    //TODO check the motor position against the positions of up and down
+    public boolean isIntakeDown(){
+        return false;
+    }
+
+    public boolean isIntakeUp(){
+        return false;
+    }
+
     // -----------------------------------------------------------------------------
     @Override
     public void periodic() {

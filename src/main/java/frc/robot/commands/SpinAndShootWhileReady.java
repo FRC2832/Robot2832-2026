@@ -12,8 +12,9 @@ import frc.robot.subsystems.PPTSubsystem;
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SpinAndShootWhileReady extends Command {
 
-    public static double TARGET_SPEED = 54;
+    //public static double TARGET_SPEED = 54;
     int cyclesSinceLastPush = Integer.MAX_VALUE;
+    private static final int CYCLES_TO_CONTINUE = 0;
 
     /** Creates a new ShootWhileReady. */
     public SpinAndShootWhileReady() {
@@ -35,20 +36,21 @@ public class SpinAndShootWhileReady extends Command {
     public void execute() {
         double leftSpeed = SpinShooterCommand.leftSpeed.getAsDouble();
         double rightSpeed = SpinShooterCommand.rightSpeed.getAsDouble();
-        double accelSpeed = 0.34;// SpinShooterCommand.acceleratorSpeed.getAsDouble();
+        double accelSpeed = SpinShooterCommand.acceleratorSpeed.getAsDouble();
+        double leftTargetSpeed = leftSpeed*100-1;
+        double rightTargetSpeed = rightSpeed*100-1;
         RobotContainer.shooterSubsystem.setMotorSpeed(rightSpeed, leftSpeed, accelSpeed);
-        if (RobotContainer.shooterSubsystem.getLeftMotorSpeed() > TARGET_SPEED
-                && RobotContainer.shooterSubsystem.getRightMotorSpeed() > TARGET_SPEED) {
+        if (RobotContainer.shooterSubsystem.getLeftMotorSpeed() > leftTargetSpeed
+                && RobotContainer.shooterSubsystem.getRightMotorSpeed() > rightTargetSpeed) {
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.FORWARD, PPTSubsystem.Speed.FORWARD);
             cyclesSinceLastPush = 0;
-        } else if (RobotContainer.shooterSubsystem.getLeftMotorSpeed() > TARGET_SPEED) {
+        } else if (RobotContainer.shooterSubsystem.getLeftMotorSpeed() > leftTargetSpeed) {
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.FORWARD);
             cyclesSinceLastPush = 0;
-        } else if (RobotContainer.shooterSubsystem.getRightMotorSpeed() > TARGET_SPEED) {
+        } else if (RobotContainer.shooterSubsystem.getRightMotorSpeed() > rightTargetSpeed) {
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.FORWARD, PPTSubsystem.Speed.STOP);
             cyclesSinceLastPush = 0;
-        } else if (cyclesSinceLastPush < 0) {
-            RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.FORWARD, PPTSubsystem.Speed.FORWARD);
+        } else if (cyclesSinceLastPush < CYCLES_TO_CONTINUE) {
             cyclesSinceLastPush++;
         } else {
             RobotContainer.pptSubsystem.setPPTSpeed(PPTSubsystem.Speed.STOP, PPTSubsystem.Speed.STOP);

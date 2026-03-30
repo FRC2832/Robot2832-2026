@@ -16,6 +16,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -54,6 +55,8 @@ public class TurretSubsystem extends SubsystemBase {
     
     public boolean isAutoAim;
 
+    PositionVoltage positionControl = new PositionVoltage(0);
+
     public TurretSubsystem(int motor_id, int encoder_id, InvertedValue inverted, Angle minAngle, Angle maxAngle,
             boolean isLeft) {
         this.minAngle = minAngle;
@@ -64,11 +67,10 @@ public class TurretSubsystem extends SubsystemBase {
         turret = configurePivot(motorWrapper);
         this.isLeft = isLeft;
         position = isLeft ? Constants.LEFT_TURRET_POS : Constants.RIGHT_TURRET_POS;
-        isAutoAim = true;
+        isAutoAim = false;
     }
 
     private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder, boolean isLeft) {
-
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(invertDirection)
                 .withNeutralMode(NeutralModeValue.Coast);
@@ -94,8 +96,10 @@ public class TurretSubsystem extends SubsystemBase {
                         .withExternalEncoderGearing(
                                 new MechanismGearing(GearBox.fromReductionStages(1 / Constants.TURRET_ENCODER_RATIO)))
                         .withExternalEncoderZeroOffset(isLeft ? Constants.LEFT_TURRET_ENCODER_OFFSET : Constants.RIGHT_TURRET_ENCODER_OFFSET)
+                        .withExternalEncoderInverted(true)
                         .withSoftLimit(minAngle, maxAngle)
-                        .withVendorConfig(config));
+                        .withVendorConfig(config)
+                        .withVendorControlRequest(positionControl));
 
     }
 
