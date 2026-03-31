@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -248,12 +249,20 @@ public class RobotContainer {
         NamedCommands.registerCommand("Start Ingestor", intakeRollerSubsystem.startIntakeCommand());
         NamedCommands.registerCommand("Stop Ingestor", intakeRollerSubsystem.stopIntakeCommand());
         NamedCommands.registerCommand("Raise Ingestor", intakeExtenderSubsystem.retractIntakeCommand());
+
+        SmartDashboard.putData("Test", rightTurretSubsystem.runOnce(
+                () -> rightTurretSubsystem.setTurretAngle(Degrees.of(30))));
     }
 
     public Command startAutoAim(){
-        return Commands.run(() -> {
-                leftTurretSubsystem.isAutoAim = true;
-                rightTurretSubsystem.isAutoAim = true;
+        return Commands.runOnce(() -> {
+                if(leftTurretSubsystem.isAutoAim || rightTurretSubsystem.isAutoAim){
+                        leftTurretSubsystem.isAutoAim = false;
+                        rightTurretSubsystem.isAutoAim = false;
+                }else{
+                        leftTurretSubsystem.isAutoAim = true;
+                        rightTurretSubsystem.isAutoAim = true;
+                }
         });
     }
 

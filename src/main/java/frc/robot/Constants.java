@@ -71,15 +71,15 @@ public class Constants {
     public static final double HOOD_SENSITIVITY = 0.05;
     public static final double TURRET_MAX_VOLTAGE = .4;
     // TODO update when the turret range increases
-    public static final Angle LEFT_TURRET_MIN_ANGLE = Degrees.of(-90);
-    public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(90);
-    public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(-90);
-    public static final Angle RIGHT_TURRET_MAX_ANGLE = Degrees.of(90);
+    public static final Angle LEFT_TURRET_MIN_ANGLE = Degrees.of(-85);
+    public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(85);
+    public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(-85);
+    public static final Angle RIGHT_TURRET_MAX_ANGLE = Degrees.of(85);
 
-    public static final Angle LEFT_TURRET_LOW_HARD_STOP = Degrees.of(-100);
-    public static final Angle LEFT_TURRET_HIGH_HARD_STOP = Degrees.of(100);
-    public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-100);
-    public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(100);
+    public static final Angle LEFT_TURRET_LOW_HARD_STOP = Degrees.of(-90);
+    public static final Angle LEFT_TURRET_HIGH_HARD_STOP = Degrees.of(90);
+    public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-90);
+    public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(90);
 
     public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.14217);
     public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.4675);

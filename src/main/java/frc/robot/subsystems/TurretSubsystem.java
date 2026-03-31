@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -22,6 +23,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -52,7 +54,7 @@ public class TurretSubsystem extends SubsystemBase {
     Angle minAngle, maxAngle;
     Translation3d position;
     boolean isLeft;
-    
+
     public boolean isAutoAim;
 
     PositionVoltage positionControl = new PositionVoltage(0);
@@ -70,7 +72,8 @@ public class TurretSubsystem extends SubsystemBase {
         isAutoAim = false;
     }
 
-    private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder, boolean isLeft) {
+    private TalonFXWrapper configureSmartMotor(TalonFX motor, InvertedValue invertDirection, CANcoder cancoder,
+            boolean isLeft) {
         MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
                 .withInverted(invertDirection)
                 .withNeutralMode(NeutralModeValue.Coast);
@@ -83,23 +86,30 @@ public class TurretSubsystem extends SubsystemBase {
                 .withKP(0.5)
                 .withKI(2)
                 .withKD(0)
-                // 12 volts when requesting max RPS
-                .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond));
+                // 6 volts gave 0.18 rps
+                .withKV(6.0 / 0.18);
         TalonFXConfiguration config = new TalonFXConfiguration()
                 .withMotorOutput(motorOutputConfigs)
                 .withCurrentLimits(currentLimits)
                 .withSlot0(slotConfigs);
         return new TalonFXWrapper(motor, DCMotor.getKrakenX60(1),
                 new SmartMotorControllerConfig(this)
-                        .withGearing(new MechanismGearing(GearBox.fromStages("1:10", "30:40", "15:140")))
+                        .withGearing(new MechanismGearing(GearBox.fromStages("10:1", "40:30", "140:15")))
                         .withExternalEncoder(cancoder)
                         .withExternalEncoderGearing(
                                 new MechanismGearing(GearBox.fromReductionStages(1 / Constants.TURRET_ENCODER_RATIO)))
-                        .withExternalEncoderZeroOffset(isLeft ? Constants.LEFT_TURRET_ENCODER_OFFSET : Constants.RIGHT_TURRET_ENCODER_OFFSET)
+                        .withExternalEncoderZeroOffset(
+                                isLeft ? Constants.LEFT_TURRET_ENCODER_OFFSET : Constants.RIGHT_TURRET_ENCODER_OFFSET)
                         .withExternalEncoderInverted(true)
+                        .withUseExternalFeedbackEncoder(true)
                         .withSoftLimit(minAngle, maxAngle)
                         .withVendorConfig(config)
-                        .withVendorControlRequest(positionControl));
+                        .withVendorControlRequest(positionControl)
+                        .withStatorCurrentLimit(Amps.of(60))
+                        .withSupplyCurrentLimit(Amps.of(40))
+                        .withMotorInverted(invertDirection != InvertedValue.Clockwise_Positive)
+                        .withClosedLoopController(1, 0, 0)
+                        .withResetPreviousConfig(true));
 
     }
 
@@ -116,16 +126,20 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void setVoltage(Voltage voltage) {
-        if(isTurretEnabled())
+        if (isTurretEnabled())
             turret.setVoltageSetpoint(voltage);
         else
             stopRotation();
     }
 
     public void setTurretAngle(Angle angle) {
-        if(isTurretEnabled())
+        if (angle.lt(minAngle))
+            angle = minAngle;
+        if (angle.gt(maxAngle))
+            angle = maxAngle;
+        if (isTurretEnabled()) {
             turret.setMechanismPositionSetpoint(angle);
-        else
+        } else
             stopRotation();
     }
 
@@ -142,14 +156,24 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void aimAtPosition(Translation2d target, Pose2d robotPose) {
-        if(!isTurretEnabled())
+        if (!isTurretEnabled())
             return;
         Pose2d targetPose = new Pose2d(target, Rotation2d.kZero);
         Pose2d turretPose = robotPose.plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
         Pose2d offset = targetPose.relativeTo(turretPose);
-        Angle angle = Degrees.of(90).minus(offset.getTranslation().getAngle().getMeasure());
+        System.out.println("Hub at position " + offset.getX() + "," + offset.getY() + " and rotation "
+                + offset.getTranslation().getAngle().getMeasure().in(Degrees) + " relative to "
+                + (isLeftTurret() ? "left turret" : "right turret"));
+        Angle angle = Degrees.of(180).plus(offset.getTranslation().getAngle().getMeasure());
+        angle = Radians.of(MathUtil.angleModulus(angle.in(Radians)));
+        System.out.println(
+                "Aiming " + (isLeftTurret() ? "left" : "right") + " turret at angle " + angle.in(Degrees) + " degrees");
         setTurretAngle(angle);
+        System.out.println((isLeftTurret() ? "Left" : "Right") + " turret currently at angle "
+                + turret.getAngle().in(Degrees) + " degrees");
     }
+
+    
 
     public Command enableAutoAim() {
         return runOnce(() -> this.isAutoAim = true);
@@ -160,7 +184,9 @@ public class TurretSubsystem extends SubsystemBase {
         // This method will be called once per scheduler run
     }
 
-    private boolean isTurretEnabled(){
+    private boolean isTurretEnabled() {
         return isLeft ? Constants.LEFT_TURRET_ENABLED : Constants.RIGHT_TURRET_ENABLED;
     }
+
+    
 }
