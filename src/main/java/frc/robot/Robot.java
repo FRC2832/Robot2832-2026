@@ -44,6 +44,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        Utils.recheckTeam();
+        RobotContainer.leftTurretSubsystem.isAutoAim = Constants.SHOULD_AUTO_AIM_AT_START;
+        RobotContainer.rightTurretSubsystem.isAutoAim = Constants.SHOULD_AUTO_AIM_AT_START;
+        RobotContainer.logger.leftTurretAutoAiming.set(Constants.SHOULD_AUTO_AIM_AT_START);
+        RobotContainer.logger.rightTurretAutoAiming.set(Constants.SHOULD_AUTO_AIM_AT_START);
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
@@ -61,6 +66,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        Utils.recheckTeam();
         if (m_autonomousCommand != null) {
             CommandScheduler.getInstance().cancel(m_autonomousCommand);
         }

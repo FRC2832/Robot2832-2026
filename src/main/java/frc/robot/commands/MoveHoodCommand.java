@@ -39,10 +39,10 @@ public class MoveHoodCommand extends Command {
         if (hood.isAutoAim()) {
             // FIXME implement auto controls, lookup table
             double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), 0.1);
-            hood.offsetHood(joystick);
+            hood.offsetHood(-joystick);
         } else {
             double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), 0.1);
-            hood.offsetHood(joystick);
+            hood.offsetHood(-joystick);
         }
     }
 

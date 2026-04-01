@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Shoot near Bump"
+            "pathName": "Hub Shoot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right Cross Bump To Neutral"
           }
         },
         {
@@ -31,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Collect from Pile"
+            "pathName": "Hub Collect From Depot"
           }
         },
         {
@@ -43,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Return From Neutral"
+            "pathName": "Hub Shoot from Depot"
           }
         },
         {
@@ -51,11 +45,23 @@
           "data": {
             "name": "Shoot"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Hub Climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Climb"
+          }
         }
       ]
     }
   },
   "resetOdom": true,
-  "folder": "Woodhaven",
+  "folder": null,
   "choreoAuto": false
 }

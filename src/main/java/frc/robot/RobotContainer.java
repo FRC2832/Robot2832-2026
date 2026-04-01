@@ -9,14 +9,13 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.util.stream.Stream;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -44,7 +43,7 @@ import frc.robot.commands.MoveTurretCommand;
 import frc.robot.commands.SpinAndShootWhileReady;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretNoYams;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
@@ -79,8 +78,8 @@ public class RobotContainer {
     // Subsytem declaration
     public static ShooterSubsystem shooterSubsystem;
     // public static TurretSubsystem_Old turretSubsystem;
-    public static TurretSubsystem leftTurretSubsystem;
-    public static TurretSubsystem rightTurretSubsystem;
+    public static TurretNoYams leftTurretSubsystem;
+    public static TurretNoYams rightTurretSubsystem;
     public static IntakeRollerSubsystem intakeRollerSubsystem;
     public static IntakeExtenderSubsystem intakeExtenderSubsystem;
     public static IndexerSubsystem indexerSubsystem;
@@ -99,13 +98,10 @@ public class RobotContainer {
         // StatusLogger.disableAutoLogging();
         drivetrain = TunerConstants.createDrivetrain();
         shooterSubsystem = new ShooterSubsystem();
-        leftTurretSubsystem = new TurretSubsystem(Constants.LEFT_ROTATOR_ID, Constants.LEFT_ROTATOR_CANCODER_ID,
-                InvertedValue.Clockwise_Positive, Constants.LEFT_TURRET_MIN_ANGLE,
-                Constants.LEFT_TURRET_MAX_ANGLE, true);
-        rightTurretSubsystem = new TurretSubsystem(Constants.RIGHT_ROTATOR_ID,
-                Constants.RIGHT_ROTATOR_CANCODER_ID,
-                InvertedValue.Clockwise_Positive, Constants.RIGHT_TURRET_MIN_ANGLE,
-                Constants.RIGHT_TURRET_MAX_ANGLE, false);
+        leftTurretSubsystem = new TurretNoYams(true, InvertedValue.CounterClockwise_Positive,
+                SensorDirectionValue.Clockwise_Positive, Constants.LEFT_TURRET_ENCODER_OFFSET);
+        rightTurretSubsystem = new TurretNoYams(false, InvertedValue.CounterClockwise_Positive,
+                SensorDirectionValue.Clockwise_Positive, Constants.RIGHT_TURRET_ENCODER_OFFSET);
         intakeRollerSubsystem = new IntakeRollerSubsystem();
         intakeExtenderSubsystem = new IntakeExtenderSubsystem();
         indexerSubsystem = new IndexerSubsystem();
@@ -119,8 +115,7 @@ public class RobotContainer {
         // Auto Chooser Setup
         // -----------------------------------------------------------------------------------------------------------------------------
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
-                stream -> stream.filter(auto -> auto.getName().startsWith("Woodhaven"))
-        );
+                stream -> stream.filter(auto -> auto.getName().startsWith("Woodhaven")));
         // autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot
         // Once"));
         // autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven
@@ -207,6 +202,17 @@ public class RobotContainer {
                         .alongWith(shooterSubsystem.reverseShooter())));
 
         // Shooter ************************
+        //Move shooter up and down while shooting and not intaking
+        operatorController.y().or(operatorController.a())
+            .and(operatorController.rightTrigger(.1).negate())
+            .and(operatorController.rightTrigger(.1).negate())
+            .whileTrue(
+                intakeExtenderSubsystem.extendIntakeCommand()
+                .andThen(new WaitCommand(1))
+                .andThen(intakeExtenderSubsystem.retractIntakeCommand())
+                .andThen(new WaitCommand(1))
+            ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
+
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
 
@@ -221,8 +227,10 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
+            leftTurretSubsystem.isAutoAim = false;
+            rightTurretSubsystem.isAutoAim = false;
             // ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
-            //SpinAndShootWhileReady.TARGET_SPEED += 5;
+            // SpinAndShootWhileReady.TARGET_SPEED += 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
             // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
@@ -232,8 +240,10 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
+            leftTurretSubsystem.isAutoAim = false;
+            rightTurretSubsystem.isAutoAim = false;
             // ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
-            //SpinAndShootWhileReady.TARGET_SPEED -= 5;
+            // SpinAndShootWhileReady.TARGET_SPEED -= 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
             // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
@@ -251,18 +261,22 @@ public class RobotContainer {
         NamedCommands.registerCommand("Raise Ingestor", intakeExtenderSubsystem.retractIntakeCommand());
 
         SmartDashboard.putData("Test", rightTurretSubsystem.runOnce(
-                () -> rightTurretSubsystem.setTurretAngle(Degrees.of(30))));
+                () -> rightTurretSubsystem.setAngle(Degrees.of(30))));
     }
 
-    public Command startAutoAim(){
+    public Command startAutoAim() {
         return Commands.runOnce(() -> {
-                if(leftTurretSubsystem.isAutoAim || rightTurretSubsystem.isAutoAim){
-                        leftTurretSubsystem.isAutoAim = false;
-                        rightTurretSubsystem.isAutoAim = false;
-                }else{
-                        leftTurretSubsystem.isAutoAim = true;
-                        rightTurretSubsystem.isAutoAim = true;
-                }
+            if (leftTurretSubsystem.isAutoAim || rightTurretSubsystem.isAutoAim) {
+                leftTurretSubsystem.isAutoAim = false;
+                rightTurretSubsystem.isAutoAim = false;
+                RobotContainer.logger.leftTurretAutoAiming.set(false);
+                RobotContainer.logger.rightTurretAutoAiming.set(false);
+            } else {
+                leftTurretSubsystem.isAutoAim = true;
+                rightTurretSubsystem.isAutoAim = true;
+                RobotContainer.logger.leftTurretAutoAiming.set(true);
+                RobotContainer.logger.rightTurretAutoAiming.set(true);
+            }
         });
     }
 
@@ -272,7 +286,8 @@ public class RobotContainer {
         if (Utils.isOnRed())
             start = FlippingUtil.flipFieldPose(start);
         drivetrain.resetPose(start);
-        return startAutoAim().alongWith(autoChooser.getSelected());
+        //return startAutoAim().alongWith(autoChooser.getSelected());
+        return autoChooser.getSelected();
         // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();

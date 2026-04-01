@@ -13,9 +13,11 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -38,6 +40,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.KrakenX60;
+import frc.robot.RobotContainer;
 
 public class TurretNoYams extends SubsystemBase {
     TalonFX motor;
@@ -46,11 +49,15 @@ public class TurretNoYams extends SubsystemBase {
     boolean isLeft;
     Translation3d position;
 
+    public boolean isAutoAim = Constants.SHOULD_AUTO_AIM_AT_START;
+
     PositionVoltage angleControl = new PositionVoltage(0)
-            .withSlot(0).withEnableFOC(true);
-    VoltageOut voltageControl = new VoltageOut(0).withEnableFOC(true);
+            .withSlot(0);//.withEnableFOC(true);
+    VoltageOut voltageControl = new VoltageOut(0);//.withEnableFOC(true);
 
     public TurretNoYams(boolean isLeft, InvertedValue motorInverted, SensorDirectionValue cancoderDirection, Angle cancoderOffset) {
+        RobotContainer.logger.leftTurretAutoAiming.set(isAutoAim);
+        RobotContainer.logger.rightTurretAutoAiming.set(isAutoAim);
         this.isLeft = isLeft;
         if(isLeft){
             position = Constants.LEFT_TURRET_POS;
@@ -72,10 +79,6 @@ public class TurretNoYams extends SubsystemBase {
                     .withInverted(invertDirection)
                     .withNeutralMode(NeutralModeValue.Coast)
             )
-            .withVoltage(
-                new VoltageConfigs()
-                    .withPeakReverseVoltage(Volts.of(0))
-            )
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(Amps.of(60))
@@ -85,15 +88,21 @@ public class TurretNoYams extends SubsystemBase {
             )
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(0.5)
-                    .withKI(2)
+                    .withKP(2)
+                    .withKI(1)
                     .withKD(0)
                     .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting max RPS
             ).withFeedback(
                 new FeedbackConfigs()
-                .withFusedCANcoder(canCoder)
-                .withRotorToSensorRatio(-1.12)
-                .withSensorToMechanismRatio(0.88)
+                .withRemoteCANcoder(canCoder) //TODO do the below and swap to FusedCANcoder
+                //.withRotorToSensorRatio(-1.12) //TODO improve ratio, zero talon at zero encoder angle
+                .withSensorToMechanismRatio(Constants.TURRET_ENCODER_RATIO)
+            ).withSoftwareLimitSwitch(
+                new SoftwareLimitSwitchConfigs()
+                .withForwardSoftLimitEnable(true)
+                .withForwardSoftLimitThreshold(isLeft ? Constants.LEFT_TURRET_HIGH_HARD_STOP : Constants.RIGHT_TURRET_HIGH_HARD_STOP)
+                .withReverseSoftLimitEnable(true)
+                .withReverseSoftLimitThreshold(isLeft ? Constants.LEFT_TURRET_LOW_HARD_STOP : Constants.RIGHT_TURRET_LOW_HARD_STOP)
             );
             motor.getConfigurator().apply(config);
     }
@@ -107,14 +116,28 @@ public class TurretNoYams extends SubsystemBase {
     }
 
     public void setAngle(Angle targetAngle){
+        Angle low = isLeftTurret() ? Constants.LEFT_TURRET_MIN_ANGLE : Constants.RIGHT_TURRET_MIN_ANGLE;
+        Angle high = isLeftTurret() ? Constants.LEFT_TURRET_MAX_ANGLE : Constants.RIGHT_TURRET_MAX_ANGLE;
+        if(targetAngle.lt(low))
+            targetAngle = low;
+        else if(targetAngle.gt(high)){
+            targetAngle = high;
+        }
         motor.setControl(angleControl.withPosition(targetAngle));
     }
 
     public Angle getAngle(){
-        return motor.getPosition().getValue();
+        return canCoder.getPosition().getValue();
     }
 
     public void setVoltage(Voltage volts){
+        Angle low = isLeftTurret() ? Constants.LEFT_TURRET_MIN_ANGLE : Constants.RIGHT_TURRET_MIN_ANGLE;
+        Angle high = isLeftTurret() ? Constants.LEFT_TURRET_MAX_ANGLE : Constants.RIGHT_TURRET_MAX_ANGLE;
+        if(getAngle().lt(low) && volts.lt(Volts.zero())){
+            volts = Volts.zero();
+        }else if(getAngle().gt(high) && volts.gt(Volts.zero())){
+            volts = Volts.zero();
+        }
         motor.setControl(voltageControl.withOutput(volts));
     }
 
@@ -129,16 +152,20 @@ public class TurretNoYams extends SubsystemBase {
         Pose2d targetPose = new Pose2d(target, Rotation2d.kZero);
         Pose2d turretPose = robotPose.plus(new Transform2d(position.toTranslation2d(), Rotation2d.kZero));
         Pose2d offset = targetPose.relativeTo(turretPose);
-        System.out.println("Hub at position " + offset.getX() + "," + offset.getY() + " and rotation "
-                + offset.getTranslation().getAngle().getMeasure().in(Degrees) + " relative to "
-                + (isLeftTurret() ? "left turret" : "right turret"));
+        // System.out.println("Hub at position " + offset.getX() + "," + offset.getY() + " and rotation "
+        //         + offset.getTranslation().getAngle().getMeasure().in(Degrees) + " relative to "
+        //         + (isLeftTurret() ? "left turret" : "right turret"));
         Angle angle = Degrees.of(180).plus(offset.getTranslation().getAngle().getMeasure());
         angle = Radians.of(MathUtil.angleModulus(angle.in(Radians)));
-        System.out.println(
-                "Aiming " + (isLeftTurret() ? "left" : "right") + " turret at angle " + angle.in(Degrees) + " degrees");
+        if(isLeftTurret())
+            RobotContainer.logger.leftTurretTarget.set(angle.in(Degrees));
+        else
+            RobotContainer.logger.rightTurretTarget.set(angle.in(Degrees));
+        // System.out.println(
+        //         "Aiming " + (isLeftTurret() ? "left" : "right") + " turret at angle " + angle.in(Degrees) + " degrees");
         setAngle(angle);
-        System.out.println((isLeftTurret() ? "Left" : "Right") + " turret currently at angle "
-                + getAngle().in(Degrees) + " degrees");
+        // System.out.println((isLeftTurret() ? "Left" : "Right") + " turret currently at angle "
+        //         + getAngle().in(Degrees) + " degrees");
     }
 
     public boolean isTurretEnabled(){

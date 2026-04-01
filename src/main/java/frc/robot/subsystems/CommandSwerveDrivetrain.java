@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -16,6 +19,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.Matrix;
@@ -26,6 +30,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -66,6 +73,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     // Field 2d
     private final Field2d matchField = new Field2d();
+
+    private boolean stateCached = false;
+    private SwerveDriveState cachedState = null;
 
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
@@ -233,7 +243,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         AutoBuilder.configure(
                 this::getPose,
                 this::resetPose,
-                () -> this.getKinematics().toChassisSpeeds(this.getState().ModuleStates),
+                () -> this.getKinematics().toChassisSpeeds(this.getStateCached().ModuleStates),
                 this::driveRequest,
                 new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)),
                 config,
@@ -242,7 +252,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Pose2d getPose() {
-        return this.getState().Pose;
+        return this.getStateCached().Pose;
+    }
+
+    public SwerveDriveState getStateCached(){
+        if(!stateCached)
+            cachedState = super.getState();
+        return cachedState;
+    }
+
+    public Command driveToPose(Pose2d target){
+        LinearVelocity maxLinearVelocity = 
+                MetersPerSecond.of(1);
+        LinearAcceleration maxLinearAcceleration = 
+                MetersPerSecondPerSecond.of(1);
+        AngularVelocity maxAngularVelocity = 
+                RotationsPerSecond.of(1);
+        AngularAcceleration maxAngularAcceleration = 
+                RotationsPerSecondPerSecond.of(1);
+        PathConstraints constraints = new PathConstraints(
+            maxLinearVelocity, maxLinearAcceleration, 
+            maxAngularVelocity, maxAngularAcceleration);
+        return AutoBuilder.pathfindToPose(target, constraints);
     }
 
     public void driveRequest(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
@@ -267,7 +298,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public LinearVelocity getForwardVelocity(){
-        SwerveModuleState[] moduleStates = this.getState().ModuleStates;
+        SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
         ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
         return MetersPerSecond.of(speeds.vxMetersPerSecond);
     }
@@ -307,6 +338,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
          * This ensures driving behavior doesn't change until an explicit disable event
          * occurs during testing.
          */
+        stateCached = false;
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(

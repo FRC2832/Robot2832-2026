@@ -37,7 +37,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // private DoubleEntry shooterI = shooterSettings.getDoubleTopic("kI").getEntry(0);
     // private DoubleEntry shooterD = shooterSettings.getDoubleTopic("kD").getEntry(.1);
     // private DoubleEntry shooterS = shooterSettings.getDoubleTopic("kS").getEntry(0.05);
-    private static final double P = 1.2, I = 0.5, D = 0.0, S = 0.0;
+    private static final double P = 1.2, I = 0.75, D = 0.1, S = 0.0;
 
     //For the networktable publishing
     private double lastLeftSpeedPublished, lastRightSpeedPublished, lastAcceleratorPublished;
@@ -145,6 +145,8 @@ public class ShooterSubsystem extends SubsystemBase {
             RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
             lastAcceleratorPublished = acc;
         }
+        RobotContainer.logger.leftShooterTarget.set(leftSpeed * 100);
+        RobotContainer.logger.rightShooterTarget.set(rightSpeed * 100);
 
         // double[] pChanges = shooterP.readQueueValues();
         // double[] iChanges = shooterI.readQueueValues();

@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Shoot near Bump"
+            "pathName": "Right Bump Shoot near Bump"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Return From Neutral"
+            "pathName": "Right Return from Neutral"
           }
         },
         {
@@ -56,6 +56,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Woodhaven",
+  "folder": null,
   "choreoAuto": false
 }

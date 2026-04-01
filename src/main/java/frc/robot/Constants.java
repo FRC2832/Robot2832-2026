@@ -52,7 +52,7 @@ public class Constants {
     // Constants for Intake subsystem
     public static final int INTAKE_INTERNAL_ROTATOR_ID = 19;
     public static final int INTAKE_EXTENDER_ID = 18;
-    public static final double INTAKE_EXTEND_VOLTAGE = 1.5; //TODO consider raising
+    public static final double INTAKE_EXTEND_VOLTAGE = 1.5; // TODO consider raising
 
     // Constants for Shooter subsytem
     public static final int LEFT_SHOOTER_ID = 14;
@@ -71,23 +71,23 @@ public class Constants {
     public static final double HOOD_SENSITIVITY = 0.05;
     public static final double TURRET_MAX_VOLTAGE = .4;
     // TODO update when the turret range increases
-    public static final Angle LEFT_TURRET_MIN_ANGLE = Degrees.of(-85);
-    public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(85);
-    public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(-85);
-    public static final Angle RIGHT_TURRET_MAX_ANGLE = Degrees.of(85);
+    public static final Angle LEFT_TURRET_MIN_ANGLE = Degrees.of(-45);
+    public static final Angle LEFT_TURRET_MAX_ANGLE = Degrees.of(45);
+    public static final Angle RIGHT_TURRET_MIN_ANGLE = Degrees.of(-45);
+    public static final Angle RIGHT_TURRET_MAX_ANGLE = Degrees.of(45);
 
-    public static final Angle LEFT_TURRET_LOW_HARD_STOP = Degrees.of(-90);
-    public static final Angle LEFT_TURRET_HIGH_HARD_STOP = Degrees.of(90);
-    public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-90);
-    public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(90);
+    public static final Angle LEFT_TURRET_LOW_HARD_STOP = Degrees.of(-50);
+    public static final Angle LEFT_TURRET_HIGH_HARD_STOP = Degrees.of(50);
+    public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-50);
+    public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(50);
 
-    public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.14217);
-    public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.4675);
+    public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217);
+    public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801);
 
     // FIXME measure robot turret positions relative to robot origin
-    public static final Translation3d LEFT_TURRET_POS = new Translation3d(Inches.of(6.75), Inches.of(8.75),
+    public static final Translation3d LEFT_TURRET_POS = new Translation3d(Inches.of(-6.75), Inches.of(8.75),
             Inches.of(20));
-    public static final Translation3d RIGHT_TURRET_POS = new Translation3d(Inches.of(6.75), Inches.of(-8.75),
+    public static final Translation3d RIGHT_TURRET_POS = new Translation3d(Inches.of(-6.75), Inches.of(-8.75),
             Inches.of(20));
     // Used for approaching the edges of the firing arc slower
     // public static final double LEFT_UPPER_APPROACH_ANGLE =
@@ -124,8 +124,16 @@ public class Constants {
             Inches.of(20.5),
             // Right camera is 90 degrees clockwise, making the image have to be 90 degrees
             // counterclockwise
-            new Rotation3d(-90 * Math.PI / 180, -25 * Math.PI / 180, -90 * Math.PI / 180));
+            new Rotation3d(0, -25 * Math.PI / 180, -90 * Math.PI / 180));
     public static final String RIGHT_CAM_NAME = "Right Camera";
+
+    public static final Transform3d REAR_CAM_POSE = new Transform3d(
+            Inches.of(-11.9375),
+            Inches.of(-5),
+            Inches.of(11.25),
+            new Rotation3d(0, -25 * Math.PI/180, Math.PI)
+    );
+    public static final String REAR_CAM_NAME = "Rear Camera";
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
     public static final Translation2d RED_HUB_POS = FlippingUtil.flipFieldPosition(BLUE_HUB_POS);
@@ -138,10 +146,12 @@ public class Constants {
             RED_HUB_POS.getMeasureY().minus(SNOWBLOW_TARGET_OFFSET));
     public static final Translation2d RED_RIGHT_SNOWBLOW_TARGET = new Translation2d(RED_HUB_POS.getMeasureX(),
             RED_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET));
-    
+
     public static final LookupTable SHOOTER_LOOKUP_TABLE = new LookupTable(
-        new Distance[]{}, 
-        new AngularVelocity[]{}, 
-        new double[]{});
+            new Distance[] {},
+            new AngularVelocity[] {},
+            new double[] {});
+
+    public static final boolean SHOULD_AUTO_AIM_AT_START = false;
 
 }

@@ -32,9 +32,13 @@ public class VisionSubsystem extends SubsystemBase {
     PhotonPoseEstimator rightPoseEstimator;
     PhotonCameraSim rightCamSim;
 
+    public PhotonCamera rearCam;
+    PhotonPoseEstimator rearPoseEstimator;
+    PhotonCameraSim rearCamSim;
+
     VisionSystemSim visionSim;
 
-    public List<PhotonPipelineResult> leftResults, rightResults;
+    public List<PhotonPipelineResult> leftResults, rightResults, rearResults;
 
     public VisionSubsystem() {
         super();
@@ -42,8 +46,11 @@ public class VisionSubsystem extends SubsystemBase {
         leftPoseEstimator = new PhotonPoseEstimator(Constants.TAG_LAYOUT, Constants.LEFT_CAM_POSE);
         rightCam = new PhotonCamera(Constants.RIGHT_CAM_NAME);
         rightPoseEstimator = new PhotonPoseEstimator(Constants.TAG_LAYOUT, Constants.RIGHT_CAM_POSE);
+        rearCam = new PhotonCamera(Constants.REAR_CAM_NAME);
+        rearPoseEstimator = new PhotonPoseEstimator(Constants.TAG_LAYOUT, Constants.REAR_CAM_POSE);
         leftResults = new LinkedList<>();
         rightResults = new LinkedList<>();
+        rearResults = new LinkedList<>();
         if (Robot.isSimulation()) {
             visionSim = new VisionSystemSim("Vision");
             visionSim.addAprilTags(Constants.TAG_LAYOUT);
@@ -55,8 +62,10 @@ public class VisionSubsystem extends SubsystemBase {
             camProp.setLatencyStdDevMs(5);
             leftCamSim = new PhotonCameraSim(leftCam);
             rightCamSim = new PhotonCameraSim(rightCam);
+            rearCamSim = new PhotonCameraSim(rearCam);
             visionSim.addCamera(leftCamSim, Constants.LEFT_CAM_POSE);
             visionSim.addCamera(rightCamSim, Constants.RIGHT_CAM_POSE);
+            visionSim.addCamera(rearCamSim, Constants.REAR_CAM_POSE);
         }
 
         // NOTE: Possibly remove?
@@ -68,7 +77,8 @@ public class VisionSubsystem extends SubsystemBase {
         // This method will be called once per scheduler run
         leftResults = estimatePose(leftCam, leftCamSim, leftPoseEstimator);
         rightResults = estimatePose(rightCam, rightCamSim, rightPoseEstimator);
-        RobotContainer.logger.updateAprilTagDetections(leftResults, rightResults);
+        rearResults = estimatePose(rearCam, rearCamSim, rearPoseEstimator);
+        RobotContainer.logger.updateAprilTagDetections(leftResults, rightResults, rearResults);
         if (Robot.isSimulation()) {
             visionSim.update(RobotContainer.drivetrain.getState().Pose);
         }

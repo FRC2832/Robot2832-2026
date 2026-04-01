@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Shoot near Bump"
+            "pathName": "Right Bump Shoot"
           }
         },
         {
@@ -19,31 +19,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Cross Bump To Neutral"
+            "pathName": "Right Bump Approach Outpost"
           }
         },
         {
-          "type": "named",
+          "type": "wait",
           "data": {
-            "name": "Start Ingestor"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right Collect from Pile"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Stop Ingestor"
+            "waitTime": 3.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Return From Neutral"
+            "pathName": "Right Bump Leave Outpost Shoot"
           }
         },
         {
@@ -56,6 +44,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Woodhaven",
+  "folder": null,
   "choreoAuto": false
 }

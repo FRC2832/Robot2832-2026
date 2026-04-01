@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -32,7 +33,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public enum Speed {
         STOP(0),
         INTAKE(0.6),
-        REVERSE(-0.6);
+        REVERSE(-0.42);
 
         private final double percentOutput;
 
@@ -51,7 +52,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     public TalonFX intakeInternalRotatorMotor;
 
     private final VoltageOut rollerVoltageRequest = new VoltageOut(0)
-        .withEnableFOC(true);
+        .withEnableFOC(false);
 
     public IntakeRollerSubsystem() {
         intakeInternalRotatorMotor = new TalonFX(Constants.INTAKE_INTERNAL_ROTATOR_ID, Constants.CANivoreCANBus);
@@ -74,9 +75,11 @@ public class IntakeRollerSubsystem extends SubsystemBase {
                 // )
                 .withCurrentLimits(
                         new CurrentLimitsConfigs()
-                                .withStatorCurrentLimit(Amps.of(60))
+                                .withStatorCurrentLimit(Amps.of(120))
                                 .withStatorCurrentLimitEnable(true)
-                                .withSupplyCurrentLimit(Amps.of(50))
+                                .withSupplyCurrentLimit(Amps.of(70))
+                                .withSupplyCurrentLowerLimit(Amps.of(40))
+                                .withSupplyCurrentLowerTime(Seconds.of(1))
                                 .withSupplyCurrentLimitEnable(true))
                 .withSlot0(
                         new Slot0Configs()

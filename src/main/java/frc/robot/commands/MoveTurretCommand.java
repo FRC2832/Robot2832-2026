@@ -15,18 +15,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Utils;
+import frc.robot.subsystems.TurretNoYams;
 import frc.robot.subsystems.TurretSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveTurretCommand extends Command {
     /** Creates a new MoveTurretCommand. */
 
-    TurretSubsystem turret;
+    TurretNoYams turret;
     static boolean isOnRed;
     boolean isLeft;
     DoubleSupplier joystickX, joystickY;
 
-    public MoveTurretCommand(TurretSubsystem turret) {
+    public MoveTurretCommand(TurretNoYams turret) {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(turret);
         this.turret = turret;
@@ -47,10 +48,11 @@ public class MoveTurretCommand extends Command {
         double xPos = joystickX.getAsDouble();
         if (Math.abs(xPos) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
             turret.isAutoAim = false;
+            RobotContainer.logger.leftTurretAutoAiming.set(false);
         if (turret.isAutoAim) {
             turret.aimAtPosition(Utils.getTargetPosition(), RobotContainer.drivetrain.getPose());
         } else {
-            turret.setVoltage(Volts.of(-6 * MathUtil.applyDeadband(xPos, 0.1)));
+            turret.setVoltage(Volts.of(1.5 * MathUtil.applyDeadband(xPos, 0.1)));
         }
     }
 

@@ -7,19 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Shoot near Bump"
+            "pathName": "Left Bump Shoot"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Right Cross Bump To Neutral"
           }
         },
         {
@@ -31,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Collect from Pile"
+            "pathName": "Left Bump Collect From Depot"
           }
         },
         {
@@ -43,7 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Woodhaven Right Bump Return From Neutral"
+            "pathName": "Left Bump Shoot from Depot"
           }
         },
         {
@@ -56,6 +50,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Woodhaven",
+  "folder": null,
   "choreoAuto": false
 }

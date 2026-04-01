@@ -13,7 +13,6 @@ import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.config.ServoHubConfig;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -27,7 +26,7 @@ public class HoodSubsystem extends SubsystemBase {
     private BooleanSupplier isAutoAim;
 
     /** Creates a new HoodSubsystem. */
-    public HoodSubsystem(TurretSubsystem turret) {
+    public HoodSubsystem(TurretNoYams turret) {
         this.isLeftTurret = turret.isLeftTurret();
         isAutoAim = () -> turret.isAutoAim;
         if (servoHub == null) {

@@ -60,6 +60,12 @@ public class Utils {
         return isOnRed;
     }
 
+    //The first isOnRed call 
+    public static void recheckTeam(){
+        teamChecked = false;
+        isOnRed();
+    }
+    
     public static Translation2d getTargetPosition() {
         Pose2d robotPose = RobotContainer.drivetrain.getPose();
 
