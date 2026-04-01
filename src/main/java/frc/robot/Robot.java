@@ -31,15 +31,15 @@ public class Robot extends TimedRobot {
     Elastic.Notification hubActiveSoonNotification = new Elastic.Notification(Elastic.NotificationLevel.INFO,
                                                                         "HUB ACTIVATING!!!!!!!!!!",
                                                                   "GO HOOOOOMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
-                                                            1000,
-                                                                        1000,
-                                                                        1000);
+                                                            2000,
+                                                                        500,
+                                                                        500);
     Elastic.Notification hubDeactivatingSoonNotification = new Elastic.Notification(Elastic.NotificationLevel.ERROR, // I used error cuz it's red but that might be scary.
                                                                         "hub is going bye bye :(",
                                                                   "hurry up!",
-                                                            1000,
-                                                                        1000,
-                                                                        1000);
+                                                            2000,
+                                                                        500,
+                                                                        500);
 
     /* log and replay timestamp and joystick data */
     private final HootAutoReplay m_timeAndJoystickReplay = new HootAutoReplay()
