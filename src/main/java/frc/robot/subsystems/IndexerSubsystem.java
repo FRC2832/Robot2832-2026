@@ -9,8 +9,6 @@ import static edu.wpi.first.units.Units.Volts;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.config.SparkBaseConfig;
-import com.revrobotics.spark.config.SparkBaseConfigAccessor;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.units.measure.Voltage;
@@ -22,7 +20,8 @@ import frc.robot.Constants;
 public class IndexerSubsystem extends SubsystemBase {
     /** Creates a new HopperSubsystem. */
 
-    // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
+    // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // -------------------------
     public enum Speed {
         STOP(0),
         FORWARD(0.2),
@@ -45,38 +44,35 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public IndexerSubsystem() {
         indexer = new SparkFlex(Constants.INDEXER_ID, Constants.INDEXER_MOTOR_TYPE); // I don't configure this motor.
-        indexer.configure(new SparkFlexConfig().inverted(true), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        indexer.configure(new SparkFlexConfig().inverted(true), ResetMode.kNoResetSafeParameters,
+                PersistMode.kNoPersistParameters);
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
 
-
     // Speed controls ----------------------------------
-    public void setIndexerSpeed(Speed speed){
+    public void setIndexerSpeed(Speed speed) {
         indexer.setVoltage(speed.voltage());
     }
 
     // ---------------------------------------------------
     // COMMANDS ------------------------------------------
-    
-    // TODO: This should be made the default command but since we're only doing subsystem setup right now I didn't do that.
+
+    // TODO: This should be made the default command but since we're only doing
+    // subsystem setup right now I didn't do that.
     public Command deliverCommand() {
         return startEnd(
-            () -> setIndexerSpeed(Speed.FORWARD),
-            () -> setIndexerSpeed(Speed.STOP)
-        );
+                () -> setIndexerSpeed(Speed.FORWARD),
+                () -> setIndexerSpeed(Speed.STOP));
     }
 
     public Command reverseDeliverCommand() {
         return startEnd(
-            () -> setIndexerSpeed(Speed.REVERSE),
-            () -> setIndexerSpeed(Speed.STOP)
-        );
+                () -> setIndexerSpeed(Speed.REVERSE),
+                () -> setIndexerSpeed(Speed.STOP));
     }
 
-    //--------------------------------------------------------
-
-
+    // --------------------------------------------------------
 
     @Override
     public void periodic() {

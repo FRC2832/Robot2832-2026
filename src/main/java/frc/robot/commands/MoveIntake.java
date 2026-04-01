@@ -13,10 +13,10 @@ import frc.robot.RobotContainer;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveIntake extends Command {
-    /** Creates a new LowerIntake. */
     private static final Timer timer = new Timer();
     boolean isDown;
     double voltage;
+
     public MoveIntake(boolean down) {
         // Use addRequirements() here to declare subsystem dependencies.
         addRequirements(RobotContainer.intakeExtenderSubsystem);
@@ -27,7 +27,7 @@ public class MoveIntake extends Command {
     @Override
     public void initialize() {
         double voltage = Constants.INTAKE_EXTEND_VOLTAGE;
-        if(isDown)
+        if (isDown)
             voltage *= -1;
         this.voltage = voltage;
         RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor.setVoltage(voltage);
@@ -51,7 +51,15 @@ public class MoveIntake extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        //Supply current increases when the resistance increases
-        return timer.get() > 4 || Math.abs(RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor.getSupplyCurrent().getValue().in(Amps)) > 12;
+        if (isDown && RobotContainer.intakeExtenderSubsystem.isIntakeDown()) {
+            return true;
+        }
+        if (!isDown && RobotContainer.intakeExtenderSubsystem.isIntakeUp()) {
+            return true;
+        }
+        // Supply current increases when the resistance increases
+        return timer.get() > 4 || Math.abs(
+                RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor
+                        .getSupplyCurrent().getValue().in(Amps)) > 12;
     }
 }

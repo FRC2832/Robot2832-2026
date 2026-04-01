@@ -16,8 +16,6 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerArrayPublisher;
-import edu.wpi.first.networktables.IntegerArrayTopic;
-import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -48,11 +46,12 @@ public class Telemetry {
     }
 
     /* What to publish over networktables for telemetry */
-    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    public final NetworkTableInstance tableRoot = NetworkTableInstance.getDefault();
 
     /* Robot swerve drive state */
-    private final NetworkTable driveStateTable = inst.getTable("DriveState");
-    private final StructPublisher<Pose2d> drivePose = driveStateTable.getStructTopic("Pose", Pose2d.struct).publish();
+    private final NetworkTable driveStateTable = tableRoot.getTable("DriveState");
+    private final StructPublisher<Pose2d> drivePose = driveStateTable.getStructTopic("Pose", Pose2d.struct)
+            .publish();
     private final StructPublisher<ChassisSpeeds> driveSpeeds = driveStateTable
             .getStructTopic("Speeds", ChassisSpeeds.struct).publish();
     private final StructArrayPublisher<SwerveModuleState> driveModuleStates = driveStateTable
@@ -66,12 +65,12 @@ public class Telemetry {
             .publish();
 
     /* Robot pose for field positioning */
-    private final NetworkTable table = inst.getTable("Pose");
+    private final NetworkTable table = tableRoot.getTable("Pose");
     private final DoubleArrayPublisher fieldPub = table.getDoubleArrayTopic("robotPose").publish();
     private final StringPublisher fieldTypePub = table.getStringTopic(".type").publish();
 
     /* AprilTag detections from PhotonVision */
-    private final NetworkTable visionTable = inst.getTable("VisionData");
+    private final NetworkTable visionTable = tableRoot.getTable("VisionData");
     private final NetworkTable leftCamTable = visionTable.getSubTable("LeftCamera");
     private final NetworkTable rightCamTable = visionTable.getSubTable("RightCamera");
     private final StructArrayPublisher<Pose3d> leftCamDetects = leftCamTable
@@ -80,9 +79,10 @@ public class Telemetry {
     private final StructArrayPublisher<Pose3d> rightCamDetects = rightCamTable
             .getStructArrayTopic("TagPoses", Pose3d.struct).publish();
     private final IntegerArrayPublisher rightCamIds = rightCamTable.getIntegerArrayTopic("FiducialIDs").publish();
-    public final StructPublisher<Pose2d> estimatedRobotPose = visionTable.getStructTopic("EstimatedPose", Pose2d.struct).publish();
+    public final StructPublisher<Pose2d> estimatedRobotPose = visionTable
+            .getStructTopic("EstimatedPose", Pose2d.struct).publish();
 
-    private final NetworkTable shooterTable = inst.getTable("ShooterData");
+    private final NetworkTable shooterTable = tableRoot.getTable("ShooterData");
     private final NetworkTable leftShooter = shooterTable.getSubTable("Left");
     private final NetworkTable rightShooter = shooterTable.getSubTable("Right");
     private final NetworkTable accelerator = shooterTable.getSubTable("Accelerator");
@@ -93,6 +93,9 @@ public class Telemetry {
     public final BooleanPublisher rightShooterAtSpeed = rightShooter.getBooleanTopic("AtSpeed").publish();
     public final BooleanPublisher acceleratorAtSpeed = accelerator.getBooleanTopic("AtSpeed").publish();
 
+    public final DoublePublisher leftHoodValue = leftShooter.getDoubleTopic("HoodTarget").publish();
+    public final DoublePublisher rightHoodValue = rightShooter.getDoubleTopic("HoodTarget").publish();
+
     /* Mechanisms to represent the swerve module states */
     private final Mechanism2d[] m_moduleMechanisms = new Mechanism2d[] {
             new Mechanism2d(1, 1),
@@ -102,21 +105,29 @@ public class Telemetry {
     };
     /* A direction and length changing ligament for speed representation */
     private final MechanismLigament2d[] m_moduleSpeeds = new MechanismLigament2d[] {
-            m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-            m_moduleMechanisms[1].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-            m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
-            m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5).append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[0].getRoot("RootSpeed", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[1].getRoot("RootSpeed", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[2].getRoot("RootSpeed", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Speed", 0.5, 0)),
+            m_moduleMechanisms[3].getRoot("RootSpeed", 0.5, 0.5)
+                    .append(new MechanismLigament2d("Speed", 0.5, 0)),
     };
     /* A direction changing and length constant ligament for module direction */
     private final MechanismLigament2d[] m_moduleDirections = new MechanismLigament2d[] {
             m_moduleMechanisms[0].getRoot("RootDirection", 0.5, 0.5)
-                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0,
+                            new Color8Bit(Color.kWhite))),
             m_moduleMechanisms[1].getRoot("RootDirection", 0.5, 0.5)
-                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0,
+                            new Color8Bit(Color.kWhite))),
             m_moduleMechanisms[2].getRoot("RootDirection", 0.5, 0.5)
-                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0,
+                            new Color8Bit(Color.kWhite))),
             m_moduleMechanisms[3].getRoot("RootDirection", 0.5, 0.5)
-                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.kWhite))),
+                    .append(new MechanismLigament2d("Direction", 0.1, 0, 0,
+                            new Color8Bit(Color.kWhite))),
     };
 
     private final double[] m_poseArray = new double[3];
@@ -139,8 +150,10 @@ public class Telemetry {
         SignalLogger.writeStruct("DriveState/Pose", Pose2d.struct, state.Pose);
         SignalLogger.writeStruct("DriveState/Speeds", ChassisSpeeds.struct, state.Speeds);
         SignalLogger.writeStructArray("DriveState/ModuleStates", SwerveModuleState.struct, state.ModuleStates);
-        SignalLogger.writeStructArray("DriveState/ModuleTargets", SwerveModuleState.struct, state.ModuleTargets);
-        SignalLogger.writeStructArray("DriveState/ModulePositions", SwerveModulePosition.struct, state.ModulePositions);
+        SignalLogger.writeStructArray("DriveState/ModuleTargets", SwerveModuleState.struct,
+                state.ModuleTargets);
+        SignalLogger.writeStructArray("DriveState/ModulePositions", SwerveModulePosition.struct,
+                state.ModulePositions);
         SignalLogger.writeDouble("DriveState/OdometryPeriod", state.OdometryPeriod, "seconds");
 
         /* Telemeterize the pose to a Field2d */
@@ -164,21 +177,23 @@ public class Telemetry {
             var targets = result.getTargets();
             Pose3d[] targetsArr = new Pose3d[targets.size()];
             long[] targetIds = new long[targetsArr.length];
-            for(int i = 0; i < targetsArr.length; i++){
+            for (int i = 0; i < targetsArr.length; i++) {
                 targetIds[i] = targets.get(i).getFiducialId();
-                targetsArr[i] = Constants.tagLayout.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
+                targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i])
+                        .orElse(Pose3d.kZero);
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             leftCamDetects.set(targetsArr, timestampMicros);
             leftCamIds.set(targetIds, timestampMicros);
         }
-        for (var result : right){
+        for (var result : right) {
             var targets = result.getTargets();
             Pose3d[] targetsArr = new Pose3d[targets.size()];
             long[] targetIds = new long[targetsArr.length];
-            for(int i = 0; i < targetsArr.length; i++){
+            for (int i = 0; i < targetsArr.length; i++) {
                 targetIds[i] = targets.get(i).getFiducialId();
-                targetsArr[i] = Constants.tagLayout.getTagPose((int) targetIds[i]).orElse(Pose3d.kZero);
+                targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i])
+                        .orElse(Pose3d.kZero);
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             rightCamDetects.set(targetsArr, timestampMicros);

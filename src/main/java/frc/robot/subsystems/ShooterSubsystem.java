@@ -5,16 +5,10 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -22,6 +16,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,7 +27,20 @@ import frc.robot.RobotContainer;
 public class ShooterSubsystem extends SubsystemBase {
     /** Creates a new Shooter. */
     private TalonFX rightShooterMotor, leftShooterMotor, accelerator;
-    public static double leftSpeed = 0.28, rightSpeed = 0.28, acceleratorSpeed = 0.33;
+    public static double leftSpeed = 0.55, rightSpeed = 0.55, acceleratorSpeed = 0.34;
+    // public static double leftSpeed = 0.75, rightSpeed = 0.75, acceleratorSpeed =
+    // 0.33;
+
+    // private NetworkTableInstance root = RobotContainer.logger.tableRoot;
+    // private NetworkTable shooterSettings = root.getTable("ShooterData");
+    // private DoubleEntry shooterP = shooterSettings.getDoubleTopic("kP").getEntry(6.5);
+    // private DoubleEntry shooterI = shooterSettings.getDoubleTopic("kI").getEntry(0);
+    // private DoubleEntry shooterD = shooterSettings.getDoubleTopic("kD").getEntry(.1);
+    // private DoubleEntry shooterS = shooterSettings.getDoubleTopic("kS").getEntry(0.05);
+    private static final double P = 1.2, I = 0.5, D = 0.0, S = 0.0;
+
+    //For the networktable publishing
+    private double lastLeftSpeedPublished, lastRightSpeedPublished, lastAcceleratorPublished;
 
     private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 
@@ -47,7 +55,7 @@ public class ShooterSubsystem extends SubsystemBase {
         configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
         configureMotor(accelerator, InvertedValue.CounterClockwise_Positive);
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
@@ -57,8 +65,8 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withInverted(invertDirection)
                                 .withNeutralMode(NeutralModeValue.Coast))
                 // .withVoltage(
-                //         new VoltageConfigs()
-                //                 .withPeakReverseVoltage(Volts.of(0)))
+                // new VoltageConfigs()
+                // .withPeakReverseVoltage(Volts.of(0)))
                 .withCurrentLimits(
                         new CurrentLimitsConfigs()
                                 .withStatorCurrentLimit(Amps.of(60))
@@ -67,22 +75,52 @@ public class ShooterSubsystem extends SubsystemBase {
                                 .withSupplyCurrentLimitEnable(true))
                 .withSlot0(
                         new Slot0Configs()
-                                .withKP(13)
-                                .withKI(0)
-                                .withKD(0.1)
-                                .withKS(0.05)
-                                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign)
+                                .withKP(P)
+                                .withKI(I)
+                                .withKD(D)
+                                .withKS(S)
+                                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseVelocitySign)
                                 // I changed the KV.
-                                .withKV(5.5/30.0) //.withKV(26.31 / 31.277344) //current for rps, over rps
-                                .withKA(12/44.38) //.withKA(17.25 / 44.38)
+                                .withKV(9.78 / 53.158203) // .withKV(26.31 / 31.277344) //current for rps, over rps
+                                .withKA(9.78 / 19.5) // .withKA(17.25 / 44.38)
                 );
         motor.getConfigurator().apply(config);
     }
 
     public void setMotorSpeed(double rightSpeed, double leftSpeed, double accelSpeed) {
-        //rightShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(rightSpeed)));
-        leftShooterMotor.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(leftSpeed)));
-        accelerator.setControl(control.withVelocity(KrakenX60.kFreeSpeed.times(accelSpeed)));
+        if (!Constants.LEFT_SHOOTER_ENABLED)
+            leftSpeed = 0;
+        if (!Constants.RIGHT_SHOOTER_ENABLED)
+            rightSpeed = 0;
+        rightShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(rightSpeed)));
+        leftShooterMotor.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(leftSpeed)));
+        accelerator.setControl(control.withVelocity(KrakenX60.FREE_SPEED.times(accelSpeed)));
+    }
+
+    public void setLeftShooterSpeed(AngularVelocity speed) {
+        if (Constants.LEFT_SHOOTER_ENABLED) {
+            leftShooterMotor.setControl(control.withVelocity(speed));
+        } else {
+            leftShooterMotor.set(0);
+        }
+    }
+
+    public void setRightShooterSpeed(AngularVelocity speed) {
+        if (Constants.RIGHT_SHOOTER_ENABLED) {
+            rightShooterMotor.setControl(control.withVelocity(speed));
+        } else {
+            rightShooterMotor.set(0);
+        }
+    }
+
+    public void setAcceleratorSpeed(AngularVelocity speed) {
+        if (Constants.RIGHT_SHOOTER_ENABLED) {
+            accelerator.setControl(control.withVelocity(speed));
+        } else if (Constants.LEFT_SHOOTER_ENABLED) {
+            accelerator.setControl(control.withVelocity(speed));
+        } else {
+            accelerator.set(0);
+        }
     }
 
     @Override
@@ -92,57 +130,112 @@ public class ShooterSubsystem extends SubsystemBase {
         left = leftShooterMotor.getVelocity().getValueAsDouble();
         right = rightShooterMotor.getVelocity().getValueAsDouble();
         acc = accelerator.getVelocity().getValueAsDouble();
-        RobotContainer.logger.leftShooterSpeed.set(left);
-        RobotContainer.logger.rightShooterSpeed.set(right);
-        RobotContainer.logger.acceleratorSpeed.set(acc);
-        RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 28, 1));
-        RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 28, 1));
-        RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
+        if(left != lastLeftSpeedPublished){
+            RobotContainer.logger.leftShooterSpeed.set(left);
+            RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 54, 1));
+            lastLeftSpeedPublished = left;
+        }
+        if(right != lastRightSpeedPublished){
+            RobotContainer.logger.rightShooterSpeed.set(right);
+            RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 54, 1));
+            lastRightSpeedPublished = right;
+        }
+        if(acc != lastAcceleratorPublished){
+            RobotContainer.logger.acceleratorSpeed.set(acc);
+            RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
+            lastAcceleratorPublished = acc;
+        }
+
+        // double[] pChanges = shooterP.readQueueValues();
+        // double[] iChanges = shooterI.readQueueValues();
+        // double[] dChanges = shooterD.readQueueValues();
+        // double[] sChanges = shooterS.readQueueValues();
+        // boolean changed = false;
+        // if(pChanges.length > 0){
+        //     p = pChanges[pChanges.length-1];
+        //     changed = true;
+        // }
+        // if(iChanges.length > 0){
+        //     i = iChanges[iChanges.length - 1];
+        //     changed = true;
+        // }
+        // if(dChanges.length > 0){
+        //     d = dChanges[dChanges.length - 1];
+        //     changed = true;
+        // }
+        // if(sChanges.length > 0){
+        //     s = sChanges[sChanges.length - 1];
+        //     changed = true;
+        // }
+        // if(changed){
+        //     reconfigureMotorPid(leftShooterMotor);
+        //     reconfigureMotorPid(rightShooterMotor);
+        //     reconfigureMotorPid(accelerator);
+        // }
     }
 
-    public static double getLastLeftSpeed(){
+    // private void reconfigureMotorPid(TalonFX motor) {
+    //     motor.getConfigurator().apply(
+    //             new Slot0Configs()
+    //                     .withKP(p)
+    //                     .withKI(i)
+    //                     .withKD(d)
+    //                     .withKS(s));
+    // }
+
+    public static AngularVelocity getLastLeftSpeed() {
+        return KrakenX60.FREE_SPEED.times(leftSpeed);
+    }
+
+    public static AngularVelocity getLastRightSpeed() {
+        return KrakenX60.FREE_SPEED.times(rightSpeed);
+    }
+
+    public static AngularVelocity getLastAcceleratorSpeed() {
+        return KrakenX60.FREE_SPEED.times(acceleratorSpeed);
+    }
+
+    public static double getLastLeftSpeedProportion() {
         return leftSpeed;
     }
 
-    public static double getLastRightSpeed(){
+    public static double getLastRightSpeedProportion() {
         return rightSpeed;
     }
 
-    public static double getLastAcceleratorSpeed(){
+    public static double getLastAcceleratorSpeedProportion() {
         return acceleratorSpeed;
     }
 
-    public Command stopShooter() 
-    { 
+    public Command stopShooter() {
         return startEnd(
-            () -> {
-                leftShooterMotor.set(0);
-                rightShooterMotor.set(0);
-                accelerator.set(0);
-            },
-            () -> {}
-        );
+                () -> {
+                    leftShooterMotor.set(0);
+                    rightShooterMotor.set(0);
+                    accelerator.set(0);
+                },
+                () -> {
+                });
     }
 
-    public Command reverseShooter() 
-    { 
+    public Command reverseShooter() {
         return startEnd(
-            () -> {
-                setMotorSpeed(-.4, -.4, -.4);
-            },
-            () -> {}
-        );
+                () -> {
+                    setMotorSpeed(-.4, -.4, -.4);
+                },
+                () -> {
+                });
     }
 
-    public double getLeftMotorSpeed(){
+    public double getLeftMotorSpeed() {
         return leftShooterMotor.getVelocity().getValueAsDouble();
     }
 
-    public double getRightMotorSpeed(){
+    public double getRightMotorSpeed() {
         return rightShooterMotor.getVelocity().getValueAsDouble();
     }
 
-    public double getAccelMotorSpeed(){
+    public double getAccelMotorSpeed() {
         return accelerator.getVelocity().getValueAsDouble();
     }
 }

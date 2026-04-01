@@ -1,0 +1,84 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.commands;
+
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import frc.robot.Utils;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.util.LookupTable;
+
+/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+public class SetShooterSpeedCommand extends Command {
+    /** Creates a new SetShooterSpeedCommand. */
+
+    ShooterSubsystem shooter;
+
+    private Translation2d target, robotPos;
+    private LookupTable.Result lookupResult;
+
+    public SetShooterSpeedCommand(ShooterSubsystem shooter) {
+        addRequirements(shooter);
+    }
+
+    /*
+     * TODO
+     * • Set the target speed of the shooter in a similar method to
+     * MoveTurretCommand, MoveHoodCommand
+     * • SpinShooter and similar commands should respond to the target this sets
+     * • Manual aim should average the two speeds before applying its operation
+     */
+
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        target = null;
+        if (RobotContainer.leftTurretSubsystem.isAutoAim) {
+            target = Utils.getTargetPosition();
+            robotPos = RobotContainer.drivetrain.getPose().getTranslation();
+            Distance dist = Meters.of(target.getDistance(robotPos));
+            lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
+            shooter.setLeftShooterSpeed(lookupResult.shooterSpeed());
+        } else {
+            shooter.setLeftShooterSpeed(ShooterSubsystem.getLastLeftSpeed());
+        }
+        if (RobotContainer.rightTurretSubsystem.isAutoAim) {
+            //ensure the check is only done once
+            if(target == null){
+                target = Utils.getTargetPosition();
+                robotPos = RobotContainer.drivetrain.getPose().getTranslation();
+                Distance dist = Meters.of(target.getDistance(robotPos));
+                lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
+            }
+            shooter.setRightShooterSpeed(lookupResult.shooterSpeed());
+        } else {
+            shooter.setRightShooterSpeed(ShooterSubsystem.getLastRightSpeed());
+        }
+        shooter.setAcceleratorSpeed(ShooterSubsystem.getLastAcceleratorSpeed());
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+}

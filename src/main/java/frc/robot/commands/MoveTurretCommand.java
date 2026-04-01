@@ -4,38 +4,68 @@
 
 package frc.robot.commands;
 
-import javax.lang.model.util.ElementScanner14;
+import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.units.measure.Angle;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Utils;
 import frc.robot.subsystems.TurretSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveTurretCommand extends Command {
     /** Creates a new MoveTurretCommand. */
 
-    public MoveTurretCommand() {
+    TurretSubsystem turret;
+    static boolean isOnRed;
+    boolean isLeft;
+    DoubleSupplier joystickX, joystickY;
+
+    public MoveTurretCommand(TurretSubsystem turret) {
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(RobotContainer.turretSubsystem);
+        addRequirements(turret);
+        this.turret = turret;
+        isLeft = turret.isLeftTurret();
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        isOnRed = Utils.isOnRed();
+        joystickX = getJoystickX();
+        joystickY = getJoystickY();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(TurretSubsystem.isAutoAim){
-            //TODO add auto aim controls
-            RobotContainer.turretSubsystem.setTurretAngle(0, 0);
-        }else{
-            double joystick = RobotContainer.operatorController.getLeftX();
-            RobotContainer.turretSubsystem.setTurretVoltage(joystick * Constants.TURRET_MAX_VOLTAGE, joystick * Constants.TURRET_MAX_VOLTAGE);
+        double xPos = joystickX.getAsDouble();
+        if (Math.abs(xPos) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
+            turret.isAutoAim = false;
+        if (turret.isAutoAim) {
+            turret.aimAtPosition(Utils.getTargetPosition(), RobotContainer.drivetrain.getPose());
+        } else {
+            turret.setVoltage(Volts.of(-6 * MathUtil.applyDeadband(xPos, 0.1)));
         }
+    }
+
+    private DoubleSupplier getJoystickX() {
+        if (isLeft) {
+            return () -> RobotContainer.operatorController.getLeftX();
+        }
+        return () -> RobotContainer.operatorController.getRightX();
+    }
+
+    private DoubleSupplier getJoystickY() {
+        if (isLeft) {
+            return () -> RobotContainer.operatorController.getLeftY();
+        }
+        return () -> RobotContainer.operatorController.getRightY();
     }
 
     // Called once the command ends or is interrupted.
@@ -48,4 +78,7 @@ public class MoveTurretCommand extends Command {
     public boolean isFinished() {
         return false;
     }
+
+    
+
 }
