@@ -94,7 +94,7 @@ public class VisionSubsystem extends SubsystemBase {
                 : camSim.getCamera().getAllUnreadResults();
         for (PhotonPipelineResult result : results) {
             List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
-                .filter(target -> target.poseAmbiguity > Constants.MAX_AMBIGUITY).toList();
+                .filter(target -> target.poseAmbiguity < Constants.MAX_AMBIGUITY).toList();
             if(filteredTargets.size() == 0)
                 continue;
             PhotonPipelineResult filtered = new PhotonPipelineResult(result.metadata, 
@@ -109,15 +109,18 @@ public class VisionSubsystem extends SubsystemBase {
             // TODO add camera std dev
             RobotContainer.logger.estimatedRobotPose.set(est.estimatedPose.toPose2d(),
                     (long) (1000000 * est.timestampSeconds));
-            if(cam.equals(rightCam))
+            if(cam.equals(rightCam)){
                 RobotContainer.logger.rightEstimatedRobotPose.set(est.estimatedPose.toPose2d(),
                         (long) (1000000 * est.timestampSeconds));
-            if(cam.equals(rearCam))
+            }
+            if(cam.equals(rearCam)){
                 RobotContainer.logger.rearEstimatedRobotPose.set(est.estimatedPose.toPose2d(),
                         (long) (1000000 * est.timestampSeconds));
-            if(cam.equals(leftCam))
+            }
+            if(cam.equals(leftCam)){
                 RobotContainer.logger.leftEstimatedRobotPose.set(est.estimatedPose.toPose2d(),
                         (long) (1000000 * est.timestampSeconds));
+            }
             RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
         }
         return results;

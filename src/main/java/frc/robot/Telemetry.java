@@ -99,6 +99,9 @@ public class Telemetry {
             .getStructTopic("EstimatedPose", Pose2d.struct).publish();
     public final StructPublisher<Pose2d> leftEstimatedRobotPose = leftCamTable
             .getStructTopic("EstimatedPose", Pose2d.struct).publish();
+    public final DoubleArrayPublisher rightAmbiguity = rightCamTable.getDoubleArrayTopic("Ambiguity").publish();
+    public final DoubleArrayPublisher leftAmbiguity = leftCamTable.getDoubleArrayTopic("Ambiguity").publish();
+    public final DoubleArrayPublisher rearAmbiguity = rearCamTable.getDoubleArrayTopic("Ambiguity").publish();
     
 
     private final NetworkTable shooterTable = tableRoot.getTable("ShooterData");
@@ -213,42 +216,54 @@ public class Telemetry {
             List<PhotonPipelineResult> rear) {
         for (var result : left) {
             var targets = result.getTargets();
+            double[] ambiguities = new double[targets.size()];
             Pose3d[] targetsArr = new Pose3d[targets.size()];
             long[] targetIds = new long[targetsArr.length];
             for (int i = 0; i < targetsArr.length; i++) {
-                targetIds[i] = targets.get(i).getFiducialId();
+                var target = targets.get(i);
+                targetIds[i] = target.getFiducialId();
                 targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i])
                         .orElse(Pose3d.kZero);
+                ambiguities[i] = target.getPoseAmbiguity();
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             leftCamDetects.set(targetsArr, timestampMicros);
             leftCamIds.set(targetIds, timestampMicros);
+            leftAmbiguity.set(ambiguities, timestampMicros);
         }
         for (var result : right) {
             var targets = result.getTargets();
+            double[] ambiguities = new double[targets.size()];
             Pose3d[] targetsArr = new Pose3d[targets.size()];
             long[] targetIds = new long[targetsArr.length];
             for (int i = 0; i < targetsArr.length; i++) {
-                targetIds[i] = targets.get(i).getFiducialId();
+                var target = targets.get(i);
+                targetIds[i] = target.getFiducialId();
                 targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i])
                         .orElse(Pose3d.kZero);
+                ambiguities[i] = target.getPoseAmbiguity();
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             rightCamDetects.set(targetsArr, timestampMicros);
             rightCamIds.set(targetIds, timestampMicros);
+            rightAmbiguity.set(ambiguities, timestampMicros);
         }
         for (var result : rear) {
             var targets = result.getTargets();
+            double[] ambiguities = new double[targets.size()];
             Pose3d[] targetsArr = new Pose3d[targets.size()];
             long[] targetIds = new long[targetsArr.length];
             for (int i = 0; i < targetsArr.length; i++) {
-                targetIds[i] = targets.get(i).getFiducialId();
+                var target = targets.get(i);
+                targetIds[i] = target.getFiducialId();
                 targetsArr[i] = Constants.TAG_LAYOUT.getTagPose((int) targetIds[i])
                         .orElse(Pose3d.kZero);
+                ambiguities[i] = target.getPoseAmbiguity();
             }
             long timestampMicros = (long) (1000000 * result.getTimestampSeconds());
             rearCamDetects.set(targetsArr, timestampMicros);
             rearCamIds.set(targetIds, timestampMicros);
+            rearAmbiguity.set(ambiguities, timestampMicros);
         }
     }
 }
