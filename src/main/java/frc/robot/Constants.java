@@ -172,6 +172,6 @@ public class Constants {
                     -0.202339, -0.4796695, -0.019498, -0.022714, -0.7685125, -0.287155, -0.577499, -0.442192, -0.442192,
                     -0.442192, -0.442192, -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
 
-    public static final boolean SHOULD_AUTO_AIM_AT_START = true;
+    public static final boolean SHOULD_AUTO_AIM_AT_START = false;
 
 }
