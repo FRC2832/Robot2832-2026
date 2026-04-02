@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.io.File;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -20,10 +22,12 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
@@ -203,15 +207,15 @@ public class RobotContainer {
 
         // Shooter ************************
         //Move shooter up and down while shooting and not intaking
-        operatorController.y().or(operatorController.a())
-            .and(operatorController.rightTrigger(.1).negate())
-            .and(operatorController.rightTrigger(.1).negate())
-            .whileTrue(
-                intakeExtenderSubsystem.extendIntakeCommand()
-                .andThen(new WaitCommand(1))
-                .andThen(intakeExtenderSubsystem.retractIntakeCommand())
-                .andThen(new WaitCommand(1))
-            ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
+        // operatorController.y().or(operatorController.a())
+        //     .and(operatorController.rightTrigger(.1).negate())
+        //     .and(operatorController.rightTrigger(.1).negate())
+        //     .whileTrue(
+        //         intakeExtenderSubsystem.extendIntakeCommand()
+        //         .andThen(new WaitCommand(1))
+        //         .andThen(intakeExtenderSubsystem.retractIntakeCommand())
+        //         .andThen(new WaitCommand(1))
+        //     ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
 
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
@@ -265,6 +269,8 @@ public class RobotContainer {
     public static void enableAutoAim(){
         leftTurretSubsystem.isAutoAim = true;
         rightTurretSubsystem.isAutoAim = true;
+        shooterSubsystem.isLeftAutoAim = true;
+        shooterSubsystem.isRightAutoAim = true;
         logger.leftTurretAutoAiming.set(true);
         logger.rightTurretAutoAiming.set(true);
         SpinShooterCommand.setToAutoSuppliers();
@@ -273,6 +279,8 @@ public class RobotContainer {
     public static void disableAutoAim(){
         leftTurretSubsystem.isAutoAim = false;
         rightTurretSubsystem.isAutoAim = false;
+        shooterSubsystem.isLeftAutoAim = false;
+        shooterSubsystem.isRightAutoAim = false;
         logger.leftTurretAutoAiming.set(false);
         logger.rightTurretAutoAiming.set(false);
         SpinShooterCommand.setToManualSuppliers();
@@ -289,13 +297,24 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        PathPlannerAuto auto = (PathPlannerAuto) autoChooser.getSelected();
-        Pose2d start = auto.getStartingPose();
-        if (Utils.isOnRed())
-            start = FlippingUtil.flipFieldPose(start);
-        drivetrain.resetPose(start);
+        Command auto = autoChooser.getSelected();
+        if(auto instanceof PathPlannerAuto ppAuto){
+            Pose2d start = ppAuto.getStartingPose();
+            if (Utils.isOnRed())
+                start = FlippingUtil.flipFieldPose(start);
+            drivetrain.resetPose(start);
+        }else if(auto instanceof InstantCommand instant){
+            String name = instant.getName();
+            if(new File(Filesystem.getDeployDirectory(), 
+                    "pathplanner/autos" + name + ".auto").exists()){
+                Pose2d start = new PathPlannerAuto(name).getStartingPose();
+                if (Utils.isOnRed())
+                    start = FlippingUtil.flipFieldPose(start);
+                drivetrain.resetPose(start);
+            }
+        }
         //return startAutoAim().alongWith(autoChooser.getSelected());
-        return autoChooser.getSelected();
+        return auto;
         // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();
