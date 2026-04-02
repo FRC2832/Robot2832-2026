@@ -14,6 +14,7 @@ import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +37,8 @@ public class VisionSubsystem extends SubsystemBase {
     PhotonPoseEstimator rearPoseEstimator;
     PhotonCameraSim rearCamSim;
 
+    public PhotonCamera frontCam;
+
     VisionSystemSim visionSim;
 
     public List<PhotonPipelineResult> leftResults, rightResults, rearResults;
@@ -51,6 +54,8 @@ public class VisionSubsystem extends SubsystemBase {
         leftResults = new LinkedList<>();
         rightResults = new LinkedList<>();
         rearResults = new LinkedList<>();
+        //driver camera
+        frontCam = new PhotonCamera(Constants.FRONT_CAM_NAME);
         if (Robot.isSimulation()) {
             visionSim = new VisionSystemSim("Vision");
             visionSim.addAprilTags(Constants.TAG_LAYOUT);
@@ -67,7 +72,6 @@ public class VisionSubsystem extends SubsystemBase {
             visionSim.addCamera(rightCamSim, Constants.RIGHT_CAM_POSE);
             visionSim.addCamera(rearCamSim, Constants.REAR_CAM_POSE);
         }
-
         // NOTE: Possibly remove?
         SmartDashboard.putData(this);
     }
@@ -89,9 +93,15 @@ public class VisionSubsystem extends SubsystemBase {
         List<PhotonPipelineResult> results = Robot.isReal() ? cam.getAllUnreadResults()
                 : camSim.getCamera().getAllUnreadResults();
         for (PhotonPipelineResult result : results) {
-            Optional<EstimatedRobotPose> maybeEst = estimator.estimateCoprocMultiTagPose(result);
+            List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
+                .filter(target -> target.poseAmbiguity > Constants.MAX_AMBIGUITY).toList();
+            if(filteredTargets.size() == 0)
+                continue;
+            PhotonPipelineResult filtered = new PhotonPipelineResult(result.metadata, 
+                    filteredTargets, result.getMultiTagResult());
+            Optional<EstimatedRobotPose> maybeEst = estimator.estimateCoprocMultiTagPose(filtered);
             if (maybeEst.isEmpty()) // there may be only one tag seen; switch to single-tag estimation
-                maybeEst = estimator.estimateLowestAmbiguityPose(result);
+                maybeEst = estimator.estimateLowestAmbiguityPose(filtered);
 
             if (maybeEst.isEmpty()) // no tags found still, so move on to next result
                 continue;
@@ -99,6 +109,15 @@ public class VisionSubsystem extends SubsystemBase {
             // TODO add camera std dev
             RobotContainer.logger.estimatedRobotPose.set(est.estimatedPose.toPose2d(),
                     (long) (1000000 * est.timestampSeconds));
+            if(cam.equals(rightCam))
+                RobotContainer.logger.rightEstimatedRobotPose.set(est.estimatedPose.toPose2d(),
+                        (long) (1000000 * est.timestampSeconds));
+            if(cam.equals(rearCam))
+                RobotContainer.logger.rearEstimatedRobotPose.set(est.estimatedPose.toPose2d(),
+                        (long) (1000000 * est.timestampSeconds));
+            if(cam.equals(leftCam))
+                RobotContainer.logger.leftEstimatedRobotPose.set(est.estimatedPose.toPose2d(),
+                        (long) (1000000 * est.timestampSeconds));
             RobotContainer.drivetrain.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds);
         }
         return results;

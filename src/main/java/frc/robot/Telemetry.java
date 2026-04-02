@@ -93,6 +93,13 @@ public class Telemetry {
     private final IntegerArrayPublisher rearCamIds = rearCamTable.getIntegerArrayTopic("FiducialIDs").publish();
     public final StructPublisher<Pose2d> estimatedRobotPose = visionTable
             .getStructTopic("EstimatedPose", Pose2d.struct).publish();
+    public final StructPublisher<Pose2d> rightEstimatedRobotPose = rightCamTable
+            .getStructTopic("EstimatedPose", Pose2d.struct).publish();
+    public final StructPublisher<Pose2d> rearEstimatedRobotPose = rearCamTable
+            .getStructTopic("EstimatedPose", Pose2d.struct).publish();
+    public final StructPublisher<Pose2d> leftEstimatedRobotPose = leftCamTable
+            .getStructTopic("EstimatedPose", Pose2d.struct).publish();
+    
 
     private final NetworkTable shooterTable = tableRoot.getTable("ShooterData");
     private final NetworkTable leftShooter = shooterTable.getSubTable("Left");

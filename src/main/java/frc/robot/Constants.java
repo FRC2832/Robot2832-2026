@@ -138,6 +138,9 @@ public class Constants {
             Inches.of(11.25),
             new Rotation3d(0, -25 * Math.PI / 180, Math.PI));
     public static final String REAR_CAM_NAME = "Rear Camera";
+    
+    public static final String FRONT_CAM_NAME = "Front Camera";
+    public static final double MAX_AMBIGUITY = 0.8; 
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
     public static final Translation2d RED_HUB_POS = FlippingUtil.flipFieldPosition(BLUE_HUB_POS);
