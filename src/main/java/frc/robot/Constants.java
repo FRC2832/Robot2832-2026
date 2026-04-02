@@ -144,15 +144,16 @@ public class Constants {
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
     public static final Translation2d RED_HUB_POS = FlippingUtil.flipFieldPosition(BLUE_HUB_POS);
-    public static final Distance SNOWBLOW_TARGET_OFFSET = Inches.of(70);
-    public static final Translation2d BLUE_LEFT_SNOWBLOW_TARGET = new Translation2d(BLUE_HUB_POS.getMeasureX(),
-            BLUE_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET));
-    public static final Translation2d BLUE_RIGHT_SNOWBLOW_TARGET = new Translation2d(BLUE_HUB_POS.getMeasureX(),
-            BLUE_HUB_POS.getMeasureY().minus(SNOWBLOW_TARGET_OFFSET));
-    public static final Translation2d RED_LEFT_SNOWBLOW_TARGET = new Translation2d(RED_HUB_POS.getMeasureX(),
-            RED_HUB_POS.getMeasureY().minus(SNOWBLOW_TARGET_OFFSET));
-    public static final Translation2d RED_RIGHT_SNOWBLOW_TARGET = new Translation2d(RED_HUB_POS.getMeasureX(),
-            RED_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET));
+    public static final Distance SNOWBLOW_TARGET_OFFSET_Y = Inches.of(70);
+    public static final Distance SNOWBLOW_TARGET_OFFSET_X = Inches.of(30);
+    public static final Translation2d BLUE_LEFT_SNOWBLOW_TARGET = new Translation2d(BLUE_HUB_POS.getMeasureX()
+            .minus(SNOWBLOW_TARGET_OFFSET_X), BLUE_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET_Y));
+    public static final Translation2d BLUE_RIGHT_SNOWBLOW_TARGET = new Translation2d(BLUE_HUB_POS.getMeasureX()
+            .minus(SNOWBLOW_TARGET_OFFSET_X), BLUE_HUB_POS.getMeasureY().minus(SNOWBLOW_TARGET_OFFSET_Y));
+    public static final Translation2d RED_LEFT_SNOWBLOW_TARGET = new Translation2d(RED_HUB_POS.getMeasureX()
+            .plus(SNOWBLOW_TARGET_OFFSET_X), RED_HUB_POS.getMeasureY().minus(SNOWBLOW_TARGET_OFFSET_Y));
+    public static final Translation2d RED_RIGHT_SNOWBLOW_TARGET = new Translation2d(RED_HUB_POS.getMeasureX()
+            .plus(SNOWBLOW_TARGET_OFFSET_X), RED_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET_Y));
 
     public static final LookupTable SHOOTER_LOOKUP_TABLE = new LookupTable(
             new Distance[] { Meters.of(3.131707461), Meters.of(2.905395605), Meters.of(2.207706018),
