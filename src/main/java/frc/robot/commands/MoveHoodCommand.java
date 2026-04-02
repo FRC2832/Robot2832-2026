@@ -16,7 +16,6 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Utils;
 import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.LookupTable;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */

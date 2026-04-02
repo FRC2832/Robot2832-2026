@@ -22,7 +22,7 @@ public class LookupTable {
      * Create a lookup table based on the specified mapping.<br>
      * <br>
      * 
-     * The two arrays passed to the function must be the same size.
+     * The three arrays passed to the function must be the same size.
      * 
      * @param distances     A list of distances mapping to the corresponding outputs.
      *                      Lookup will interpolate between outputs based on the
