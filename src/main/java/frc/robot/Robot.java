@@ -58,6 +58,8 @@ public class Robot extends TimedRobot {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run();
 
+        // FIX: this stuff (+ other stuff possibly?) makes the loops take like 0.002 seconds which is far too long but I'm not fixing it tonight. Hashtag plx fix @kransaw.
+
         matchTime = DriverStation.getMatchTime();
         hubActive = PhaseChecker.isHubActive(matchTime);
 
