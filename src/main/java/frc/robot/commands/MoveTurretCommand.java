@@ -46,13 +46,16 @@ public class MoveTurretCommand extends Command {
     @Override
     public void execute() {
         double xPos = joystickX.getAsDouble();
-        if (Math.abs(xPos) > 0.1 || Math.abs(joystickY.getAsDouble()) > 0.1)
+        if (Math.abs(xPos) > Constants.TURRET_CONTROL_DEADZONE
+                || Math.abs(joystickY.getAsDouble()) > Constants.TURRET_CONTROL_DEADZONE) {
             turret.isAutoAim = false;
             RobotContainer.logger.leftTurretAutoAiming.set(false);
+            //TODO decide if we should turn off autoaim for all turrets or just this one
+        }
         if (turret.isAutoAim) {
             turret.aimAtPosition(Utils.getTargetPosition(), RobotContainer.drivetrain.getPose());
         } else {
-            turret.setVoltage(Volts.of(1.5 * MathUtil.applyDeadband(xPos, 0.1)));
+            turret.setVoltage(Volts.of(1.5 * MathUtil.applyDeadband(xPos, Constants.TURRET_CONTROL_DEADZONE)));
         }
     }
 
@@ -80,7 +83,5 @@ public class MoveTurretCommand extends Command {
     public boolean isFinished() {
         return false;
     }
-
-    
 
 }

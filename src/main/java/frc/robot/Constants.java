@@ -6,8 +6,10 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -81,14 +83,17 @@ public class Constants {
     public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-50);
     public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(50);
 
-    public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217);
-    public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801);
+    public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217 + .01709);
+    public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801 - .107442);
+
+    public static final double TURRET_CONTROL_DEADZONE = 0.2;
 
     // FIXME measure robot turret positions relative to robot origin
     public static final Translation3d LEFT_TURRET_POS = new Translation3d(Inches.of(-6.75), Inches.of(8.75),
             Inches.of(20));
     public static final Translation3d RIGHT_TURRET_POS = new Translation3d(Inches.of(-6.75), Inches.of(-8.75),
             Inches.of(20));
+    public static final Translation3d BETWEEN_TURRETS_POS = new Translation3d(Inches.of(-6.75), Inches.of(0), Inches.of(20));
     // Used for approaching the edges of the firing arc slower
     // public static final double LEFT_UPPER_APPROACH_ANGLE =
     // (2*LEFT_TURRET_MAX_ANGLE + LEFT_TURRET_MIN_ANGLE) / 3;
@@ -131,8 +136,7 @@ public class Constants {
             Inches.of(-11.9375),
             Inches.of(-5),
             Inches.of(11.25),
-            new Rotation3d(0, -25 * Math.PI/180, Math.PI)
-    );
+            new Rotation3d(0, -25 * Math.PI / 180, Math.PI));
     public static final String REAR_CAM_NAME = "Rear Camera";
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
@@ -148,10 +152,26 @@ public class Constants {
             RED_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET));
 
     public static final LookupTable SHOOTER_LOOKUP_TABLE = new LookupTable(
-            new Distance[] {},
-            new AngularVelocity[] {},
-            new double[] {});
+            new Distance[] { Meters.of(3.131707461), Meters.of(2.905395605), Meters.of(2.207706018),
+                    Meters.of(2.214880037), Meters.of(2.236692242), Meters.of(2.061506812), Meters.of(2.810240181),
+                    Meters.of(2.836135891), Meters.of(4.944140737), Meters.of(2.704494197), Meters.of(3.096642723),
+                    Meters.of(3.348627156), Meters.of(3.214721528), Meters.of(3.339439679), Meters.of(3.218443989),
+                    Meters.of(4.710429101), Meters.of(4.55551602), Meters.of(4.112445384), Meters.of(3.909571046),
+                    Meters.of(3.343450924), Meters.of(4.708524724), Meters.of(4.545698486), Meters.of(4.088802765),
+                    Meters.of(3.93504571), Meters.of(3.360961813)},
+            new AngularVelocity[] { RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
+                    RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
+                    RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(60),
+                    RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
+                    RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(60),
+                    RotationsPerSecond.of(65), RotationsPerSecond.of(70), RotationsPerSecond.of(60),
+                    RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(65),
+                    RotationsPerSecond.of(70), RotationsPerSecond.of(60), RotationsPerSecond.of(55),
+                    RotationsPerSecond.of(50)},
+            new double[] { -0.2206255, -0.559337, -0.850459, -0.8642775, -0.8642775, -0.9273405, -0.415452, -0.415452,
+                    -0.202339, -0.4796695, -0.019498, -0.022714, -0.7685125, -0.287155, -0.577499, -0.442192, -0.442192,
+                    -0.442192, -0.442192, -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
 
-    public static final boolean SHOULD_AUTO_AIM_AT_START = false;
+    public static final boolean SHOULD_AUTO_AIM_AT_START = true;
 
 }

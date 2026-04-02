@@ -4,12 +4,20 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Utils;
 import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.util.LookupTable;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class MoveHoodCommand extends Command {
@@ -37,11 +45,13 @@ public class MoveHoodCommand extends Command {
     @Override
     public void execute() {
         if (hood.isAutoAim()) {
-            // FIXME implement auto controls, lookup table
-            double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), 0.1);
-            hood.offsetHood(-joystick);
+            Translation2d target = Utils.getTargetPosition();
+            Translation2d robotPos = RobotContainer.drivetrain.getPose().getTranslation();
+            Distance dist = Meters.of(target.getDistance(robotPos));
+            LookupTable.Result lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
+            hood.setHoodPosition(lookupResult.hoodServoSetting());
         } else {
-            double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), 0.1);
+            double joystick = MathUtil.applyDeadband(joystickY.getAsDouble(), Constants.TURRET_CONTROL_DEADZONE);
             hood.offsetHood(-joystick);
         }
     }

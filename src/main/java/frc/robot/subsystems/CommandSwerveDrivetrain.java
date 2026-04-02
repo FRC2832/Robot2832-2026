@@ -256,8 +256,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public SwerveDriveState getStateCached(){
-        if(!stateCached)
+        if(!stateCached){
             cachedState = super.getState();
+            stateCached = true;
+        }
         return cachedState;
     }
 

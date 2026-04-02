@@ -3,6 +3,8 @@ package frc.robot.util;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import java.util.LinkedList;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -31,9 +33,32 @@ public class LookupTable {
      *                      list. Must be the same length as inputs
      */
     public LookupTable(Distance[] distances, AngularVelocity[] shooterSpeeds, double[] hoodSettings) {
-        this.distances = distances;
-        this.shooterSpeeds = shooterSpeeds;
-        this.hoodSettings = hoodSettings;
+        this.distances = new Distance[distances.length];
+        this.shooterSpeeds = new AngularVelocity[shooterSpeeds.length];
+        this.hoodSettings = new double[hoodSettings.length];
+        //selection sort by distance, moving all arrays the same amount
+        LinkedList<Integer> remainingIndices = new LinkedList<>();
+        for(int i = 0; i < distances.length; i++){
+            remainingIndices.add(i);
+        }
+        int[] order = new int[distances.length];
+        for(int dex = 0; dex < distances.length; dex++){
+            Distance minDistance = distances[remainingIndices.get(0)];
+            int minDex = 0;
+            for(int i = 1; i < remainingIndices.size(); i++){
+                Distance dist = distances[remainingIndices.get(i)];
+                if(dist.lt(minDistance)){
+                    minDistance = dist;
+                    minDex = i;
+                }
+            }
+            order[dex] = remainingIndices.remove(minDex);
+        }
+        for(int i = 0; i < order.length; i++){
+            this.distances[i] = distances[order[i]];
+            this.hoodSettings[i] = hoodSettings[order[i]];
+            this.shooterSpeeds[i] = shooterSpeeds[order[i]];
+        }
     }
 
     /**

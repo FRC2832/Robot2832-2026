@@ -10,6 +10,8 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,10 +30,13 @@ public class SpinShooterCommand extends Command {
         setSuppliers(leftSpeed, rightSpeed, acceleratorSpeed);
     }
 
-    // TODO set to use automatic suppliers
     public SpinShooterCommand() {
-        this(ShooterSubsystem::getLastLeftSpeedProportion, ShooterSubsystem::getLastRightSpeedProportion,
-                ShooterSubsystem::getLastAcceleratorSpeedProportion);
+        addRequirements(RobotContainer.shooterSubsystem);
+        if(Constants.SHOULD_AUTO_AIM_AT_START){
+            setToAutoSuppliers();
+        }else{
+            setToManualSuppliers();
+        }
     }
 
     public static void setSuppliers(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed,
@@ -54,7 +59,8 @@ public class SpinShooterCommand extends Command {
     public static double runLookup() {
         Translation2d target = Utils.getTargetPosition();
         Pose2d robotPose = RobotContainer.drivetrain.getPose();
-        Distance dist = Meters.of(robotPose.getTranslation().getDistance(target));
+        Pose2d turretPose = robotPose.plus(new Transform2d(Constants.BETWEEN_TURRETS_POS.toTranslation2d(), Rotation2d.kZero));
+        Distance dist = Meters.of(turretPose.getTranslation().getDistance(target));
         return Constants.SHOOTER_LOOKUP_TABLE.lookup(dist).shooterSpeed().in(RotationsPerSecond) / 100; // 100RPS is
                                                                                                         // free speed
     }

@@ -216,7 +216,7 @@ public class RobotContainer {
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
 
-        operatorController.b().onTrue(startAutoAim());
+        operatorController.b().onTrue(toggleAutoAim());
         leftTurretSubsystem.setDefaultCommand(new MoveTurretCommand(leftTurretSubsystem));
         rightTurretSubsystem.setDefaultCommand(new MoveTurretCommand(rightTurretSubsystem));
 
@@ -227,8 +227,7 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
-            leftTurretSubsystem.isAutoAim = false;
-            rightTurretSubsystem.isAutoAim = false;
+            disableAutoAim();
             // ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
             // SpinAndShootWhileReady.TARGET_SPEED += 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
@@ -240,8 +239,7 @@ public class RobotContainer {
                     ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
-            leftTurretSubsystem.isAutoAim = false;
-            rightTurretSubsystem.isAutoAim = false;
+            disableAutoAim();
             // ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
             // SpinAndShootWhileReady.TARGET_SPEED -= 5;
             // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
@@ -264,18 +262,28 @@ public class RobotContainer {
                 () -> rightTurretSubsystem.setAngle(Degrees.of(30))));
     }
 
-    public Command startAutoAim() {
+    public static void enableAutoAim(){
+        leftTurretSubsystem.isAutoAim = true;
+        rightTurretSubsystem.isAutoAim = true;
+        logger.leftTurretAutoAiming.set(true);
+        logger.rightTurretAutoAiming.set(true);
+        SpinShooterCommand.setToAutoSuppliers();
+    }
+
+    public static void disableAutoAim(){
+        leftTurretSubsystem.isAutoAim = false;
+        rightTurretSubsystem.isAutoAim = false;
+        logger.leftTurretAutoAiming.set(false);
+        logger.rightTurretAutoAiming.set(false);
+        SpinShooterCommand.setToManualSuppliers();
+    }
+
+    public Command toggleAutoAim() {
         return Commands.runOnce(() -> {
             if (leftTurretSubsystem.isAutoAim || rightTurretSubsystem.isAutoAim) {
-                leftTurretSubsystem.isAutoAim = false;
-                rightTurretSubsystem.isAutoAim = false;
-                RobotContainer.logger.leftTurretAutoAiming.set(false);
-                RobotContainer.logger.rightTurretAutoAiming.set(false);
+                enableAutoAim();
             } else {
-                leftTurretSubsystem.isAutoAim = true;
-                rightTurretSubsystem.isAutoAim = true;
-                RobotContainer.logger.leftTurretAutoAiming.set(true);
-                RobotContainer.logger.rightTurretAutoAiming.set(true);
+                disableAutoAim();
             }
         });
     }
