@@ -140,7 +140,7 @@ public class Constants {
     public static final String REAR_CAM_NAME = "Rear Camera";
     
     public static final String FRONT_CAM_NAME = "Front Camera";
-    public static final double MAX_AMBIGUITY = 0.8; 
+    public static final double MAX_AMBIGUITY = 0.6; 
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
     public static final Translation2d RED_HUB_POS = FlippingUtil.flipFieldPosition(BLUE_HUB_POS);
@@ -160,7 +160,7 @@ public class Constants {
                     Meters.of(2.214880037), Meters.of(2.236692242), Meters.of(2.061506812), Meters.of(2.810240181),
                     Meters.of(2.836135891), Meters.of(4.944140737), Meters.of(2.704494197), Meters.of(3.096642723),
                     Meters.of(3.348627156), Meters.of(3.214721528), Meters.of(3.339439679), Meters.of(3.218443989),
-                    Meters.of(4.710429101), Meters.of(4.55551602), Meters.of(4.112445384), Meters.of(3.909571046),
+                    Meters.of(4.710429101), Meters.of(4.55551602), Meters.of(4.112445384), /*Meters.of(3.909571046),*/
                     Meters.of(3.343450924), Meters.of(4.708524724), Meters.of(4.545698486), Meters.of(4.088802765),
                     Meters.of(3.93504571), Meters.of(3.360961813)},
             new AngularVelocity[] { RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
@@ -169,12 +169,12 @@ public class Constants {
                     RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
                     RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(60),
                     RotationsPerSecond.of(65), RotationsPerSecond.of(70), RotationsPerSecond.of(60),
-                    RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(65),
+                    /*RotationsPerSecond.of(55),*/ RotationsPerSecond.of(50), RotationsPerSecond.of(65),
                     RotationsPerSecond.of(70), RotationsPerSecond.of(60), RotationsPerSecond.of(55),
                     RotationsPerSecond.of(50)},
             new double[] { -0.2206255, -0.559337, -0.850459, -0.8642775, -0.8642775, -0.9273405, -0.415452, -0.415452,
                     -0.202339, -0.4796695, -0.019498, -0.022714, -0.7685125, -0.287155, -0.577499, -0.442192, -0.442192,
-                    -0.442192, -0.442192, -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
+                    -0.442192, /*-0.442192,*/ -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
 
     public static final boolean SHOULD_AUTO_SET_SPEED_AT_START = true;
     public static final boolean SHOULD_AUTO_AIM_TURRET_AT_START = false;
