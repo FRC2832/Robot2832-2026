@@ -39,12 +39,16 @@ public class ShooterSubsystem extends SubsystemBase {
     // private DoubleEntry shooterS = shooterSettings.getDoubleTopic("kS").getEntry(0.05);
     private static final double P = 1.2, I = 0.75, D = 0.1, S = 0.0;
 
+    public boolean isLeftAutoAim, isRightAutoAim;
+
     //For the networktable publishing
     private double lastLeftSpeedPublished, lastRightSpeedPublished, lastAcceleratorPublished;
 
     private VelocityVoltage control = new VelocityVoltage(0).withSlot(0);
 
     public ShooterSubsystem() {
+        isLeftAutoAim = Constants.SHOULD_AUTO_SET_SPEED_AT_START;
+        isRightAutoAim = Constants.SHOULD_AUTO_SET_SPEED_AT_START;
         rightShooterMotor = new TalonFX(Constants.RIGHT_SHOOTER_ID, Constants.CANivoreCANBus);
         leftShooterMotor = new TalonFX(Constants.LEFT_SHOOTER_ID, Constants.CANivoreCANBus);
         accelerator = new TalonFX(Constants.ACCELERATOR_ID, Constants.CANivoreCANBus);

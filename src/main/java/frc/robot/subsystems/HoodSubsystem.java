@@ -28,7 +28,11 @@ public class HoodSubsystem extends SubsystemBase {
     /** Creates a new HoodSubsystem. */
     public HoodSubsystem(TurretNoYams turret) {
         this.isLeftTurret = turret.isLeftTurret();
-        isAutoAim = () -> turret.isAutoAim;
+        if(isLeftTurret)
+            isAutoAim = () -> RobotContainer.shooterSubsystem.isLeftAutoAim;
+        else
+            isAutoAim = () -> RobotContainer.shooterSubsystem.isRightAutoAim;
+
         if (servoHub == null) {
             servoHub = new ServoHub(Constants.SERVO_HUB_ID);
             ServoHubConfig config = new ServoHubConfig();

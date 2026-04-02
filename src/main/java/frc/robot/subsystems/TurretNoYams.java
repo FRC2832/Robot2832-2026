@@ -46,7 +46,7 @@ public class TurretNoYams extends SubsystemBase {
     boolean isLeft;
     Translation3d position;
 
-    public boolean isAutoAim = Constants.SHOULD_AUTO_AIM_AT_START;
+    public boolean isAutoAim = Constants.SHOULD_AUTO_AIM_TURRET_AT_START;
 
     PositionVoltage angleControl = new PositionVoltage(0)
             .withSlot(0);//.withEnableFOC(true);

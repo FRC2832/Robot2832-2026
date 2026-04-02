@@ -80,10 +80,12 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         Utils.recheckTeam();
-        RobotContainer.leftTurretSubsystem.isAutoAim = Constants.SHOULD_AUTO_AIM_AT_START;
-        RobotContainer.rightTurretSubsystem.isAutoAim = Constants.SHOULD_AUTO_AIM_AT_START;
-        RobotContainer.logger.leftTurretAutoAiming.set(Constants.SHOULD_AUTO_AIM_AT_START);
-        RobotContainer.logger.rightTurretAutoAiming.set(Constants.SHOULD_AUTO_AIM_AT_START);
+        RobotContainer.leftTurretSubsystem.isAutoAim = Constants.SHOULD_AUTO_AIM_TURRET_AT_START;
+        RobotContainer.rightTurretSubsystem.isAutoAim = Constants.SHOULD_AUTO_AIM_TURRET_AT_START;
+        RobotContainer.shooterSubsystem.isLeftAutoAim = Constants.SHOULD_AUTO_SET_SPEED_AT_START;
+        RobotContainer.shooterSubsystem.isRightAutoAim = Constants.SHOULD_AUTO_SET_SPEED_AT_START;
+        RobotContainer.logger.leftTurretAutoAiming.set(Constants.SHOULD_AUTO_AIM_TURRET_AT_START);
+        RobotContainer.logger.rightTurretAutoAiming.set(Constants.SHOULD_AUTO_AIM_TURRET_AT_START);
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {

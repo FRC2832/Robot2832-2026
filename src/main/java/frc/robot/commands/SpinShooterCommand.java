@@ -32,7 +32,7 @@ public class SpinShooterCommand extends Command {
 
     public SpinShooterCommand() {
         addRequirements(RobotContainer.shooterSubsystem);
-        if(Constants.SHOULD_AUTO_AIM_AT_START){
+        if(Constants.SHOULD_AUTO_SET_SPEED_AT_START){
             setToAutoSuppliers();
         }else{
             setToManualSuppliers();

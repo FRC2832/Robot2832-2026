@@ -83,8 +83,8 @@ public class Constants {
     public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-50);
     public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(50);
 
-    public static final Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217 + .01709);
-    public static final Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801 - .107442);
+    public static Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217 + .01709 - .02);
+    public static Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801 - .107442 -.014);
 
     public static final double TURRET_CONTROL_DEADZONE = 0.2;
 
@@ -172,6 +172,7 @@ public class Constants {
                     -0.202339, -0.4796695, -0.019498, -0.022714, -0.7685125, -0.287155, -0.577499, -0.442192, -0.442192,
                     -0.442192, -0.442192, -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
 
-    public static final boolean SHOULD_AUTO_AIM_AT_START = true;
+    public static final boolean SHOULD_AUTO_SET_SPEED_AT_START = true;
+    public static final boolean SHOULD_AUTO_AIM_TURRET_AT_START = false;
 
 }
