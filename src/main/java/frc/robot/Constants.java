@@ -54,7 +54,7 @@ public class Constants {
     // Constants for Intake subsystem
     public static final int INTAKE_INTERNAL_ROTATOR_ID = 19;
     public static final int INTAKE_EXTENDER_ID = 18;
-    public static final double INTAKE_EXTEND_VOLTAGE = 1.5; // TODO consider raising
+    public static final double INTAKE_EXTEND_VOLTAGE = 2; // TODO consider raising
 
     // Constants for Shooter subsytem
     public static final int LEFT_SHOOTER_ID = 14;

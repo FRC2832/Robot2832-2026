@@ -58,8 +58,11 @@ public class MoveIntake extends Command {
             return true;
         }
         // Supply current increases when the resistance increases
-        return timer.get() > 0.8 || Math.abs(
+        double timeout = 2;
+        if(isDown)
+            timeout = 0.8;
+        return timer.get() > timeout || Math.abs(
                 RobotContainer.intakeExtenderSubsystem.intakeExtenderMotor
-                        .getSupplyCurrent().getValue().in(Amps)) > 6;
+                        .getSupplyCurrent().getValue().in(Amps)) > 12;
     }
 }
