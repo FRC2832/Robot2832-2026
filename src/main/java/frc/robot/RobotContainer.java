@@ -161,7 +161,7 @@ public class RobotContainer {
                 () -> point.withModuleDirection(
                         new Rotation2d(-driverController.getLeftY(),
                                 -driverController.getLeftX()))));
-
+        driverController.x().whileTrue(drivetrain.aimTowardsHub());
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
         driverController.back().and(driverController.y())
@@ -255,7 +255,7 @@ public class RobotContainer {
         leftHoodSubsystem.setDefaultCommand(new MoveHoodCommand(leftHoodSubsystem));
         rightHoodSubsystem.setDefaultCommand(new MoveHoodCommand(rightHoodSubsystem));
         // Commands for auton
-        NamedCommands.registerCommand("Shoot", new SpinAndShootWhileReady().withTimeout(6));
+        NamedCommands.registerCommand("Shoot", new SpinAndShootWhileReady().withTimeout(3.5));
         NamedCommands.registerCommand("Reverse PPT", pptSubsystem.reverseDeliverCommand().withTimeout(3));
         NamedCommands.registerCommand("Extend Ingestor", intakeExtenderSubsystem.extendIntakeCommand());
         NamedCommands.registerCommand("Start Ingestor", intakeRollerSubsystem.startIntakeCommand());
