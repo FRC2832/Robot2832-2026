@@ -267,8 +267,8 @@ public class RobotContainer {
     }
 
     public static void enableAutoAim(){
-        leftTurretSubsystem.isAutoAim = true;
-        rightTurretSubsystem.isAutoAim = true;
+        leftTurretSubsystem.isAutoAim = false; //TODO fix turret aiming and reenable
+        rightTurretSubsystem.isAutoAim = false;
         shooterSubsystem.isLeftAutoAim = true;
         shooterSubsystem.isRightAutoAim = true;
         logger.leftTurretAutoAiming.set(true);

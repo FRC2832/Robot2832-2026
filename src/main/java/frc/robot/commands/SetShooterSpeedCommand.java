@@ -45,7 +45,7 @@ public class SetShooterSpeedCommand extends Command {
     @Override
     public void execute() {
         target = null;
-        if (RobotContainer.leftTurretSubsystem.isAutoAim) {
+        if (RobotContainer.shooterSubsystem.isLeftAutoAim) {
             target = Utils.getTargetPosition();
             robotPos = RobotContainer.drivetrain.getPose().getTranslation();
             Distance dist = Meters.of(target.getDistance(robotPos));
@@ -54,7 +54,7 @@ public class SetShooterSpeedCommand extends Command {
         } else {
             shooter.setLeftShooterSpeed(ShooterSubsystem.getLastLeftSpeed());
         }
-        if (RobotContainer.rightTurretSubsystem.isAutoAim) {
+        if (RobotContainer.shooterSubsystem.isRightAutoAim) {
             //ensure the check is only done once
             if(target == null){
                 target = Utils.getTargetPosition();
