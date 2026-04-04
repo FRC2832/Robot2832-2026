@@ -130,7 +130,7 @@ public class RobotContainer {
         SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
-    //TODO temp
+    // TODO temp
     Angle left, right;
 
     private void configureBindings() {
@@ -211,31 +211,30 @@ public class RobotContainer {
                         .alongWith(shooterSubsystem.reverseShooter())));
 
         // Shooter ************************
-        //Move shooter up and down while shooting and not intaking
+        // Move shooter up and down while shooting and not intaking
         // operatorController.y().or(operatorController.a())
-        //     .and(operatorController.rightTrigger(.1).negate())
-        //     .and(operatorController.rightTrigger(.1).negate())
-        //     .whileTrue(
-        //         intakeExtenderSubsystem.extendIntakeCommand()
-        //         .andThen(new WaitCommand(1))
-        //         .andThen(intakeExtenderSubsystem.retractIntakeCommand())
-        //         .andThen(new WaitCommand(1))
-        //     ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
+        // .and(operatorController.rightTrigger(.1).negate())
+        // .and(operatorController.rightTrigger(.1).negate())
+        // .whileTrue(
+        // intakeExtenderSubsystem.extendIntakeCommand()
+        // .andThen(new WaitCommand(1))
+        // .andThen(intakeExtenderSubsystem.retractIntakeCommand())
+        // .andThen(new WaitCommand(1))
+        // ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
 
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
 
         operatorController.x().whileTrue(
-            leftTurretSubsystem.runOnce(() -> {
-                leftTurretSubsystem.setAngle(left);
-            }).alongWith(
-                rightTurretSubsystem.runOnce(() -> {
-                    rightTurretSubsystem.setAngle(right);
-                })
-            )
-        );
+                leftTurretSubsystem.runOnce(() -> {
+                    leftTurretSubsystem.setAngle(left);
+                }).alongWith(
+                        rightTurretSubsystem.runOnce(() -> {
+                            rightTurretSubsystem.setAngle(right);
+                        })));
 
         operatorController.b().onTrue(toggleAutoAim());
+
         leftTurretSubsystem.setDefaultCommand(new MoveTurretCommand(leftTurretSubsystem));
         rightTurretSubsystem.setDefaultCommand(new MoveTurretCommand(rightTurretSubsystem));
 
@@ -281,9 +280,9 @@ public class RobotContainer {
                 () -> rightTurretSubsystem.setAngle(Degrees.of(30))));
     }
 
-    public static void enableAutoAim(){
-        leftTurretSubsystem.isAutoAim = false; //TODO fix turret aiming and reenable
-        rightTurretSubsystem.isAutoAim = false;
+    public static void enableAutoAim() {
+        leftTurretSubsystem.isAutoAim = true; // TODO fix turret aiming and reenable
+        rightTurretSubsystem.isAutoAim = true;
         shooterSubsystem.isLeftAutoAim = true;
         shooterSubsystem.isRightAutoAim = true;
         logger.leftTurretAutoAiming.set(true);
@@ -291,7 +290,7 @@ public class RobotContainer {
         SpinShooterCommand.setToAutoSuppliers();
     }
 
-    public static void disableAutoAim(){
+    public static void disableAutoAim() {
         leftTurretSubsystem.isAutoAim = false;
         rightTurretSubsystem.isAutoAim = false;
         shooterSubsystem.isLeftAutoAim = false;
@@ -304,31 +303,31 @@ public class RobotContainer {
     public Command toggleAutoAim() {
         return Commands.runOnce(() -> {
             if (leftTurretSubsystem.isAutoAim || rightTurretSubsystem.isAutoAim) {
-                enableAutoAim();
-            } else {
                 disableAutoAim();
+            } else {
+                enableAutoAim();
             }
         });
     }
 
     public Command getAutonomousCommand() {
         Command auto = autoChooser.getSelected();
-        if(auto instanceof PathPlannerAuto ppAuto){
+        if (auto instanceof PathPlannerAuto ppAuto) {
             Pose2d start = ppAuto.getStartingPose();
             if (Utils.isOnRed())
                 start = FlippingUtil.flipFieldPose(start);
             drivetrain.resetPose(start);
-        }else if(auto instanceof InstantCommand instant){
+        } else if (auto instanceof InstantCommand instant) {
             String name = instant.getName();
-            if(new File(Filesystem.getDeployDirectory(), 
-                    "pathplanner/autos" + name + ".auto").exists()){
+            if (new File(Filesystem.getDeployDirectory(),
+                    "pathplanner/autos" + name + ".auto").exists()) {
                 Pose2d start = new PathPlannerAuto(name).getStartingPose();
                 if (Utils.isOnRed())
                     start = FlippingUtil.flipFieldPose(start);
                 drivetrain.resetPose(start);
             }
         }
-        //return startAutoAim().alongWith(autoChooser.getSelected());
+        // return startAutoAim().alongWith(autoChooser.getSelected());
         return auto;
         // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton

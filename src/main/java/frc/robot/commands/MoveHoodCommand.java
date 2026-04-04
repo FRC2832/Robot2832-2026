@@ -23,7 +23,7 @@ public class MoveHoodCommand extends Command {
     /** Creates a new MoveHoodCommand. */
     HoodSubsystem hood;
     boolean isLeftHood;
-    DoubleSupplier joystickY;
+    DoubleSupplier joystickX, joystickY;
 
     public MoveHoodCommand(HoodSubsystem hood) {
         // Use addRequirements() here to declare subsystem dependencies.
@@ -38,11 +38,19 @@ public class MoveHoodCommand extends Command {
         // System.out.println("Moving hood by " +
         // (-RobotContainer.operatorController.getRightY()));
         joystickY = getJoystickY();
+        joystickX = getJoystickX();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        double xPos = joystickX.getAsDouble();
+        double yPos = joystickY.getAsDouble();
+        if(Math.abs(xPos) > Math.abs(yPos)){
+            yPos = 0;
+        }else{
+            xPos = 0;
+        }
         if (hood.isAutoAim()) {
             Translation2d target = Utils.getTargetPosition();
             Translation2d robotPos = RobotContainer.drivetrain.getPose().getTranslation();
@@ -73,4 +81,12 @@ public class MoveHoodCommand extends Command {
         }
         return () -> RobotContainer.operatorController.getRightY();
     }
+
+    private DoubleSupplier getJoystickX() {
+        if (isLeftHood) {
+            return () -> RobotContainer.operatorController.getLeftX();
+        }
+        return () -> RobotContainer.operatorController.getRightX();
+    }
+
 }

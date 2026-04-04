@@ -85,15 +85,15 @@ public class TurretNoYams extends SubsystemBase {
             )
             .withSlot0(
                 new Slot0Configs()
-                    .withKP(2)
-                    .withKI(1)
-                    .withKD(0)
-                    .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting max RPS
+                    .withKP(20)
+                    .withKI(10)
+                    .withKD(2)
+                    //.withKV(1.51 / 0.083984) // 12 volts when requesting max RPS
             ).withFeedback(
                 new FeedbackConfigs()
                 .withRemoteCANcoder(canCoder) //TODO do the below and swap to FusedCANcoder
-                //.withRotorToSensorRatio(-1.12) //TODO improve ratio, zero talon at zero encoder angle
                 .withSensorToMechanismRatio(Constants.TURRET_ENCODER_RATIO)
+                .withRotorToSensorRatio(Constants.TURRET_GEAR_RATIO)
             ).withSoftwareLimitSwitch(
                 new SoftwareLimitSwitchConfigs()
                 .withForwardSoftLimitEnable(true)
@@ -160,7 +160,7 @@ public class TurretNoYams extends SubsystemBase {
             RobotContainer.logger.rightTurretTarget.set(angle.in(Degrees));
         // System.out.println(
         //         "Aiming " + (isLeftTurret() ? "left" : "right") + " turret at angle " + angle.in(Degrees) + " degrees");
-        setAngle(angle);
+        setAngle(angle.times(-1));
         // System.out.println((isLeftTurret() ? "Left" : "Right") + " turret currently at angle "
         //         + getAngle().in(Degrees) + " degrees");
     }
