@@ -4,31 +4,65 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Utils;
 import frc.robot.subsystems.ShooterSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class SpinShooterCommand extends Command {
     /** Creates a new ShootCommand. */
     static DoubleSupplier leftSpeed, rightSpeed, acceleratorSpeed;
-   
+
     public SpinShooterCommand(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed, DoubleSupplier acceleratorSpeed) {
         addRequirements(RobotContainer.shooterSubsystem);
         setSuppliers(leftSpeed, rightSpeed, acceleratorSpeed);
     }
 
-    //TODO set to use automatic suppliers
-    public SpinShooterCommand(){
-        this(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed, ShooterSubsystem::getLastAcceleratorSpeed);
+    public SpinShooterCommand() {
+        addRequirements(RobotContainer.shooterSubsystem);
+        if(Constants.SHOULD_AUTO_SET_SPEED_AT_START){
+            setToAutoSuppliers();
+        }else{
+            setToManualSuppliers();
+        }
     }
 
-    public static void setSuppliers(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed, DoubleSupplier acceleratorSpeed){
+    public static void setSuppliers(DoubleSupplier leftSpeed, DoubleSupplier rightSpeed,
+            DoubleSupplier acceleratorSpeed) {
         SpinShooterCommand.leftSpeed = leftSpeed;
         SpinShooterCommand.rightSpeed = rightSpeed;
         SpinShooterCommand.acceleratorSpeed = acceleratorSpeed;
+    }
+
+    public static void setToManualSuppliers() {
+        setSuppliers(ShooterSubsystem::getLastLeftSpeedProportion, ShooterSubsystem::getLastRightSpeedProportion,
+                ShooterSubsystem::getLastAcceleratorSpeedProportion);
+    }
+
+    public static void setToAutoSuppliers() {
+        DoubleSupplier supplier = () -> runLookup();
+        setSuppliers(supplier, supplier, ShooterSubsystem::getLastAcceleratorSpeedProportion);
+    }
+
+    public static double runLookup() {
+        Translation2d target = Utils.getTargetPosition();
+        Pose2d robotPose = RobotContainer.drivetrain.getPose();
+        Pose2d turretPose = robotPose.plus(new Transform2d(Constants.BETWEEN_TURRETS_POS.toTranslation2d(), Rotation2d.kZero));
+        Distance dist = Meters.of(turretPose.getTranslation().getDistance(target));
+        return Constants.SHOOTER_LOOKUP_TABLE.lookup(dist).shooterSpeed().in(RotationsPerSecond) / 100; // 100RPS is
+                                                                                                        // free speed
     }
 
     // Called when the command is initially scheduled.
@@ -42,12 +76,14 @@ public class SpinShooterCommand extends Command {
         ShooterSubsystem.leftSpeed = leftSpeed.getAsDouble();
         ShooterSubsystem.rightSpeed = rightSpeed.getAsDouble();
         ShooterSubsystem.acceleratorSpeed = acceleratorSpeed.getAsDouble();
-        RobotContainer.shooterSubsystem.setMotorSpeed(ShooterSubsystem.rightSpeed, ShooterSubsystem.leftSpeed, ShooterSubsystem.acceleratorSpeed);
+        RobotContainer.shooterSubsystem.setMotorSpeed(ShooterSubsystem.rightSpeed, ShooterSubsystem.leftSpeed,
+                ShooterSubsystem.acceleratorSpeed);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        RobotContainer.shooterSubsystem.setMotorSpeed(0, 0, 0);
     }
 
     // Returns true when the command should end.

@@ -4,31 +4,33 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
-import java.util.stream.Stream;
+import java.io.File;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.PathPlannerLogging;
-import com.revrobotics.util.StatusLogger;
-import com.ctre.phoenix6.SignalLogger;
+import com.pathplanner.lib.util.FlippingUtil;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
@@ -41,15 +43,17 @@ import frc.robot.subsystems.PPTSubsystem;
 import frc.robot.commands.DriveSpeedCMDs;
 import frc.robot.commands.MoveHoodCommand;
 import frc.robot.commands.MoveIntake;
+import frc.robot.commands.MoveTurretCommand;
 import frc.robot.commands.SpinAndShootWhileReady;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.subsystems.TurretNoYams;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
-    private static double MaxSpeed = 0.6 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top
-                                                                                        // speed
+    private static double MaxSpeed = 0.8 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts
+                                                                                               // desired top
+                                                                                               // speed
     private double MaxAngularRate = 0.9 * RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per
                                                                                             // second
     // max angular velocity
@@ -57,10 +61,11 @@ public class RobotContainer {
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive
+                                                                     // motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-    //For use with pathplanner
+    // For use with pathplanner
     public static final SwerveRequest.RobotCentric robotCentricDrive = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
@@ -76,12 +81,15 @@ public class RobotContainer {
 
     // Subsytem declaration
     public static ShooterSubsystem shooterSubsystem;
-    public static TurretSubsystem turretSubsystem;
+    // public static TurretSubsystem_Old turretSubsystem;
+    public static TurretNoYams leftTurretSubsystem;
+    public static TurretNoYams rightTurretSubsystem;
     public static IntakeRollerSubsystem intakeRollerSubsystem;
     public static IntakeExtenderSubsystem intakeExtenderSubsystem;
     public static IndexerSubsystem indexerSubsystem;
     public static PPTSubsystem pptSubsystem;
-    public static HoodSubsystem hoodSubsystem;
+    public static HoodSubsystem leftHoodSubsystem;
+    public static HoodSubsystem rightHoodSubsystem;
     public static VisionSubsystem visionSubsystem;
 
     private static final double shooterManualStepSize = 0.05;
@@ -94,27 +102,41 @@ public class RobotContainer {
         // StatusLogger.disableAutoLogging();
         drivetrain = TunerConstants.createDrivetrain();
         shooterSubsystem = new ShooterSubsystem();
-        turretSubsystem = new TurretSubsystem();
+        leftTurretSubsystem = new TurretNoYams(true, InvertedValue.CounterClockwise_Positive,
+                SensorDirectionValue.Clockwise_Positive, Constants.LEFT_TURRET_ENCODER_OFFSET);
+        rightTurretSubsystem = new TurretNoYams(false, InvertedValue.CounterClockwise_Positive,
+                SensorDirectionValue.Clockwise_Positive, Constants.RIGHT_TURRET_ENCODER_OFFSET);
         intakeRollerSubsystem = new IntakeRollerSubsystem();
         intakeExtenderSubsystem = new IntakeExtenderSubsystem();
         indexerSubsystem = new IndexerSubsystem();
         pptSubsystem = new PPTSubsystem();
-        hoodSubsystem = new HoodSubsystem();
+        leftHoodSubsystem = new HoodSubsystem(leftTurretSubsystem);
+        rightHoodSubsystem = new HoodSubsystem(rightTurretSubsystem);
         driverController = new CommandXboxController(0);
         operatorController = new CommandXboxController(1);
         visionSubsystem = new VisionSubsystem();
         configureBindings();
-        // Auto Chooser Setup -----------------------------------------------------------------------------------------------------------------------------
-        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(stream -> Stream.of());
-        autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot Once"));
-        autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven Left Bump Shoot Once"));
-        autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven Right Bump Shoot Once"));
+        // Auto Chooser Setup
+        // -----------------------------------------------------------------------------------------------------------------------------
+        autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
+                stream -> stream.filter(auto -> auto.getName().startsWith("Woodhaven")));
+        // autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot
+        // Once"));
+        // autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven
+        // Left Bump Shoot Once"));
+        // autoChooser.addOption("Right Bump Shoot Once", new PathPlannerAuto("Woodhaven
+        // Right Bump Shoot Once"));
         SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
-    private void configureBindings() {
+    // TODO temp
+    Angle left, right;
 
-        // Default Commands -------------------------------------------------------------------------------------------------------------------------------
+    private void configureBindings() {
+        left = leftTurretSubsystem.getAngle();
+        right = rightTurretSubsystem.getAngle();
+        // Default Commands
+        // -------------------------------------------------------------------------------------------------------------------------------
         indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
         shooterSubsystem.setDefaultCommand(shooterSubsystem.stopShooter());
 
@@ -123,19 +145,13 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(
-                        () -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed * speedMultiplier) // Drive
-                                                                                                             // forward
-                                                                                                             // with
-                                // negative Y
-                                // (forward)
-                                .withVelocityY(-driverController.getLeftX() * MaxSpeed * speedMultiplier) // Drive left
-                                                                                                          // with
-                                                                                                          // negative X
-                                                                                                          // (left)
-                                .withRotationalRate(-driverController.getRightX() * MaxAngularRate * speedMultiplier) // Drive
-                                                                                                                      // counterclockwise
-                                                                                                                      // with
-                // negative X (left)
+                        () -> drive.withVelocityX(-driverController.getLeftY() * MaxSpeed
+                                * speedMultiplier) // Drive forward with negative Y (forward)
+                                .withVelocityY(-driverController.getLeftX() * MaxSpeed
+                                        * speedMultiplier) // Drive left with negative X (left)
+                                .withRotationalRate(-driverController.getRightX()
+                                        * MaxAngularRate * speedMultiplier) // Drive counterclockwise with negative X
+                                                                            // (left)
                 ));
 
         // Idle while the robot is disabled. This ensures the configured
@@ -147,14 +163,19 @@ public class RobotContainer {
         driverController.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driverController.b().whileTrue(drivetrain.applyRequest(
                 () -> point.withModuleDirection(
-                        new Rotation2d(-driverController.getLeftY(), -driverController.getLeftX()))));
-
+                        new Rotation2d(-driverController.getLeftY(),
+                                -driverController.getLeftX()))));
+        driverController.x().whileTrue(drivetrain.aimTowardsHub());
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        driverController.back().and(driverController.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driverController.back().and(driverController.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driverController.start().and(driverController.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driverController.start().and(driverController.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        driverController.back().and(driverController.y())
+                .whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driverController.back().and(driverController.x())
+                .whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driverController.start().and(driverController.y())
+                .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driverController.start().and(driverController.x())
+                .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // TODO: Test if this works to actually reset field orientation
         // Reset the field-centric heading on start press.
@@ -164,14 +185,16 @@ public class RobotContainer {
 
         // Speed control keys (Variable speed control)
         driverController.leftTrigger(0.15)
-                .whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(), driverController));
+                .whileTrue(new DriveSpeedCMDs(this, 1.0 - driverController.getLeftTriggerAxis(),
+                        driverController));
         // driverController.leftTrigger(0.2).whileTrue(new DriveSpeedCMDs(this, 0.7));
         // // Turtle
         // driverController.leftTrigger(0.6).whileTrue(new DriveSpeedCMDs(this, 0.4));
         // // Snail
         driverController.y().toggleOnTrue(RobotContainer.drivetrain.applyRequest(() -> brake));
 
-        // Operator controls -------------------------------------------------------------------------------------------------------------------------------
+        // Operator controls
+        // -------------------------------------------------------------------------------------------------------------------------------
         // Intake ************************
         operatorController.back().whileTrue(new MoveIntake(false));
         operatorController.start().whileTrue(new MoveIntake(true));
@@ -180,63 +203,150 @@ public class RobotContainer {
         operatorController.leftTrigger(.3).whileTrue(intakeRollerSubsystem.reverseIntakeCommand());
 
         // PPT / Delivering ***************
-        operatorController.rightBumper().whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
+        operatorController.rightBumper()
+                .whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand()
-                                        .alongWith(indexerSubsystem.reverseDeliverCommand()
-                                        .alongWith(shooterSubsystem.reverseShooter())));
+                .alongWith(indexerSubsystem.reverseDeliverCommand()
+                        .alongWith(shooterSubsystem.reverseShooter())));
 
         // Shooter ************************
+        // Move shooter up and down while shooting and not intaking
+        // operatorController.y().or(operatorController.a())
+        // .and(operatorController.rightTrigger(.1).negate())
+        // .and(operatorController.rightTrigger(.1).negate())
+        // .whileTrue(
+        // intakeExtenderSubsystem.extendIntakeCommand()
+        // .andThen(new WaitCommand(1))
+        // .andThen(intakeExtenderSubsystem.retractIntakeCommand())
+        // .andThen(new WaitCommand(1))
+        // ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
+
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
+
+        operatorController.x().whileTrue(
+                leftTurretSubsystem.runOnce(() -> {
+                    leftTurretSubsystem.setAngle(left);
+                }).alongWith(
+                        rightTurretSubsystem.runOnce(() -> {
+                            rightTurretSubsystem.setAngle(right);
+                        })));
+
+        operatorController.b().onTrue(toggleAutoAim());
+
+        leftTurretSubsystem.setDefaultCommand(new MoveTurretCommand(leftTurretSubsystem));
+        rightTurretSubsystem.setDefaultCommand(new MoveTurretCommand(rightTurretSubsystem));
+
         // Shooter manual speed adjustment
         operatorController.povUp().onTrue(shooterSubsystem.runOnce(() -> {
-            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
-                    ShooterSubsystem::getLastAcceleratorSpeed);
+            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeedProportion,
+                    ShooterSubsystem::getLastRightSpeedProportion,
+                    ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed += shooterManualStepSize;
             ShooterSubsystem.rightSpeed += shooterManualStepSize;
-            ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
-            //System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
+            disableAutoAim();
+            // ShooterSubsystem.acceleratorSpeed += shooterManualStepSize;
+            // SpinAndShootWhileReady.TARGET_SPEED += 5;
+            // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
+            // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         operatorController.povDown().onTrue(shooterSubsystem.runOnce(() -> {
-            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeed, ShooterSubsystem::getLastRightSpeed,
-                    ShooterSubsystem::getLastAcceleratorSpeed);
+            SpinShooterCommand.setSuppliers(ShooterSubsystem::getLastLeftSpeedProportion,
+                    ShooterSubsystem::getLastRightSpeedProportion,
+                    ShooterSubsystem::getLastAcceleratorSpeedProportion);
             ShooterSubsystem.leftSpeed -= shooterManualStepSize;
             ShooterSubsystem.rightSpeed -= shooterManualStepSize;
-            ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
-            //System.out.println("Shooters: " + ShooterSubsystem.leftSpeed + "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
+            disableAutoAim();
+            // ShooterSubsystem.acceleratorSpeed -= shooterManualStepSize;
+            // SpinAndShootWhileReady.TARGET_SPEED -= 5;
+            // System.out.println("Shooters: " + ShooterSubsystem.leftSpeed +
+            // "\nAccelerator" + ShooterSubsystem.acceleratorSpeed);
         }));
         // TODO add switch back to automatic targeting
         // On operator Y press, call ShootCommand.setSuppliers with the automatic
         // targeting suppliers
-        new Trigger(() -> Math.abs(operatorController.getRightY()) > 0.1).whileTrue(new MoveHoodCommand());
-        //Commands for auton
-        NamedCommands.registerCommand("Shoot", new SpinShooterCommand().withTimeout(6).alongWith(
-                new WaitCommand(3).andThen(pptSubsystem.deliverCommand().withTimeout(3))
-        ));
+        leftHoodSubsystem.setDefaultCommand(new MoveHoodCommand(leftHoodSubsystem));
+        rightHoodSubsystem.setDefaultCommand(new MoveHoodCommand(rightHoodSubsystem));
+        // Commands for auton
+        NamedCommands.registerCommand("Shoot", new SpinAndShootWhileReady().withTimeout(3.5));
         NamedCommands.registerCommand("Reverse PPT", pptSubsystem.reverseDeliverCommand().withTimeout(3));
         NamedCommands.registerCommand("Extend Ingestor", intakeExtenderSubsystem.extendIntakeCommand());
+        NamedCommands.registerCommand("Start Ingestor", intakeRollerSubsystem.startIntakeCommand());
+        NamedCommands.registerCommand("Stop Ingestor", intakeRollerSubsystem.stopIntakeCommand());
+        NamedCommands.registerCommand("Raise Ingestor", intakeExtenderSubsystem.retractIntakeCommand());
+
+        SmartDashboard.putData("Test", rightTurretSubsystem.runOnce(
+                () -> rightTurretSubsystem.setAngle(Degrees.of(30))));
+    }
+
+    public static void enableAutoAim() {
+        leftTurretSubsystem.isAutoAim = true; // TODO fix turret aiming and reenable
+        rightTurretSubsystem.isAutoAim = true;
+        shooterSubsystem.isLeftAutoAim = true;
+        shooterSubsystem.isRightAutoAim = true;
+        logger.leftTurretAutoAiming.set(true);
+        logger.rightTurretAutoAiming.set(true);
+        SpinShooterCommand.setToAutoSuppliers();
+    }
+
+    public static void disableAutoAim() {
+        leftTurretSubsystem.isAutoAim = false;
+        rightTurretSubsystem.isAutoAim = false;
+        shooterSubsystem.isLeftAutoAim = false;
+        shooterSubsystem.isRightAutoAim = false;
+        logger.leftTurretAutoAiming.set(false);
+        logger.rightTurretAutoAiming.set(false);
+        SpinShooterCommand.setToManualSuppliers();
+    }
+
+    public Command toggleAutoAim() {
+        return Commands.runOnce(() -> {
+            if (leftTurretSubsystem.isAutoAim || rightTurretSubsystem.isAutoAim) {
+                disableAutoAim();
+            } else {
+                enableAutoAim();
+            }
+        });
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
-        //return new PathPlannerAuto("Hub Shoot Once");
+        Command auto = autoChooser.getSelected();
+        if (auto instanceof PathPlannerAuto ppAuto) {
+            Pose2d start = ppAuto.getStartingPose();
+            if (Utils.isOnRed())
+                start = FlippingUtil.flipFieldPose(start);
+            drivetrain.resetPose(start);
+        } else if (auto instanceof InstantCommand instant) {
+            String name = instant.getName();
+            if (new File(Filesystem.getDeployDirectory(),
+                    "pathplanner/autos" + name + ".auto").exists()) {
+                Pose2d start = new PathPlannerAuto(name).getStartingPose();
+                if (Utils.isOnRed())
+                    start = FlippingUtil.flipFieldPose(start);
+                drivetrain.resetPose(start);
+            }
+        }
+        // return startAutoAim().alongWith(autoChooser.getSelected());
+        return auto;
+        // return new PathPlannerAuto("Hub Shoot Once");
         // // Simple drive forward auton
         // final var idle = new SwerveRequest.Idle();
         // return Commands.sequence(
-        //         // Reset our field centric heading to match the robot
-        //         // facing away from our alliance station wall (0 deg).
-        //         drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
-        //         // Then slowly drive forward (away from us) for 5 seconds.
-        //         drivetrain.applyRequest(() -> drive.withVelocityX(0.5)
-        //                 .withVelocityY(0)
-        //                 .withRotationalRate(0))
-        //                 .withTimeout(5.0),
-        //         // Finally idle for the rest of auton
-        //         drivetrain.applyRequest(() -> idle));
+        // // Reset our field centric heading to match the robot
+        // // facing away from our alliance station wall (0 deg).
+        // drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
+        // // Then slowly drive forward (away from us) for 5 seconds.
+        // drivetrain.applyRequest(() -> drive.withVelocityX(0.5)
+        // .withVelocityY(0)
+        // .withRotationalRate(0))
+        // .withTimeout(5.0),
+        // // Finally idle for the rest of auton
+        // drivetrain.applyRequest(() -> idle));
     }
 
     // Used in DriveSpeedCMDs to set speedMultiplier
     public void setSpeedMultiplier(double multiplier) {
         speedMultiplier = multiplier;
     }
+
 }

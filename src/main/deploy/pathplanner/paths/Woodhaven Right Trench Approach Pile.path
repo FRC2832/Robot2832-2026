@@ -1,0 +1,89 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.118,
+        "y": 2.467110459758091
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.633075767561415,
+        "y": 0.6675267352899932
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.634949213780252,
+        "y": 0.6213893801461658
+      },
+      "prevControl": {
+        "x": 3.6704924105631456,
+        "y": 0.6970608179009615
+      },
+      "nextControl": {
+        "x": 5.303819502841804,
+        "y": 0.56890970840149
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.82729761904762,
+        "y": 0.9893974285714293
+      },
+      "prevControl": {
+        "x": 7.301159090904212,
+        "y": 0.9113600909124236
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9963724304715855,
+      "rotationDegrees": 90.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.9161849710982637,
+      "maxWaypointRelativePos": 1.0857418111753385,
+      "constraints": {
+        "maxVelocity": 1.5,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 450.0
+  },
+  "reversed": false,
+  "folder": "Woodhaven",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 211.864
+  },
+  "useDefaultConstraints": true
+}

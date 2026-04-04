@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -27,11 +28,12 @@ import frc.robot.Constants.KrakenX60;
 public class IntakeRollerSubsystem extends SubsystemBase {
     /** Creates a new IntakeSubsystem. */
 
-    // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -------------------------
-     public enum Speed {
+    // ENUMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // -------------------------
+    public enum Speed {
         STOP(0),
-        INTAKE(0.67),
-        REVERSE(-0.67);
+        INTAKE(0.6),
+        REVERSE(-0.42);
 
         private final double percentOutput;
 
@@ -49,41 +51,45 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public TalonFX intakeInternalRotatorMotor;
 
-    private final VoltageOut rollerVoltageRequest = new VoltageOut(0);
+    private final VoltageOut rollerVoltageRequest = new VoltageOut(0)
+        .withEnableFOC(false);
 
     public IntakeRollerSubsystem() {
         intakeInternalRotatorMotor = new TalonFX(Constants.INTAKE_INTERNAL_ROTATOR_ID, Constants.CANivoreCANBus);
-        // Confirm appropriate inversion, voltage limits, current limits, and PID constants
+        // Confirm appropriate inversion, voltage limits, current limits, and PID
+        // constants
         configureMotor(intakeInternalRotatorMotor, InvertedValue.Clockwise_Positive);
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
+
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
         final TalonFXConfiguration config = new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(invertDirection)
-                    .withNeutralMode(NeutralModeValue.Coast)
-            )
-            // .withVoltage(
-            //     new VoltageConfigs()
-            //         .withPeakReverseVoltage(Volts.of(0))
-            // )
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(50))
-                    .withSupplyCurrentLimitEnable(true)
-            )
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(0.5)
-                    .withKI(2)
-                    .withKD(0)
-                    .withKV(10.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
-            );
-            motor.getConfigurator().apply(config);
+                .withMotorOutput(
+                        new MotorOutputConfigs()
+                                .withInverted(invertDirection)
+                                .withNeutralMode(NeutralModeValue.Coast))
+                // .withVoltage(
+                // new VoltageConfigs()
+                // .withPeakReverseVoltage(Volts.of(0))
+                // )
+                .withCurrentLimits(
+                        new CurrentLimitsConfigs()
+                                .withStatorCurrentLimit(Amps.of(120))
+                                .withStatorCurrentLimitEnable(true)
+                                .withSupplyCurrentLimit(Amps.of(70))
+                                .withSupplyCurrentLowerLimit(Amps.of(40))
+                                .withSupplyCurrentLowerTime(Seconds.of(1))
+                                .withSupplyCurrentLimitEnable(true))
+                .withSlot0(
+                        new Slot0Configs()
+                                .withKP(0.5)
+                                .withKI(2)
+                                .withKD(0)
+                                .withKV(10.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting
+                                                                                            // max RPS
+                );
+        motor.getConfigurator().apply(config);
     }
 
     // ------------------------------------------------------------------
@@ -91,27 +97,34 @@ public class IntakeRollerSubsystem extends SubsystemBase {
 
     public void setIntakeSpeed(Speed speed) {
         intakeInternalRotatorMotor.setControl(
-            rollerVoltageRequest
-                .withOutput(speed.voltage())
-        );
+                rollerVoltageRequest
+                        .withOutput(speed.voltage()));
     }
 
     // ----------------------------------------------------------------------------------
-    // COMMANDS -------------------------------------------------------------------------
-    
+    // COMMANDS
+    // -------------------------------------------------------------------------
+
     public Command runIntakeCommand() {
         return startEnd(
-            () -> setIntakeSpeed(Speed.INTAKE),
-            () -> setIntakeSpeed(Speed.STOP)
-        );
+                () -> setIntakeSpeed(Speed.INTAKE),
+                () -> setIntakeSpeed(Speed.STOP));
     }
 
     public Command reverseIntakeCommand() {
         return startEnd(
-            () -> setIntakeSpeed(Speed.REVERSE),
-            () -> setIntakeSpeed(Speed.STOP)
-        );
+                () -> setIntakeSpeed(Speed.REVERSE),
+                () -> setIntakeSpeed(Speed.STOP));
     }
+
+    public Command startIntakeCommand(){
+        return runOnce(() -> setIntakeSpeed(Speed.INTAKE));
+    }
+
+    public Command stopIntakeCommand(){
+        return runOnce(() -> setIntakeSpeed(Speed.STOP));
+    }
+
     // -----------------------------------------------------------------------------
     @Override
     public void periodic() {

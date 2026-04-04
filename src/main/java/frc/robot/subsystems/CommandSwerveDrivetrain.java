@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -15,14 +19,21 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -32,6 +43,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
@@ -61,6 +73,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     // Field 2d
     private final Field2d matchField = new Field2d();
+
+    private boolean stateCached = false;
+    private SwerveDriveState cachedState = null;
 
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
@@ -218,30 +233,67 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         SmartDashboard.putData("Field", matchField);
     }
 
-    public void configurePathPlanner(){
+    public void configurePathPlanner() {
         RobotConfig config = null;
-        try{
+        try {
             config = RobotConfig.fromGUISettings();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         AutoBuilder.configure(
-            this::getPose, 
-            this::resetPose, 
-            () -> this.getKinematics().toChassisSpeeds(this.getState().ModuleStates), 
-            this::driveRequest, 
-            new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)), 
-            config, 
-            () -> DriverStation.getAlliance().map(alliance -> alliance == DriverStation.Alliance.Red).orElse(false),
-            this);
+                this::getPose,
+                this::resetPose,
+                () -> this.getKinematics().toChassisSpeeds(this.getStateCached().ModuleStates),
+                this::driveRequest,
+                new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)),
+                config,
+                frc.robot.Utils::isOnRed,
+                this);
     }
 
-    public Pose2d getPose(){
-        return this.getState().Pose;
+    public Pose2d getPose() {
+        return this.getStateCached().Pose;
     }
 
-    public void driveRequest(ChassisSpeeds speeds, DriveFeedforwards feedforwards){
-        //ChassisSpeeds relative = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getPose().getRotation());
+    public SwerveDriveState getStateCached(){
+        if(!stateCached){
+            cachedState = super.getState();
+            stateCached = true;
+        }
+        return cachedState;
+    }
+
+    public Command driveToPose(Pose2d target){
+        LinearVelocity maxLinearVelocity = 
+                MetersPerSecond.of(1);
+        LinearAcceleration maxLinearAcceleration = 
+                MetersPerSecondPerSecond.of(1);
+        AngularVelocity maxAngularVelocity = 
+                RotationsPerSecond.of(1);
+        AngularAcceleration maxAngularAcceleration = 
+                RotationsPerSecondPerSecond.of(1);
+        PathConstraints constraints = new PathConstraints(
+            maxLinearVelocity, maxLinearAcceleration, 
+            maxAngularVelocity, maxAngularAcceleration);
+        return AutoBuilder.pathfindToPose(target, constraints);
+    }
+
+    public Command aimTowardsHub(){
+        //find hub
+        Translation2d hubPos = Constants.BLUE_HUB_POS;
+        if(frc.robot.Utils.isOnRed()){
+            hubPos = Constants.RED_HUB_POS;
+        }
+        //get rotation of robot towards hub
+        Translation2d robotPos = getPose().getTranslation();
+        Rotation2d rotation = new Rotation2d(hubPos.getX() - robotPos.getX(), hubPos.getY() - robotPos.getY());
+        //rotate there
+        return driveToPose(new Pose2d(robotPos, rotation));
+    }
+
+    public void driveRequest(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+        // ChassisSpeeds relative = ChassisSpeeds.fromRobotRelativeSpeeds(speeds,
+        // getPose().getRotation());
         SwerveRequest.RobotCentric request = RobotContainer.robotCentricDrive
                 .withVelocityX(speeds.vxMetersPerSecond)
                 .withVelocityY(speeds.vyMetersPerSecond)
@@ -258,6 +310,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command applyRequest(Supplier<SwerveRequest> request) {
         return run(() -> this.setControl(request.get()));
+    }
+
+    public LinearVelocity getForwardVelocity(){
+        SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
+        ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
+        return MetersPerSecond.of(speeds.vxMetersPerSecond);
     }
 
     /**
@@ -295,6 +353,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
          * This ensures driving behavior doesn't change until an explicit disable event
          * occurs during testing.
          */
+        stateCached = false;
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(

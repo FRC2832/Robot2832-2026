@@ -25,56 +25,65 @@ import frc.robot.commands.MoveIntake;
 public class IntakeExtenderSubsystem extends SubsystemBase {
     /** Creates a new IntakeSubsystem. */
 
-
     // Motor setup --------------------------------------
 
     public TalonFX intakeExtenderMotor;
 
     public IntakeExtenderSubsystem() {
         intakeExtenderMotor = new TalonFX(Constants.INTAKE_EXTENDER_ID, Constants.CANivoreCANBus);
-        // Confirm appropriate inversion, voltage limits, current limits, and PID constants
+        // Confirm appropriate inversion, voltage limits, current limits, and PID
+        // constants
         configureMotor(intakeExtenderMotor, InvertedValue.CounterClockwise_Positive);
 
-        SmartDashboard.putData(this); 
+        SmartDashboard.putData(this);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {
         final TalonFXConfiguration config = new TalonFXConfiguration()
-            .withMotorOutput(
-                new MotorOutputConfigs()
-                    .withInverted(invertDirection)
-                    .withNeutralMode(NeutralModeValue.Brake)
-            )
-            // .withVoltage(
-            //     new VoltageConfigs()
-            //         .withPeakReverseVoltage(Volts.of(0))
-            // )
-            .withCurrentLimits(
-                new CurrentLimitsConfigs()
-                    .withStatorCurrentLimit(Amps.of(60))
-                    .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(Amps.of(40))
-                    .withSupplyCurrentLimitEnable(true)
-            )
-            .withSlot0(
-                new Slot0Configs()
-                    .withKP(0.5)
-                    .withKI(2)
-                    .withKD(0)
-                    .withKV(12.0 / KrakenX60.kFreeSpeed.in(RotationsPerSecond)) // 12 volts when requesting max RPS
-            );
-            motor.getConfigurator().apply(config);
+                .withMotorOutput(
+                        new MotorOutputConfigs()
+                                .withInverted(invertDirection)
+                                .withNeutralMode(NeutralModeValue.Brake))
+                // .withVoltage(
+                // new VoltageConfigs()
+                // .withPeakReverseVoltage(Volts.of(0))
+                // )
+                .withCurrentLimits(
+                        new CurrentLimitsConfigs()
+                                .withStatorCurrentLimit(Amps.of(60))
+                                .withStatorCurrentLimitEnable(true)
+                                .withSupplyCurrentLimit(Amps.of(50))
+                                .withSupplyCurrentLimitEnable(true))
+                .withSlot0(
+                        new Slot0Configs()
+                                .withKP(0.5)
+                                .withKI(2)
+                                .withKD(0)
+                                .withKV(12.0 / KrakenX60.FREE_SPEED.in(RotationsPerSecond)) // 12 volts when requesting
+                                                                                            // max RPS
+                );
+        motor.getConfigurator().apply(config);
     }
 
     // ------------------------------------------------------------------
-    // COMMANDS -------------------------------------------------------------------------
-    
+    // COMMANDS
+    // -------------------------------------------------------------------------
+
     public Command extendIntakeCommand() {
         return new MoveIntake(true);
     }
 
     public Command retractIntakeCommand() {
         return new MoveIntake(false);
+    }
+
+    //TODO check the motor position against the positions of up and down
+    public boolean isIntakeDown(){
+        return false;
+    }
+
+    public boolean isIntakeUp(){
+        return false;
     }
 
     // -----------------------------------------------------------------------------
