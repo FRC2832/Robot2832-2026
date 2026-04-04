@@ -121,8 +121,10 @@ public class Telemetry {
 
     public final DoublePublisher leftTurretTarget = leftShooter.getDoubleTopic("TargetTurretAngle").publish();
     public final BooleanPublisher leftTurretAutoAiming = leftShooter.getBooleanTopic("IsAutoAiming").publish();
+    public final DoublePublisher leftTurretPosition = leftShooter.getDoubleTopic("TurretAngle").publish();
     public final DoublePublisher rightTurretTarget = rightShooter.getDoubleTopic("TargetTurretAngle").publish();
     public final BooleanPublisher rightTurretAutoAiming = rightShooter.getBooleanTopic("IsAutoAiming").publish();
+    public final DoublePublisher rightTurretPosition = rightShooter.getDoubleTopic("TurretAngle").publish();
 
     public final DoublePublisher leftHoodValue = leftShooter.getDoubleTopic("HoodTarget").publish();
     public final DoublePublisher rightHoodValue = rightShooter.getDoubleTopic("HoodTarget").publish();

@@ -141,6 +141,10 @@ public class TurretNoYams extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        if(isLeftTurret())
+            RobotContainer.logger.leftTurretPosition.set(this.getAngle().in(Degrees));
+        else
+            RobotContainer.logger.rightTurretPosition.set(this.getAngle().in(Degrees));
     }
 
     public void aimAtPosition(Translation2d target, Pose2d robotPose) {
