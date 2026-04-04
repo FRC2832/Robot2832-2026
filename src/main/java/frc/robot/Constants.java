@@ -83,6 +83,8 @@ public class Constants {
     public static final Angle RIGHT_TURRET_LOW_HARD_STOP = Degrees.of(-50);
     public static final Angle RIGHT_TURRET_HIGH_HARD_STOP = Degrees.of(50);
 
+    //FIXME Turret CANcoder zero offset for turrets. Align with the mark, take whatever it says in AdvantageScope
+    // for their positions in rotations (rot), and subtract that from these numbers.
     public static Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217 + .01709 - .02);
     public static Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801 - .107442 -.014);
 
@@ -177,6 +179,7 @@ public class Constants {
                     -0.442192, /*-0.442192,*/ -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
 
     public static final boolean SHOULD_AUTO_SET_SPEED_AT_START = true;
+    //FIXME controls initial enabling of autoaim
     public static final boolean SHOULD_AUTO_AIM_TURRET_AT_START = false;
 
 }

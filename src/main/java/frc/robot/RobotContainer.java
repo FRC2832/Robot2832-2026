@@ -22,13 +22,13 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -48,6 +48,7 @@ import frc.robot.commands.SpinAndShootWhileReady;
 import frc.robot.commands.SpinShooterCommand;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretNoYams;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
 public class RobotContainer {
@@ -129,8 +130,12 @@ public class RobotContainer {
         SmartDashboard.putData("AutoChooser", autoChooser);
     }
 
-    private void configureBindings() {
+    //TODO temp
+    Angle left, right;
 
+    private void configureBindings() {
+        left = leftTurretSubsystem.getAngle();
+        right = rightTurretSubsystem.getAngle();
         // Default Commands
         // -------------------------------------------------------------------------------------------------------------------------------
         indexerSubsystem.setDefaultCommand(indexerSubsystem.deliverCommand());
@@ -219,6 +224,16 @@ public class RobotContainer {
 
         operatorController.y().whileTrue(new SpinShooterCommand());
         operatorController.a().whileTrue(new SpinAndShootWhileReady());
+
+        operatorController.x().whileTrue(
+            leftTurretSubsystem.runOnce(() -> {
+                leftTurretSubsystem.setAngle(left);
+            }).alongWith(
+                rightTurretSubsystem.runOnce(() -> {
+                    rightTurretSubsystem.setAngle(right);
+                })
+            )
+        );
 
         operatorController.b().onTrue(toggleAutoAim());
         leftTurretSubsystem.setDefaultCommand(new MoveTurretCommand(leftTurretSubsystem));
