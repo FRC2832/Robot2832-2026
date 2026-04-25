@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
@@ -204,10 +205,12 @@ public class RobotContainer {
 
         // PPT / Delivering ***************
         operatorController.rightBumper()
-                .whileTrue(pptSubsystem.deliverCommand().alongWith(new SpinShooterCommand()));
+                .whileTrue(pptSubsystem.deliverCommand()
+                .alongWith(new SpinShooterCommand())
+                .alongWith(this.slowDriveForShooting()));
         operatorController.leftBumper().whileTrue(pptSubsystem.reverseDeliverCommand()
                 .alongWith(indexerSubsystem.reverseDeliverCommand()
-                        .alongWith(shooterSubsystem.reverseShooter())));
+                .alongWith(shooterSubsystem.reverseShooter())));
 
         // Shooter ************************
         // Move shooter up and down while shooting and not intaking
@@ -221,8 +224,10 @@ public class RobotContainer {
         // .andThen(new WaitCommand(1))
         // ).onFalse(intakeExtenderSubsystem.extendIntakeCommand());
 
-        operatorController.y().whileTrue(new SpinShooterCommand());
-        operatorController.a().whileTrue(new SpinAndShootWhileReady());
+        operatorController.y().whileTrue(new SpinShooterCommand()
+            .alongWith(this.slowDriveForShooting()));
+        operatorController.a().whileTrue(new SpinAndShootWhileReady()
+            .alongWith(this.slowDriveForShooting()));
 
         operatorController.x().whileTrue(
                 leftTurretSubsystem.runOnce(() -> {
@@ -347,6 +352,13 @@ public class RobotContainer {
     // Used in DriveSpeedCMDs to set speedMultiplier
     public void setSpeedMultiplier(double multiplier) {
         speedMultiplier = multiplier;
+    }
+
+    private Command slowDriveForShooting(){
+        return Commands.startEnd(
+            () -> this.setSpeedMultiplier(Math.min(0.6, speedMultiplier)),
+            () -> this.setSpeedMultiplier(MathUtil.isNear(speedMultiplier, 0.6, 0.001) ? 1 : speedMultiplier)
+        );
     }
 
 }
