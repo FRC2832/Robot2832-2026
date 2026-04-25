@@ -58,7 +58,6 @@ public class ShooterSubsystem extends SubsystemBase {
         configureMotor(rightShooterMotor, InvertedValue.Clockwise_Positive);
         configureMotor(leftShooterMotor, InvertedValue.CounterClockwise_Positive); // inverted
         configureMotor(accelerator, InvertedValue.CounterClockwise_Positive);
-
         SmartDashboard.putData(this);
     }
 
@@ -127,31 +126,35 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+    int periodicCount = 0;
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
-        double left, right, acc;
-        left = leftShooterMotor.getVelocity().getValueAsDouble();
-        right = rightShooterMotor.getVelocity().getValueAsDouble();
-        acc = accelerator.getVelocity().getValueAsDouble();
-        if(left != lastLeftSpeedPublished){
-            RobotContainer.logger.leftShooterSpeed.set(left);
-            RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 54, 1));
-            lastLeftSpeedPublished = left;
+        if(periodicCount++ >= 4){
+            double left, right, acc;
+            left = leftShooterMotor.getVelocity().getValueAsDouble();
+            right = rightShooterMotor.getVelocity().getValueAsDouble();
+            acc = accelerator.getVelocity().getValueAsDouble();
+            if(left != lastLeftSpeedPublished){
+                RobotContainer.logger.leftShooterSpeed.set(left);
+                RobotContainer.logger.leftShooterAtSpeed.set(MathUtil.isNear(left, 54, 1));
+                lastLeftSpeedPublished = left;
+            }
+            if(right != lastRightSpeedPublished){
+                RobotContainer.logger.rightShooterSpeed.set(right);
+                RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 54, 1));
+                lastRightSpeedPublished = right;
+            }
+            if(acc != lastAcceleratorPublished){
+                RobotContainer.logger.acceleratorSpeed.set(acc);
+                RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
+                lastAcceleratorPublished = acc;
+            }
+            RobotContainer.logger.leftShooterTarget.set(leftSpeed * 100);
+            RobotContainer.logger.rightShooterTarget.set(rightSpeed * 100);
+            periodicCount -= 4;
         }
-        if(right != lastRightSpeedPublished){
-            RobotContainer.logger.rightShooterSpeed.set(right);
-            RobotContainer.logger.rightShooterAtSpeed.set(MathUtil.isNear(right, 54, 1));
-            lastRightSpeedPublished = right;
-        }
-        if(acc != lastAcceleratorPublished){
-            RobotContainer.logger.acceleratorSpeed.set(acc);
-            RobotContainer.logger.acceleratorAtSpeed.set(acc > 32);
-            lastAcceleratorPublished = acc;
-        }
-        RobotContainer.logger.leftShooterTarget.set(leftSpeed * 100);
-        RobotContainer.logger.rightShooterTarget.set(rightSpeed * 100);
-
         // double[] pChanges = shooterP.readQueueValues();
         // double[] iChanges = shooterI.readQueueValues();
         // double[] dChanges = shooterD.readQueueValues();

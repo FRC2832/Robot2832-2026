@@ -142,7 +142,7 @@ public class Constants {
     public static final String REAR_CAM_NAME = "Rear Camera";
     
     public static final String FRONT_CAM_NAME = "Front Camera";
-    public static final double MAX_AMBIGUITY = 0.6; 
+    public static final double MAX_AMBIGUITY = 0.5; 
 
     public static final Translation2d BLUE_HUB_POS = new Translation2d(Inches.of(182.11), Inches.of(158.84));
     public static final Translation2d RED_HUB_POS = FlippingUtil.flipFieldPosition(BLUE_HUB_POS);

@@ -60,7 +60,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         // constants
         configureMotor(intakeInternalRotatorMotor, InvertedValue.Clockwise_Positive);
 
-        SmartDashboard.putData(this);
+        //SmartDashboard.putData(this);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {

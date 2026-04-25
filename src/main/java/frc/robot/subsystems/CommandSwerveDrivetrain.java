@@ -72,7 +72,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     // Field 2d
-    private final Field2d matchField = new Field2d();
+    //handled in Telemetry to add additional poses such as turret targets
+    //private final Field2d matchField = new Field2d();
 
     private boolean stateCached = false;
     private SwerveDriveState cachedState = null;
@@ -159,7 +160,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configurePathPlanner();
         // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", matchField);
+        //SmartDashboard.putData("Field", matchField);
     }
 
     /**
@@ -187,7 +188,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configurePathPlanner();
         // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", matchField);
+        //SmartDashboard.putData("Field", matchField);
     }
 
     /**
@@ -230,7 +231,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configurePathPlanner();
         // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", matchField);
+        //SmartDashboard.putData("Field", matchField);
     }
 
     public void configurePathPlanner() {
@@ -365,7 +366,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         // Do this in either robot periodic or subsystem periodic
-        matchField.setRobotPose(this.getPose());
+        //matchField.setRobotPose(this.getPose());
     }
 
     private void startSimThread() {

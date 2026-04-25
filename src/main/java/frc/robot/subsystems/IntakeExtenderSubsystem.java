@@ -35,7 +35,7 @@ public class IntakeExtenderSubsystem extends SubsystemBase {
         // constants
         configureMotor(intakeExtenderMotor, InvertedValue.CounterClockwise_Positive);
 
-        SmartDashboard.putData(this);
+        //SmartDashboard.putData(this);
     }
 
     private void configureMotor(TalonFX motor, InvertedValue invertDirection) {

@@ -138,6 +138,7 @@ public class TurretNoYams extends SubsystemBase {
         motor.setControl(voltageControl.withOutput(volts));
     }
 
+    int periodicCount = 0;
     @Override
     public void periodic() {
         // This method will be called once per scheduler run

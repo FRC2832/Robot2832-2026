@@ -63,7 +63,7 @@ public class PPTSubsystem extends SubsystemBase {
         configureMotor(rightPPT, InvertedValue.Clockwise_Positive);
         configureMotor(leftPPT, InvertedValue.CounterClockwise_Positive); // inverted
 
-        SmartDashboard.putData(this);
+        //SmartDashboard.putData(this);
     }
 
     // TODO: These should probably be changed eventually
