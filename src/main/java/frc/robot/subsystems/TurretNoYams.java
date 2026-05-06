@@ -84,14 +84,14 @@ public class TurretNoYams extends SubsystemBase {
                     .withSupplyCurrentLimitEnable(true)
             )
             .withSlot0(
-                new Slot0Configs()
-                    .withKP(20)
-                    .withKI(10)
-                    .withKD(2)
+                new Slot0Configs()        //stable state
+                    .withKP(80)     //20
+                    .withKI(40)     //10
+                    .withKD(8)      //2
                     //.withKV(1.51 / 0.083984) // 12 volts when requesting max RPS
             ).withFeedback(
                 new FeedbackConfigs()
-                .withRemoteCANcoder(canCoder) //TODO do the below and swap to FusedCANcoder
+                .withRemoteCANcoder(canCoder)
                 .withSensorToMechanismRatio(Constants.TURRET_ENCODER_RATIO)
                 .withRotorToSensorRatio(Constants.TURRET_GEAR_RATIO)
             ).withSoftwareLimitSwitch(
