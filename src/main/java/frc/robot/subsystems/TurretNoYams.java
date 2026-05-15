@@ -85,9 +85,9 @@ public class TurretNoYams extends SubsystemBase {
             )
             .withSlot0(
                 new Slot0Configs()        //stable state
-                    .withKP(80)     //20
-                    .withKI(40)     //10
-                    .withKD(8)      //2
+                    .withKP(240)     //20
+                    .withKI(100)     //10
+                    .withKD(12)      //2
                     //.withKV(1.51 / 0.083984) // 12 volts when requesting max RPS
             ).withFeedback(
                 new FeedbackConfigs()
@@ -164,9 +164,9 @@ public class TurretNoYams extends SubsystemBase {
         Angle angle = Degrees.of(180).plus(offset.getTranslation().getAngle().getMeasure());
         angle = Radians.of(MathUtil.angleModulus(angle.in(Radians)));
         if(isLeftTurret())
-            RobotContainer.logger.leftTurretTarget.set(angle.in(Degrees));
+            RobotContainer.logger.leftTurretTarget.set(-angle.in(Degrees));
         else
-            RobotContainer.logger.rightTurretTarget.set(angle.in(Degrees));
+            RobotContainer.logger.rightTurretTarget.set(-angle.in(Degrees));
         // System.out.println(
         //         "Aiming " + (isLeftTurret() ? "left" : "right") + " turret at angle " + angle.in(Degrees) + " degrees");
         setAngle(angle.times(-1));

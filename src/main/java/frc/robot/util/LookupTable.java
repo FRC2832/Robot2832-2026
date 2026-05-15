@@ -80,8 +80,7 @@ public class LookupTable {
         if (targetDex == -1)
             return new Result(shooterSpeeds[0], hoodSettings[0]); // need more data
         if (targetDex == distances.length - 1)
-            return new Result(shooterSpeeds[targetDex], hoodSettings[targetDex]); // need more
-                                                                                                         // data
+            return new Result(shooterSpeeds[targetDex], hoodSettings[targetDex]); // need more data
         double offset = MathUtil.inverseInterpolate(distances[targetDex].in(Meters), distances[targetDex + 1].in(Meters), distanceToTarget.in(Meters));
         double shooterSpeed = MathUtil.interpolate(shooterSpeeds[targetDex].in(RotationsPerSecond), shooterSpeeds[targetDex + 1].in(RotationsPerSecond), offset);
         double hoodSetting = MathUtil.interpolate(hoodSettings[targetDex], hoodSettings[targetDex + 1], offset);

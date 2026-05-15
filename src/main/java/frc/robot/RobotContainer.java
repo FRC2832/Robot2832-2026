@@ -356,8 +356,8 @@ public class RobotContainer {
 
     private Command slowDriveForShooting(){
         return Commands.startEnd(
-            () -> this.setSpeedMultiplier(Math.min(0.6, speedMultiplier)),
-            () -> this.setSpeedMultiplier(MathUtil.isNear(speedMultiplier, 0.6, 0.001) ? 1 : speedMultiplier)
+            () -> this.setSpeedMultiplier(Math.min(0.3, speedMultiplier)),
+            () -> this.setSpeedMultiplier(MathUtil.isNear(speedMultiplier, 0.3, 0.001) ? 1 : speedMultiplier)
         );
     }
 

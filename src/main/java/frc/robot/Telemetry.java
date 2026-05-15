@@ -126,6 +126,11 @@ public class Telemetry {
     public final BooleanPublisher rightTurretAutoAiming = rightShooter.getBooleanTopic("IsAutoAiming").publish();
     public final DoublePublisher rightTurretPosition = rightShooter.getDoubleTopic("TurretAngle").publish();
 
+    public final DoublePublisher hood_angle_est = shooterTable.getDoubleTopic("Debug_HoodAngle").publish();
+    public final DoublePublisher shot_time_est = shooterTable.getDoubleTopic("Debug_ShotTime").publish();
+    public final DoublePublisher shot_offset = shooterTable.getDoubleTopic("Debug_ShotOffset").publish();
+    public final StructPublisher<Translation2d> turret_pos = shooterTable.getStructTopic("BetweenTurretsPosition", Translation2d.struct).publish();
+
     public final DoublePublisher leftHoodValue = leftShooter.getDoubleTopic("HoodTarget").publish();
     public final DoublePublisher rightHoodValue = rightShooter.getDoubleTopic("HoodTarget").publish();
 

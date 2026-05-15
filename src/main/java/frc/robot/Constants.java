@@ -158,28 +158,28 @@ public class Constants {
             .plus(SNOWBLOW_TARGET_OFFSET_X), RED_HUB_POS.getMeasureY().plus(SNOWBLOW_TARGET_OFFSET_Y));
 
     public static final LookupTable SHOOTER_LOOKUP_TABLE = new LookupTable(
-            new Distance[] { Meters.of(3.131707461), Meters.of(2.905395605), Meters.of(2.207706018),
-                    Meters.of(2.214880037), Meters.of(2.236692242), Meters.of(2.061506812), Meters.of(2.810240181),
-                    Meters.of(2.836135891), Meters.of(4.944140737), Meters.of(2.704494197), Meters.of(3.096642723),
-                    Meters.of(3.348627156), Meters.of(3.214721528), Meters.of(3.339439679), Meters.of(3.218443989),
-                    Meters.of(4.710429101), Meters.of(4.55551602), Meters.of(4.112445384), /*Meters.of(3.909571046),*/
-                    Meters.of(3.343450924), Meters.of(4.708524724), Meters.of(4.545698486), Meters.of(4.088802765),
-                    Meters.of(3.93504571), Meters.of(3.360961813)},
-            new AngularVelocity[] { RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
-                    RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
-                    RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(60),
-                    RotationsPerSecond.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(50),
-                    RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(60),
-                    RotationsPerSecond.of(65), RotationsPerSecond.of(70), RotationsPerSecond.of(60),
-                    /*RotationsPerSecond.of(55),*/ RotationsPerSecond.of(50), RotationsPerSecond.of(65),
-                    RotationsPerSecond.of(70), RotationsPerSecond.of(60), RotationsPerSecond.of(55),
-                    RotationsPerSecond.of(50)},
-            new double[] { -0.2206255, -0.559337, -0.850459, -0.8642775, -0.8642775, -0.9273405, -0.415452, -0.415452,
-                    -0.202339, -0.4796695, -0.019498, -0.022714, -0.7685125, -0.287155, -0.577499, -0.442192, -0.442192,
-                    -0.442192, /*-0.442192,*/ -0.023005, -0.465704, -0.394342, -0.394342, 0, -0.020297});
+            new Distance[] { Meters.of(5.5), Meters.of(1.39629360645135), 
+                Meters.of(3.561168019), Meters.of(4.972537343), Meters.of(4.710429101), 
+                Meters.of(4.55551602), Meters.of(4.112445384), Meters.of(3.909571046), 
+                Meters.of(3.343450924), Meters.of(4.708524724), Meters.of(4.545698486),
+                Meters.of(4.088802765), Meters.of(3.93504571), Meters.of(3.360961813), 
+                Meters.of(3.322258516)/*, Meters.of(2.330515406)*/},
+            new AngularVelocity[] { RotationsPerSecond.of(70), 
+                RotationsPerSecond.of(45), RotationsPerSecond.of(50), RotationsPerSecond.of(65), 
+                RotationsPerSecond.of(65), RotationsPerSecond.of(70), RotationsPerSecond.of(60), 
+                RotationsPerSecond.of(55), RotationsPerSecond.of(50), RotationsPerSecond.of(65), 
+                RotationsPerSecond.of(70), RotationsPerSecond.of(60), RotationsPerSecond.of(55), 
+                RotationsPerSecond.of(50), RotationsPerSecond.of(50)/*, RotationsPerSecond.of(70)*/},
+            new double[] {0, -1, 0, -.087793, -0.442192, -0.442192, -0.442192, -0.442192, -0.023005, -0.465704, -0.394342, 
+                -0.394342, 0, -0.020297, -1/*, -1*/});
 
+    //The hypothetical angle of the exit point of the hood if the servo had total length 0 
+    //TODO find this
+    public static final Angle HOOD_EXIT_ANGLE_OFFSET = Degrees.of(112.83864936625); //64 degrees, plus the minimum angle the servo ends can make to the shooter axle
+
+    //controls distance component of autoaim
     public static final boolean SHOULD_AUTO_SET_SPEED_AT_START = true;
-    //FIXME controls initial enabling of autoaim
-    public static final boolean SHOULD_AUTO_AIM_TURRET_AT_START = false;
+    //controls initial enabling of autoaim
+    public static final boolean SHOULD_AUTO_AIM_TURRET_AT_START = true;
 
 }

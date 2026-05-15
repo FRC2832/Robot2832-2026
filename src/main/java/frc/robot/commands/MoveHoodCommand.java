@@ -53,8 +53,15 @@ public class MoveHoodCommand extends Command {
         }
         if (hood.isAutoAim()) {
             Translation2d target = Utils.getTargetPosition();
-            Translation2d robotPos = RobotContainer.drivetrain.getPose().getTranslation();
-            Distance dist = Meters.of(target.getDistance(robotPos));
+            //Translation2d robotPos = RobotContainer.drivetrain.getPose().getTranslation();
+            Translation2d turretPos = null;
+            if(isLeftHood){
+                turretPos = Constants.LEFT_TURRET_POS.toTranslation2d();
+            }else{
+                turretPos = Constants.RIGHT_TURRET_POS.toTranslation2d();
+            }
+            turretPos = Utils.robotRelativePosition(turretPos, RobotContainer.drivetrain.getPose());
+            Distance dist = Meters.of(target.getDistance(turretPos));
             LookupTable.Result lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
             hood.setHoodPosition(lookupResult.hoodServoSetting());
         } else {

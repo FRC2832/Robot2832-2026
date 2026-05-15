@@ -246,7 +246,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 this::resetPose,
                 () -> this.getKinematics().toChassisSpeeds(this.getStateCached().ModuleStates),
                 this::driveRequest,
-                new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)),
+                new PPHolonomicDriveController(new PIDConstants(6, 0.5, 0), new PIDConstants(6, 0.5, 0)),
                 config,
                 frc.robot.Utils::isOnRed,
                 this);
@@ -311,6 +311,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command applyRequest(Supplier<SwerveRequest> request) {
         return run(() -> this.setControl(request.get()));
+    }
+
+    public LinearVelocity getVelocity(){
+        SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
+        ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
+        final double x = speeds.vxMetersPerSecond;
+        final double y = speeds.vyMetersPerSecond;
+        return MetersPerSecond.of(x*x+y*y);
+    }
+
+    public Rotation2d getMovementDirection(){
+        SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
+        ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
+        if(speeds.vxMetersPerSecond == 0 && speeds.vyMetersPerSecond == 0)
+            return Rotation2d.kZero;
+        return new Rotation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
     }
 
     public LinearVelocity getForwardVelocity(){
