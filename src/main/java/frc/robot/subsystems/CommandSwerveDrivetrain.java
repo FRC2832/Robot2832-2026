@@ -72,7 +72,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     // Field 2d
-    private final Field2d matchField = new Field2d();
+    //handled in Telemetry to add additional poses such as turret targets
+    //private final Field2d matchField = new Field2d();
 
     private boolean stateCached = false;
     private SwerveDriveState cachedState = null;
@@ -159,7 +160,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configurePathPlanner();
         // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", matchField);
+        //SmartDashboard.putData("Field", matchField);
     }
 
     /**
@@ -187,7 +188,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configurePathPlanner();
         // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", matchField);
+        //SmartDashboard.putData("Field", matchField);
     }
 
     /**
@@ -230,7 +231,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configurePathPlanner();
         // Do this in either robot or subsystem init
-        SmartDashboard.putData("Field", matchField);
+        //SmartDashboard.putData("Field", matchField);
     }
 
     public void configurePathPlanner() {
@@ -245,7 +246,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 this::resetPose,
                 () -> this.getKinematics().toChassisSpeeds(this.getStateCached().ModuleStates),
                 this::driveRequest,
-                new PPHolonomicDriveController(new PIDConstants(5, 0.1, 0), new PIDConstants(5, 0.1, 0)),
+                new PPHolonomicDriveController(new PIDConstants(6, 0.5, 0), new PIDConstants(6, 0.5, 0)),
                 config,
                 frc.robot.Utils::isOnRed,
                 this);
@@ -312,6 +313,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> this.setControl(request.get()));
     }
 
+    public LinearVelocity getVelocity(){
+        SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
+        ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
+        final double x = speeds.vxMetersPerSecond;
+        final double y = speeds.vyMetersPerSecond;
+        return MetersPerSecond.of(x*x+y*y);
+    }
+
+    public Rotation2d getMovementDirection(){
+        SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
+        ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, this.getPose().getRotation());
+        if(speeds.vxMetersPerSecond == 0 && speeds.vyMetersPerSecond == 0)
+            return Rotation2d.kZero;
+        return new Rotation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
+    }
+
     public LinearVelocity getForwardVelocity(){
         SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
         ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
@@ -365,7 +383,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         // Do this in either robot periodic or subsystem periodic
-        matchField.setRobotPose(this.getPose());
+        //matchField.setRobotPose(this.getPose());
     }
 
     private void startSimThread() {

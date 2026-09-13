@@ -84,14 +84,14 @@ public class TurretNoYams extends SubsystemBase {
                     .withSupplyCurrentLimitEnable(true)
             )
             .withSlot0(
-                new Slot0Configs()
-                    .withKP(20)
-                    .withKI(10)
-                    .withKD(2)
+                new Slot0Configs()        //stable state
+                    .withKP(240)     //20
+                    .withKI(100)     //10
+                    .withKD(12)      //2
                     //.withKV(1.51 / 0.083984) // 12 volts when requesting max RPS
             ).withFeedback(
                 new FeedbackConfigs()
-                .withRemoteCANcoder(canCoder) //TODO do the below and swap to FusedCANcoder
+                .withRemoteCANcoder(canCoder)
                 .withSensorToMechanismRatio(Constants.TURRET_ENCODER_RATIO)
                 .withRotorToSensorRatio(Constants.TURRET_GEAR_RATIO)
             ).withSoftwareLimitSwitch(
@@ -138,13 +138,18 @@ public class TurretNoYams extends SubsystemBase {
         motor.setControl(voltageControl.withOutput(volts));
     }
 
+    int periodicCount = 0;
     @Override
     public void periodic() {
+        periodicCount++;
         // This method will be called once per scheduler run
-        if(isLeftTurret())
-            RobotContainer.logger.leftTurretPosition.set(this.getAngle().in(Degrees));
-        else
-            RobotContainer.logger.rightTurretPosition.set(this.getAngle().in(Degrees));
+        if(periodicCount >= 5){
+            if(isLeftTurret())
+                RobotContainer.logger.leftTurretPosition.set(this.getAngle().in(Degrees));
+            else
+                RobotContainer.logger.rightTurretPosition.set(this.getAngle().in(Degrees));
+            periodicCount -= 5;
+        }
     }
 
     public void aimAtPosition(Translation2d target, Pose2d robotPose) {
@@ -159,9 +164,9 @@ public class TurretNoYams extends SubsystemBase {
         Angle angle = Degrees.of(180).plus(offset.getTranslation().getAngle().getMeasure());
         angle = Radians.of(MathUtil.angleModulus(angle.in(Radians)));
         if(isLeftTurret())
-            RobotContainer.logger.leftTurretTarget.set(angle.in(Degrees));
+            RobotContainer.logger.leftTurretTarget.set(-angle.in(Degrees));
         else
-            RobotContainer.logger.rightTurretTarget.set(angle.in(Degrees));
+            RobotContainer.logger.rightTurretTarget.set(-angle.in(Degrees));
         // System.out.println(
         //         "Aiming " + (isLeftTurret() ? "left" : "right") + " turret at angle " + angle.in(Degrees) + " degrees");
         setAngle(angle.times(-1));

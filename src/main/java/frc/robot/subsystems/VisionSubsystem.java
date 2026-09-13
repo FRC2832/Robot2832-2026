@@ -94,7 +94,7 @@ public class VisionSubsystem extends SubsystemBase {
                 : camSim.getCamera().getAllUnreadResults();
         for (PhotonPipelineResult result : results) {
             List<PhotonTrackedTarget> filteredTargets = result.getTargets().stream()
-                .filter(target -> target.poseAmbiguity < Constants.MAX_AMBIGUITY).toList();
+                .filter(target -> target.getPoseAmbiguity() < Constants.MAX_AMBIGUITY).toList();
             if(filteredTargets.size() == 0)
                 continue;
             PhotonPipelineResult filtered = new PhotonPipelineResult(result.metadata, 

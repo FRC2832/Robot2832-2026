@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +22,8 @@ public class SetShooterSpeedCommand extends Command {
 
     ShooterSubsystem shooter;
 
-    private Translation2d target, robotPos;
+    private Translation2d target;
+    private Pose2d robotPos;
     private LookupTable.Result lookupResult;
 
     public SetShooterSpeedCommand(ShooterSubsystem shooter) {
@@ -47,8 +49,9 @@ public class SetShooterSpeedCommand extends Command {
         target = null;
         if (RobotContainer.shooterSubsystem.isLeftAutoAim) {
             target = Utils.getTargetPosition();
-            robotPos = RobotContainer.drivetrain.getPose().getTranslation();
-            Distance dist = Meters.of(target.getDistance(robotPos));
+            robotPos = RobotContainer.drivetrain.getPose();
+            Translation2d turretPos = Utils.robotRelativePosition(Constants.LEFT_TURRET_POS.toTranslation2d(), robotPos);
+            Distance dist = Meters.of(target.getDistance(turretPos));
             lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
             shooter.setLeftShooterSpeed(lookupResult.shooterSpeed());
         } else {
@@ -58,10 +61,11 @@ public class SetShooterSpeedCommand extends Command {
             //ensure the check is only done once
             if(target == null){
                 target = Utils.getTargetPosition();
-                robotPos = RobotContainer.drivetrain.getPose().getTranslation();
-                Distance dist = Meters.of(target.getDistance(robotPos));
-                lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
+                robotPos = RobotContainer.drivetrain.getPose();
             }
+            Translation2d turretPos = Utils.robotRelativePosition(Constants.RIGHT_TURRET_POS.toTranslation2d(), robotPos);
+            Distance dist = Meters.of(target.getDistance(turretPos));
+            lookupResult = Constants.SHOOTER_LOOKUP_TABLE.lookup(dist);
             shooter.setRightShooterSpeed(lookupResult.shooterSpeed());
         } else {
             shooter.setRightShooterSpeed(ShooterSubsystem.getLastRightSpeed());

@@ -47,7 +47,7 @@ public class IndexerSubsystem extends SubsystemBase {
         indexer.configure(new SparkFlexConfig().inverted(true), ResetMode.kNoResetSafeParameters,
                 PersistMode.kNoPersistParameters);
 
-        SmartDashboard.putData(this);
+        //SmartDashboard.putData(this);
     }
 
     // Speed controls ----------------------------------
