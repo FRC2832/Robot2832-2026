@@ -102,7 +102,7 @@ public class Utils {
         RobotContainer.logger.shot_offset.set(offsetDist.in(Meters));
         RobotContainer.logger.turret_pos.set(turretPos);
         //offset = offset.times(getShotTime(dist, hoodAngle, result.shooterSpeed()).in(Seconds));
-        return est.plus(new Translation2d(offsetDist.in(Meters), robotMovementDirection));
+        return est.minus(new Translation2d(offsetDist.in(Meters), robotMovementDirection));
     }
 
     public static Translation2d getTargetPositionEstimate() {

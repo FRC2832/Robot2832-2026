@@ -324,6 +324,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Rotation2d getMovementDirection(){
         SwerveModuleState[] moduleStates = this.getStateCached().ModuleStates;
         ChassisSpeeds speeds = this.getKinematics().toChassisSpeeds(moduleStates);
+        speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, this.getPose().getRotation());
         if(speeds.vxMetersPerSecond == 0 && speeds.vyMetersPerSecond == 0)
             return Rotation2d.kZero;
         return new Rotation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
