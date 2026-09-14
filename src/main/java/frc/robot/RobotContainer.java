@@ -119,7 +119,7 @@ public class RobotContainer {
         // Auto Chooser Setup
         // -----------------------------------------------------------------------------------------------------------------------------
         autoChooser = AutoBuilder.buildAutoChooserWithOptionsModifier(
-                stream -> stream.filter(auto -> auto.getName().startsWith("Woodhaven")));
+                stream -> stream.filter(auto -> auto.getName().startsWith(""))); // was "Woodhaven" - CHANGED BY CONNOR AND JASON AT KETTERING to avoid filter
         // autoChooser.setDefaultOption("Hub Shoot Once", new PathPlannerAuto("Hub Shoot
         // Once"));
         // autoChooser.addOption("Left Bump Shoot Once", new PathPlannerAuto("Woodhaven

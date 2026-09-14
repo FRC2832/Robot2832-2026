@@ -85,8 +85,8 @@ public class Constants {
 
     //FIXME Turret CANcoder zero offset for turrets. Align with the mark, take whatever it says in AdvantageScope
     // for their positions in rotations (rot), and subtract that from these numbers.
-    public static Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217 + .01709 - .02 - 0.192);   //Patty's value 0.192
-    public static Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801 - .107442 -.014 - 0.316);  //Patty's value 0.316
+    public static Angle LEFT_TURRET_ENCODER_OFFSET = Rotations.of(.03217 + .01709 - .02 - 0.192 - 0.0472);   //Patty's value 0.192 // Changed by Connor and Jason at Kettering - 0.0472
+    public static Angle RIGHT_TURRET_ENCODER_OFFSET = Rotations.of(-.350801 - .107442 -.014 - 0.316 - 0.1639);  //Patty's value 0.316 // Changed by Connor and Jason at Kettering - 0.1639
 
     public static final double TURRET_CONTROL_DEADZONE = 0.2;
 
