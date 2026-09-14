@@ -49,22 +49,29 @@ public class Robot extends TimedRobot {
     public Robot() {
         m_robotContainer = new RobotContainer();
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-
         Elastic.selectTab("Autonomous"); // I heard a rumor that if you don't run an elastic command in init the robot explodes?
     }
 
+    int periodicCount = 0;
+    boolean updatedTimeThisSecond = false;
     @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run();
 
         // FIX: this stuff (+ other stuff possibly?) makes the loops take like 0.002 seconds which is far too long but I'm not fixing it tonight. Hashtag plx fix @kransaw.
-
-        matchTime = DriverStation.getMatchTime();
-        hubActive = PhaseChecker.isHubActive(matchTime);
-
-        SmartDashboard.putNumber("Match Time", matchTime);
-        SmartDashboard.putBoolean("Hub Active", hubActive);
+        if(periodicCount >= 48 && !updatedTimeThisSecond){
+            matchTime = DriverStation.getMatchTime();
+            updatedTimeThisSecond = true;
+            hubActive = PhaseChecker.isHubActive(Math.ceil(matchTime));
+        } else
+            matchTime += 0.02;
+        if(periodicCount++ >= 50){
+            SmartDashboard.putNumber("Match Time", Math.round(matchTime * 10.0) / 10.0);
+            SmartDashboard.putBoolean("Hub Active", hubActive);
+            periodicCount -= 50;
+            updatedTimeThisSecond = false;
+        }
     }
 
     @Override

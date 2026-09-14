@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import java.util.function.BooleanSupplier;
 
 import com.revrobotics.ResetMode;
@@ -13,6 +15,7 @@ import com.revrobotics.servohub.ServoChannel.ChannelId;
 import com.revrobotics.servohub.config.ServoHubConfig;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -106,5 +109,27 @@ public class HoodSubsystem extends SubsystemBase {
 
     private boolean isHoodEnabled(){
         return isLeftTurret ? Constants.LEFT_HOOD_ENABLED : Constants.RIGHT_HOOD_ENABLED;
+    }
+
+    //Uses the law of cosines to solve for the angle difference compared to a known point, with the servos at -1
+    public Angle getShootAngle(){
+        return getShootAngle(this.getHoodPosition()); 
+    }
+
+    public static Angle getShootAngle(double servoSetting){
+        //lengths in inches for the sides of the triangle we will use
+        final double HINGE_TO_SERVO_BOTTOM = 3.375;
+        final double HINGE_TO_SERVO_TOP = 7.0;
+        final double SERVO_MIN_LENGTH = 4.5;
+        //extension distance per unit of servo setting, in inches
+        final double SERVO_EXTENSION_RATIO = 25.0/25.4;
+        double servo_length = SERVO_MIN_LENGTH + SERVO_EXTENSION_RATIO * (servoSetting + 1); //since minimum length is at -1
+        //Since the Law of Cosines states that c^2 = a^2 + b^2 - 2ab cos C for angle C opposite side c, the inverse is:
+        // C = arccos( (a^2+b^2-c^2) / (2ab) )
+        double cos_num = HINGE_TO_SERVO_BOTTOM*HINGE_TO_SERVO_BOTTOM + HINGE_TO_SERVO_TOP*HINGE_TO_SERVO_TOP - servo_length*servo_length;
+        double cos_denom = 2 * HINGE_TO_SERVO_BOTTOM * HINGE_TO_SERVO_TOP;
+        Angle offset = Radians.of(Math.acos(cos_num / cos_denom));
+        //As we increase the servo length, the shot angle decreases towards horizontal
+        return Constants.HOOD_EXIT_ANGLE_OFFSET.minus(offset);
     }
 }
